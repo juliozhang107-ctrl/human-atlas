@@ -11,10 +11,12 @@ import {contributionFor,integrateBeam,bodySpan,isEnvelope,sectionTissue,hounsfie
 import {plane,frameFor,crossSection,fillSegments,fillEnclosed,byDescendingVolume,type Frame,type Plane} from './slice';
 import {RELAXATION,ACOUSTIC,sequence,ctWindow,mrSignal} from './modalities';
 import {windowSection,ultrasoundSector,probeFor,scatterFromAttenuation} from './imaging';
-interface Props {atlas:Atlas;state:SceneState;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void;onBeam:(reading:BeamReading|null)=>void}
-export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,onBeam}:Props){
- const host=useRef<HTMLDivElement>(null),latest=useRef(state),select=useRef(onSelect),beam=useRef(onBeam);
- latest.current=state;select.current=onSelect;beam.current=onBeam;
+/** Two millimetres a notch, matching the position slider. */
+export const SLICE_STEP=.002;
+interface Props {atlas:Atlas;state:SceneState;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void;onBeam:(reading:BeamReading|null)=>void;onSlice:(position:number)=>void}
+export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,onBeam,onSlice}:Props){
+ const host=useRef<HTMLDivElement>(null),latest=useRef(state),select=useRef(onSelect),beam=useRef(onBeam),step=useRef(onSlice);
+ latest.current=state;select.current=onSelect;beam.current=onBeam;step.current=onSlice;
  useEffect(()=>{
   const el=host.current!;let disposed=false,frame=0,dirty=true,ready=false,lastView='',lastReset=-1,lastIsolate='',layoutKey='',amount=0;
   let lastState:SceneState|null=null;
@@ -185,7 +187,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
   // several overlapping structures owns a pixel. That exact answer is what lets the reader tap a
   // section and be told what they are looking at, so it is worth the milliseconds.
   const sliceCanvas=document.createElement('canvas');sliceCanvas.className='section-view';sliceCanvas.hidden=true;
-  sliceCanvas.setAttribute('aria-label','Cross-sectional image. Tap a structure to name it.');el.appendChild(sliceCanvas);
+  sliceCanvas.setAttribute('aria-label','Cross-sectional image. Scroll to move through the stack, and tap a structure to name it.');el.appendChild(sliceCanvas);
   const sliceContext=sliceCanvas.getContext('2d')!;
   const sliceBuffer=document.createElement('canvas'),sliceBufferContext=sliceBuffer.getContext('2d')!;
   let sliceLabels:Int32Array|null=null,sliceFrame:Frame|null=null,sliceKey='',drawKey='',sliceActive=false;
@@ -298,9 +300,31 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
   };
   const sliceTap=(e:PointerEvent)=>{const label=sliceLabelAt(e.clientX,e.clientY);if(label>=0&&!isEnvelope(atlas.parts[label]))select.current(atlas.parts[label].id);};
   const sliceLeave=()=>{hover.hidden=true;};
+  // How far the plane can travel, cached per plane so a wheel event does not walk the atlas.
+  const travelled=new Map<string,[number,number]>();
+  const travelFor=(p:Plane)=>{
+   const cached=travelled.get(p.id);
+   if(cached)return cached;
+   let low=Infinity,high=-Infinity;
+   for(const part of atlas.parts){low=Math.min(low,part.bounds[0][p.axis]);high=Math.max(high,part.bounds[1][p.axis]);}
+   const span:[number,number]=[low,high];travelled.set(p.id,span);return span;
+  };
+  /** The wheel walks the stack, as it does on a reading workstation: away from the reader moves
+   *  superiorly on an axial section, and anteriorly or toward the patient's left on the others. */
+  const sliceWheel=(e:WheelEvent)=>{
+   const s=latest.current;
+   if(!sectional(s))return;
+   e.preventDefault();
+   const p=plane(s.plane),[low,high]=travelFor(p);
+   const direction=e.deltaY>0?-1:e.deltaY<0?1:0;
+   if(!direction)return;
+   const next=Math.min(high,Math.max(low,s.slice+direction*SLICE_STEP));
+   if(next!==s.slice)step.current(next);
+  };
   sliceCanvas.addEventListener('pointermove',sliceHover);
   sliceCanvas.addEventListener('pointerup',sliceTap);
   sliceCanvas.addEventListener('pointerleave',sliceLeave);
+  sliceCanvas.addEventListener('wheel',sliceWheel,{passive:false});
 
   const clock=new T.Clock();let lastExtent=-1;
   const animate=()=>{
@@ -371,7 +395,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
 
   };animate();
   const contextLost=(e:Event)=>{e.preventDefault();onError('The 3D session was paused by your device. Reload to continue.');};renderer.domElement.addEventListener('webglcontextlost',contextLost);
-  return()=>{disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());scene.traverse(o=>{if(o instanceof T.Mesh&&!geometries.includes(o.geometry)){o.geometry.dispose();const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});env.dispose();partTexture.dispose();selectionTexture.dispose();attenuationTexture.dispose();pickMaterial.dispose();beamTarget.dispose();beamMaterial.dispose();bodyTarget.dispose();bodyMaterial.dispose();prime.geometry.dispose();(prime.material as T.Material).dispose();filmMaterial.dispose();film.geometry.dispose();markerGeometry.dispose();markerMaterial.dispose();sliceCanvas.removeEventListener('pointermove',sliceHover);sliceCanvas.removeEventListener('pointerup',sliceTap);sliceCanvas.removeEventListener('pointerleave',sliceLeave);sliceCanvas.remove();hover.remove();renderer.dispose();renderer.domElement.remove();};
+  return()=>{disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());scene.traverse(o=>{if(o instanceof T.Mesh&&!geometries.includes(o.geometry)){o.geometry.dispose();const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});env.dispose();partTexture.dispose();selectionTexture.dispose();attenuationTexture.dispose();pickMaterial.dispose();beamTarget.dispose();beamMaterial.dispose();bodyTarget.dispose();bodyMaterial.dispose();prime.geometry.dispose();(prime.material as T.Material).dispose();filmMaterial.dispose();film.geometry.dispose();markerGeometry.dispose();markerMaterial.dispose();sliceCanvas.removeEventListener('pointermove',sliceHover);sliceCanvas.removeEventListener('pointerup',sliceTap);sliceCanvas.removeEventListener('pointerleave',sliceLeave);sliceCanvas.removeEventListener('wheel',sliceWheel);sliceCanvas.remove();hover.remove();renderer.dispose();renderer.domElement.remove();};
  },[atlas]);
  return <div className="scene" ref={host}/>;
 }
