@@ -135,6 +135,39 @@ for(const id of STUDIES.map(s=>s.path)){
   // The weighting is measured, and each declared study must be the weighting it claims: on T1 urine
   // is dark against liver, on an inversion recovery fluid is bright and muscle is dark.
   assert.equal(manifest.weighting,declared.label,`${id}: manifest weighting disagrees with the study list`);
+  // A stitched acquisition scales each station separately and shows the joins as brightness bands.
+  // Measuring the body median slice by slice catches any that survive the flattening.
+  // Banding is a step, not a gradient: a stitched study jumps in brightness between one slice and
+  // the next while the anatomy barely changes. A smooth falloff across a single station is coil
+  // sensitivity and is left alone, so only adjacent slices holding a similar amount of body are
+  // compared, which excludes the places where an arm or a leg enters the field.
+  const [dxm,dym,dzm]=manifest.dims;
+  const level=[],area=[];
+  for(let y=0;y<dym;y++){
+   const sample=[];
+   for(let x=0;x<dxm;x+=3)for(let z=0;z<dzm;z+=3){
+    const value=values[(x*dym+y)*dzm+z];
+    if(value>40)sample.push(value);
+   }
+   if(sample.length>80){sample.sort((a,b)=>a-b);level.push(sample[sample.length>>1]);area.push(sample.length);}
+   else {level.push(null);area.push(0);}
+  }
+  // A join is a sustained shift, so the level either side is compared over a window rather than
+  // slice to slice. Brightness that swings back and forth across a few slices is anatomy changing
+  // quickly, not a seam, and averages out over the window.
+  const window=8;
+  const median=list=>{const v=list.filter(x=>x!==null).sort((a,b)=>a-b);return v.length?v[v.length>>1]:null;};
+  let worst=0,worstAt=-1;
+  for(let y=window;y<level.length-window;y++){
+   const before=median(level.slice(y-window,y)),after=median(level.slice(y,y+window));
+   if(before===null||after===null)continue;
+   const areaBefore=median(area.slice(y-window,y)),areaAfter=median(area.slice(y,y+window));
+   const ratio=areaAfter/Math.max(1,areaBefore);
+   if(ratio<.88||ratio>1.14)continue;
+   const shift=Math.abs(after-before)/Math.max(1,before);
+   if(shift>worst){worst=shift;worstAt=y;}
+  }
+  assert.ok(worst<.3,`${id}: brightness shifts ${(worst*100).toFixed(0)}% across slice ${worstAt} with the body unchanged, which reads as a station join`);
   const fluid=hu('urinary bladder'),liver=hu('liver'),muscle=hu('autochthon left')??hu('autochthon right');
   if(manifest.weighting==='T1'&&fluid&&liver)
    assert.ok(fluid/liver<0.9,`${id}: declared T1 but fluid/liver is ${(fluid/liver).toFixed(2)}`);

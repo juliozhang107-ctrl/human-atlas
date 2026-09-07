@@ -52,6 +52,59 @@ def largest_parts(mask, share=STRAY_SHARE):
     cleaned = keep[parts]
     return cleaned, int(mask.sum() - cleaned.sum())
 
+def harmonise(values, axis=1, step=.16, shortest=20):
+    """Put the stations of a stitched acquisition onto a common brightness.
+
+    This is for magnetic resonance only. A CT is measured on an absolute scale and must never be
+    rescaled this way: its Hounsfield numbers are the whole point of a window preset.
+
+    Whole-body magnetic resonance is acquired in overlapping stations, each scaled on its own, and
+    the joins show as bands: in this collection's whole-body T1 the head station runs about three
+    times brighter than the trunk. Magnetic resonance carries no absolute scale, so nothing is lost
+    by putting the stations on a common one.
+
+    The joins are found rather than assumed. Walking the stack, a station edge is a slice where the
+    body median jumps while the amount of body barely changes; where the body itself is changing,
+    an arm or a leg entering the field, the change is anatomy and is left alone. Each station is
+    then scaled as a block by its own median. Scaling per slice instead would flatten the real
+    craniocaudal variation, and smoothing a gain curve across a step leaves half the step behind."""
+    threshold = np.percentile(values, 70)
+    count = values.shape[axis]
+    level, area = np.full(count, np.nan), np.zeros(count)
+    for i in range(count):
+        slab = np.take(values, i, axis=axis)
+        body = slab[slab > threshold]
+        area[i] = body.size
+        if body.size > 200: level[i] = np.median(body)
+    index = np.arange(count)
+    known = np.isfinite(level) & (level > 0)
+    if known.sum() < 8: return values, None
+    level = np.interp(index, index[known], level[known])
+
+    joins = []
+    for i in range(1, count):
+        ratio = area[i] / max(1., area[i - 1])
+        if ratio < .88 or ratio > 1.14: continue          # the body is changing, not the station
+        if abs(level[i] - level[i - 1]) / max(1e-6, level[i - 1]) <= step: continue
+        # A station spans many slices. Brightness that swings back and forth over two or three, as
+        # it does through the neck where the anatomy changes quickly, is not a join; treating it as
+        # one carves the stack into slivers and scales each against its neighbours, which writes a
+        # flicker into the image that was never there.
+        if joins and i - joins[-1] < shortest: continue
+        if count - i < shortest: continue
+        joins.append(i)
+    if not joins: return values, None
+
+    edges = [0, *joins, count]
+    target = float(np.median(level))
+    gain = np.ones(count)
+    for start, stop in zip(edges, edges[1:]):
+        if stop - start < 2: continue
+        station = float(np.median(level[start:stop]))
+        gain[start:stop] = np.clip(target / max(station, target * .05), .2, 5.)
+    shape = [1, 1, 1]; shape[axis] = count
+    return values * gain.reshape(shape), (len(joins), round(float(level.max() / max(1e-6, level.min())), 2))
+
 def resample(volume, source_spacing, target_spacing, nearest=False):
     """Separable resampling along each axis. Intensity is interpolated, which also filters the
     noise and makes the result compress far better; labels take the nearest voxel, because an
@@ -83,6 +136,13 @@ def build(subject_dir, out_dir, modality, subject, source, target_spacing=None, 
     values = intensity.astype(np.float32) * raw['slope'] + raw['inter']
     print(f'{modality}: {intensity.shape} at {tuple(round(s,2) for s in spacing)} mm, '
           f'values {values.min():.0f}..{values.max():.0f}')
+
+    # Only magnetic resonance. A CT is measured on an absolute scale, so rescaling it would move
+    # every Hounsfield value and the window presets would stop meaning anything.
+    if modality != 'ct':
+        values, banding = harmonise(values)
+        if banding: print(f'  levelled {banding[0]} station joins (brightness ranged {banding[1]}x '
+                          f'along the stack)')
 
     # Crop the air around the patient. It carries no information and, at 1.5 mm, the margins on a
     # body-sized field are a large share of the voxels.

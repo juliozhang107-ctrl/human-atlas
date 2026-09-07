@@ -78,6 +78,21 @@ One control turns the written names off, leaving the image clean; hovering then 
 under the pointer and names just that one, which is the way to read a section without a wall of text
 over it. See `tools/anatomy_names.py`.
 
+**Whole-body magnetic resonance is levelled across its stations.** It is acquired in overlapping
+stations, each scaled on its own, so the joins show as horizontal bands: in the T1 the head station
+ran about three times brighter than the trunk and a quarter of the head was clipped to white. The
+joins are found rather than assumed, as slices where the body median jumps while the amount of body
+barely changes, and each station is then scaled as a block. Three joins were found in the T1; the
+single-station T2 and STIR need none and are left untouched. Head-to-trunk brightness falls from
+2.93 to 1.59 and clipping in the head from 24% to 5%.
+
+Two things this deliberately does not do. It never touches CT, whose Hounsfield numbers are absolute
+and are what the window presets act on. And it scales whole stations rather than individual slices:
+scaling per slice would flatten the real craniocaudal variation, and smoothing a gain curve across a
+step leaves half the step behind. N4 bias field correction was tried and made the seams worse, since
+it fits a smooth field and cannot represent a discontinuity; the faint rectangles still visible where
+one station's field of view ends are what remains, and they come with the source.
+
 **The published labels are cleaned on the way in.** A segmentation model run over a region it was not expecting leaves false positives, and this collection's own labels put nine millimetres of skull among the toes of a study whose highest slice is lung. Two filters remove them: connected components far smaller than the structure they belong to, and structures that sit somewhere they anatomically cannot, such as a skull below a lung. Anatomy legitimately cut off by the edge of the field, like a clavicle at the top of a scan that stops at the neck, is kept.
 
 These are clinical studies, so they carry incidental findings. The STIR has a visible lesion in the left axilla. They show real anatomy, not idealised anatomy.
