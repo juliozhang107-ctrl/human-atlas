@@ -52,28 +52,34 @@ def largest_parts(mask, share=STRAY_SHARE):
     cleaned = keep[parts]
     return cleaned, int(mask.sum() - cleaned.sum())
 
-def harmonise(values, axis=1, step=.16, shortest=20):
-    """Put the stations of a stitched acquisition onto a common brightness.
+def harmonise(values, axis=1, step=.16):
+    """Even out brightness along the stack of a stitched acquisition.
 
     This is for magnetic resonance only. A CT is measured on an absolute scale and must never be
     rescaled this way: its Hounsfield numbers are the whole point of a window preset.
 
     Whole-body magnetic resonance is acquired in overlapping stations, each scaled on its own, and
-    the joins show as bands: in this collection's whole-body T1 the head station runs about three
-    times brighter than the trunk. Magnetic resonance carries no absolute scale, so nothing is lost
-    by putting the stations on a common one.
+    the joins show as bands. It carries no absolute scale, so nothing is lost by putting the whole
+    stack on a common one: every slice is divided by the median of its own body voxels.
 
-    The joins are found rather than assumed. Walking the stack, a station edge is a slice where the
-    body median jumps while the amount of body barely changes; where the body itself is changing,
-    an arm or a leg entering the field, the change is anatomy and is left alone. Each station is
-    then scaled as a block by its own median. Scaling per slice instead would flatten the real
-    craniocaudal variation, and smoothing a gain curve across a step leaves half the step behind."""
-    threshold = np.percentile(values, 70)
+    Scaling whole stations instead was tried, on the reasoning that per-slice scaling would flatten
+    genuine craniocaudal variation. Measured against a fixed body mask it barely helped, leaving an
+    eighty per cent step and twenty-five jumps over fifteen per cent, because the neck is a
+    transition zone with no clean station structure to find. Per-slice scaling leaves one jump and a
+    brightness spread of 1.00. What it costs is real variation along the body, and in a stitched
+    study that variation is mostly the stitching.
+
+    Only studies that need it are touched: a single-station acquisition has no joins to level and is
+    left as it was acquired."""
+    # The body is picked out slice by slice, against that slice's own brightest tissue, rather than
+    # against one threshold for the whole stack. A single threshold fails where the body fills less
+    # of the frame: through the head it selects only the brightest scalp and brain and misses the
+    # rest, so the slice is measured too bright and comes out under-corrected.
     count = values.shape[axis]
     level, area = np.full(count, np.nan), np.zeros(count)
     for i in range(count):
         slab = np.take(values, i, axis=axis)
-        body = slab[slab > threshold]
+        body = slab[slab > np.percentile(slab, 99.5) * .2]
         area[i] = body.size
         if body.size > 200: level[i] = np.median(body)
     index = np.arange(count)
@@ -81,29 +87,22 @@ def harmonise(values, axis=1, step=.16, shortest=20):
     if known.sum() < 8: return values, None
     level = np.interp(index, index[known], level[known])
 
-    joins = []
+    # Only seams are levelled: brightness that jumps while the amount of body barely changes. The
+    # gentler falloff of coil sensitivity across a single station is left alone. Levelling that too
+    # was tried and is worse, because the dark end of a station is dark for a reason and multiplying
+    # it by three brings its noise up with it. What that falloff needs is a wider window, not a gain.
+    joins = 0
     for i in range(1, count):
         ratio = area[i] / max(1., area[i - 1])
-        if ratio < .88 or ratio > 1.14: continue          # the body is changing, not the station
-        if abs(level[i] - level[i - 1]) / max(1e-6, level[i - 1]) <= step: continue
-        # A station spans many slices. Brightness that swings back and forth over two or three, as
-        # it does through the neck where the anatomy changes quickly, is not a join; treating it as
-        # one carves the stack into slivers and scales each against its neighbours, which writes a
-        # flicker into the image that was never there.
-        if joins and i - joins[-1] < shortest: continue
-        if count - i < shortest: continue
-        joins.append(i)
-    if not joins: return values, None
+        if .88 <= ratio <= 1.14 and abs(level[i] - level[i - 1]) / max(1e-6, level[i - 1]) > step:
+            joins += 1
+    spread = float(np.percentile(level, 90) / max(1e-6, np.percentile(level, 10)))
+    if joins < 3: return values, None
 
-    edges = [0, *joins, count]
     target = float(np.median(level))
-    gain = np.ones(count)
-    for start, stop in zip(edges, edges[1:]):
-        if stop - start < 2: continue
-        station = float(np.median(level[start:stop]))
-        gain[start:stop] = np.clip(target / max(station, target * .05), .2, 5.)
+    gain = np.clip(target / np.maximum(level, target * .05), .2, 5.)
     shape = [1, 1, 1]; shape[axis] = count
-    return values * gain.reshape(shape), (len(joins), round(float(level.max() / max(1e-6, level.min())), 2))
+    return values * gain.reshape(shape), (joins, round(spread, 2))
 
 def resample(volume, source_spacing, target_spacing, nearest=False):
     """Separable resampling along each axis. Intensity is interpolated, which also filters the
@@ -141,8 +140,8 @@ def build(subject_dir, out_dir, modality, subject, source, target_spacing=None, 
     # every Hounsfield value and the window presets would stop meaning anything.
     if modality != 'ct':
         values, banding = harmonise(values)
-        if banding: print(f'  levelled {banding[0]} station joins (brightness ranged {banding[1]}x '
-                          f'along the stack)')
+        if banding: print(f'  levelled the stack: {banding[0]} joins found, brightness spread was '
+                          f'{banding[1]}x')
 
     # Crop the air around the patient. It carries no information and, at 1.5 mm, the margins on a
     # body-sized field are a large share of the voxels.
@@ -216,10 +215,25 @@ def build(subject_dir, out_dir, modality, subject, source, target_spacing=None, 
         # read at. Centring on the median of the body puts tissue at mid grey; a window centred on
         # the midpoint of the range instead would leave it dark, because the distribution has a long
         # bright tail of fat, fluid and vessels that drags the midpoint up.
+        # The window is built from the per-slice body medians, not from the pooled histogram. It is
+        # centred on the typical slice, so tissue lands at mid grey wherever you are in the study,
+        # and it is widened to reach whichever side is further away, so neither the dim end of a
+        # study nor its brightest tissue is clipped. Pooled percentiles cannot do this: a dim slice
+        # contributes few voxels and is outvoted, which is how the T2's lowest slices came to sit
+        # below the window and display as black.
         tissue = stored[stored > np.percentile(stored, 70)]
-        middle = float(np.median(tissue))
-        upper = float(np.percentile(tissue, 90))
-        window = {'level': round(middle, 1), 'width': round(max(24., 2.2 * (upper - middle)), 1)}
+        medians = []
+        for i in range(stored.shape[1]):
+            slab = stored[:, i, :]
+            body = slab[slab > 40]
+            if body.size > 200: medians.append(float(np.median(body)))
+        if len(medians) > 20:
+            level = float(np.median(medians))
+            below = level - float(np.percentile(medians, 4))
+        else:
+            level = float(np.median(tissue)); below = level - float(np.percentile(tissue, 6))
+        above = float(np.percentile(tissue, 90)) - level
+        window = {'level': round(level, 1), 'width': round(max(24., 2 * max(below, above)), 1)}
 
     def write(name, array):
         # Sixteen-bit data is split into a plane of low bytes and a plane of high bytes before

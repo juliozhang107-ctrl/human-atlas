@@ -138,16 +138,26 @@ for(const id of STUDIES.map(s=>s.path)){
   // Magnetic resonance has no absolute scale, so each study must say how to read it, and that
   // window must put its own tissue near mid grey rather than leaving the image dark.
   assert.ok(manifest.window&&manifest.window.width>0,`${id}: no display window`);
-  // Body is defined the same way the builder defines it, as the upper thirty per cent of voxels,
-  // so the two cannot disagree about what tissue the window is supposed to centre on.
-  const all=[];
-  for(let i=0;i<values.length;i+=17)all.push(values[i]);
-  all.sort((a,b)=>a-b);
-  const bodyFloor=all[Math.floor(all.length*.7)];
-  const sample=all.filter(v=>v>bodyFloor);
-  const tissue=sample[sample.length>>1];
-  const grey=(tissue-(manifest.window.level-manifest.window.width/2))/manifest.window.width;
-  assert.ok(grey>.32&&grey<.68,`${id}: its window puts tissue at ${(grey*100).toFixed(0)}% grey, which reads too ${grey<.5?'dark':'bright'}`);
+  // Measured the way a reader meets it, slice by slice, which is also how the builder sizes the
+  // window. A pooled histogram answers a different question: bright slices outvote dim ones, so it
+  // reports a study as well exposed while its dim end displays as black.
+  const [dxw,dyw,dzw]=manifest.dims;
+  const greys=[];
+  for(let y=0;y<dyw;y++){
+   const body=[];
+   for(let x=0;x<dxw;x+=3)for(let z=0;z<dzw;z+=3){
+    const value=values[(x*dyw+y)*dzw+z];
+    if(value>40)body.push(value);
+   }
+   if(body.length<60)continue;
+   body.sort((a,b)=>a-b);
+   greys.push((body[body.length>>1]-(manifest.window.level-manifest.window.width/2))/manifest.window.width);
+  }
+  assert.ok(greys.length>20,`${id}: too few slices to judge the window`);
+  greys.sort((a,b)=>a-b);
+  const typical=greys[greys.length>>1];
+  assert.ok(typical>.4&&typical<.6,`${id}: the typical slice displays at ${(typical*100).toFixed(0)}% grey, too ${typical<.5?'dark':'bright'}`);
+  assert.ok(greys[0]>.02,`${id}: its dimmest slice displays at ${(greys[0]*100).toFixed(0)}% grey, which is clipped to black`);
   // A stitched acquisition scales each station separately and shows the joins as brightness bands.
   // Measuring the body median slice by slice catches any that survive the flattening.
   // Banding is a step, not a gradient: a stitched study jumps in brightness between one slice and
