@@ -65,6 +65,17 @@ The CT keeps the 1.5 mm sampling the collection distributes, which is as fine as
 
 An MR sequence is a study too, not a display setting. One acquisition carries one weighting, so T1, T2 and STIR are three separate studies of three patients. Each is labelled with the weighting **measured from its own tissue signals** rather than read from metadata this collection records in mixed units: urine against liver, spleen against liver, and subcutaneous fat against liver, the last being what separates a STIR from a T2 since muscle is dark on both. `tools/weighting.py` does the measuring, and documents its own limit: those ratios compare one region against another, so they hold only within a single station and cannot classify a stitched whole-body acquisition.
 
+**Structures are named as a report would name them.** The source classes are short identifiers
+meant for a model's output directory: `autochthon_left` is the deep intrinsic back muscle group, and
+calling it "Left autochthon" on an image teaches the wrong word. Every class carries the reported
+name and its Terminologia Anatomica term, so `autochthon_left` reads as Left erector spinae,
+*Musculi dorsi proprii sinistri*, and `vertebrae_C1` as Atlas (C1). The names are written onto the
+image itself for the larger structures, largest first, with anything that would collide left to the
+readout instead; the panel lists everything the slice holds, in full, however small. Each name is
+anchored to the point nearest the structure's centre of area that actually lies inside it, so a
+label on a horseshoe-shaped colon points at the colon rather than into the bowel it wraps around.
+See `tools/anatomy_names.py`.
+
 **The published labels are cleaned on the way in.** A segmentation model run over a region it was not expecting leaves false positives, and this collection's own labels put nine millimetres of skull among the toes of a study whose highest slice is lung. Two filters remove them: connected components far smaller than the structure they belong to, and structures that sit somewhere they anatomically cannot, such as a skull below a lung. Anatomy legitimately cut off by the edge of the field, like a clavicle at the top of a scan that stops at the neck, is kept.
 
 These are clinical studies, so they carry incidental findings. The STIR has a visible lesion in the left axilla. They show real anatomy, not idealised anatomy.

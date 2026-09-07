@@ -6,7 +6,7 @@ import type {PlaneId} from './slice';
  *
  *  Sixteen-bit volumes arrive as a plane of low bytes followed by a plane of high bytes, which
  *  compresses far better than interleaved pairs because the high plane is nearly constant. */
-export interface Structure {index:number;file:string;name:string;voxels:number}
+export interface Structure {index:number;file:string;name:string;latin:string;voxels:number}
 export interface Source {dataset:string;subject:string;doi:string;url:string;licence:string;attribution:string}
 export interface VolumeManifest {
  modality:string;subject:string;dims:[number,number,number];spacing:[number,number,number];axes:string;
@@ -55,6 +55,34 @@ export function slicePosition(volume:Volume,id:PlaneId,index:number){
 }
 
 export interface Section {width:number;height:number;pixelWidth:number;pixelHeight:number;grey:Uint8Array;labels:Uint8Array}
+/** Where to write a structure's name on a section, and how much of the slice it occupies. */
+export interface Anchor {index:number;x:number;y:number;area:number}
+
+/** One anchor per structure in a section: the point nearest its centre of area that actually lies
+ *  inside it, so a name written there points at the structure rather than into the gap between its
+ *  parts. A colon wrapping round the abdomen has a centroid in the middle of the small bowel; this
+ *  moves the label back onto the colon. */
+export function anchorsFor(section:Section,minimumArea=40):Anchor[]{
+ const sums=new Map<number,{x:number;y:number;n:number}>();
+ for(let y=0,i=0;y<section.height;y++)for(let x=0;x<section.width;x++,i++){
+  const label=section.labels[i];
+  if(!label)continue;
+  const at=sums.get(label);
+  if(at){at.x+=x;at.y+=y;at.n++;}else sums.set(label,{x,y,n:1});
+ }
+ const best=new Map<number,{x:number;y:number;d:number}>();
+ for(let y=0,i=0;y<section.height;y++)for(let x=0;x<section.width;x++,i++){
+  const label=section.labels[i];
+  if(!label)continue;
+  const at=sums.get(label)!;
+  if(at.n<minimumArea)continue;
+  const distance=(x-at.x/at.n)**2+(y-at.y/at.n)**2;
+  const held=best.get(label);
+  if(!held||distance<held.d)best.set(label,{x,y,d:distance});
+ }
+ return [...best].map(([index,at])=>({index,x:at.x,y:at.y,area:sums.get(index)!.n}))
+  .sort((a,b)=>b.area-a.area);
+}
 
 /** Cut one slice out of the volume, windowed to grey, with the matching labels.
  *

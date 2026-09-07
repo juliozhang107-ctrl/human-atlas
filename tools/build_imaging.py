@@ -9,16 +9,11 @@ sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np
 from scipy import ndimage
 import nifti
+from anatomy_names import describe
 
 def human(name):
-    """TotalSegmentator file names into something a reader would recognise."""
-    parts = name.replace('.nii.gz', '').split('_')
-    tail = {'left': 'left', 'right': 'right'}
-    side = ''
-    if parts[-1] in tail: side, parts = parts.pop(), parts
-    text = ' '.join(parts).replace('vertebrae', 'vertebra').replace('costa', 'rib')
-    text = text[0].upper() + text[1:]
-    return f'{side.capitalize()} {text[0].lower()}{text[1:]}' if side else text
+    """The name a report would use for a segmentation class, from tools/anatomy_names.py."""
+    return describe(name.replace('.nii.gz', ''))[0]
 
 STRAY_SHARE = .05
 
@@ -129,8 +124,9 @@ def build(subject_dir, out_dir, modality, subject, source, target_spacing=None, 
             continue
         index = len(names) + 1
         labels[kept] = index                        # largest first, so smaller structures overwrite
-        names.append({'index': index, 'file': name.replace('.nii.gz', ''),
-                      'name': human(name), 'voxels': int(kept.sum())})
+        reported, latin = describe(stem)
+        names.append({'index': index, 'file': stem, 'name': reported, 'latin': latin,
+                      'voxels': int(kept.sum())})
     if dropped: print(f'  dropped {dropped} stray voxels in components under {int(STRAY_SHARE*100)}% of their structure')
     if rejected: print(f'  rejected {len(rejected)} anatomically impossible labels: {", ".join(rejected)}')
 

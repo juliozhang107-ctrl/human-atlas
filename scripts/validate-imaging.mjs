@@ -3,7 +3,7 @@ import zlib from 'node:zlib';
 import {readFileSync} from 'node:fs';
 import {PLANES,plane} from '../app/slice.ts';
 import {CT_WINDOWS,MODALITIES,STUDIES,ctWindow,modality,study as studyFor,studiesFor,windowed} from '../app/modalities.ts';
-import {extractSection,planeAxis,sliceCount} from '../app/volume.ts';
+import {extractSection,anchorsFor,planeAxis,sliceCount} from '../app/volume.ts';
 
 const load=id=>{
  const base=new URL(`../public/imaging/${id}/`,import.meta.url);
@@ -63,6 +63,17 @@ for(const id of STUDIES.map(s=>s.path)){
  const indices=new Set(manifest.structures.map(s=>s.index));
  for(const s of manifest.structures)assert.ok(present.has(s.index),`${id}: ${s.name} is declared but absent from the volume`);
  assert.equal(indices.size,manifest.structures.length,`${id}: duplicate structure indices`);
+ // Every structure must carry a reported name, and the identifiers the model writes must not reach
+ // a reader: 'autochthon_left' is the erector spinae, and naming it after the file would teach the
+ // wrong word.
+ for(const s of manifest.structures){
+  assert.ok(s.name&&s.name.trim(),`${id}: structure ${s.index} has no name`);
+  assert.ok(!/_/.test(s.name),`${id}: ${s.name} still reads like a file name`);
+  assert.ok(s.name[0]===s.name[0].toUpperCase(),`${id}: ${s.name} should start with a capital`);
+  assert.ok('latin' in s,`${id}: ${s.name} has no Terminologia Anatomica field`);
+ }
+ const named=manifest.structures.filter(s=>s.latin).length;
+ assert.ok(named>manifest.structures.length*.9,`${id}: only ${named} of ${manifest.structures.length} carry a Latin term`);
  const labelled=[...labels].filter(Boolean).length;
  assert.ok(labelled>values.length*.02,`${id}: barely any voxels are labelled`);
 
@@ -78,6 +89,11 @@ for(const id of STUDIES.map(s=>s.path)){
   assert.equal(section.labels.length,section.grey.length);
   assert.ok(section.pixelWidth>0&&section.pixelHeight>0,`${id}/${p.id}: pixel spacing must be positive`);
   assert.ok(section.labels.some(Boolean),`${id}/${p.id}: the middle slice should cross some anatomy`);
+  // A name written on the image must sit inside the structure it names, not in the gap between its
+  // parts, which is where a plain centroid would land for anything horseshoe shaped.
+  for(const anchor of anchorsFor(section))
+   assert.equal(section.labels[anchor.y*section.width+anchor.x],anchor.index,
+    `${id}/${p.id}: the anchor for structure ${anchor.index} falls outside it`);
   // Out-of-range indices clamp rather than reading past the end of the volume.
   for(const index of [-5,count+5])
    assert.equal(extractSection(study,p.id,index,400,40).grey.length,section.grey.length,`${id}/${p.id}: index ${index} must clamp`);
@@ -157,4 +173,4 @@ assert.equal(studiesFor('mr').length,3,'three magnetic resonance sequences are o
 // Anatomy that cannot be where a label puts it: the collection's own labels once placed a fragment
 // of skull among the toes of a study whose highest slice is lung.
 
-console.log('Manifests, label coverage, section geometry, sampling, CT densities and MR weightings all check out.');
+console.log('Manifests, naming, label coverage, section geometry, anchors, sampling, CT densities and MR weightings all check out.');

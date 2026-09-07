@@ -28,7 +28,7 @@ export type ViewMode = 'anatomy'|'radiograph'|'ct'|'mr'|'us';
  *  a different study rather than a different way of displaying one. `highlight` names the structure
  *  currently selected, so a section can tint it where the study has a label of the same name. */
 export interface SceneState {inspectorOpen?:boolean;explode:number;visible:SystemId[];selected:string[];isolate:boolean;view:View;rotate:boolean;reset:number;
- mode:ViewMode;level:number;window:number;plane:PlaneId;slice:number;ctWindow:string;study:string;highlight:string}
+ mode:ViewMode;level:number;window:number;plane:PlaneId;slice:number;ctWindow:string;study:string;highlight:string;labels:boolean}
 export const DEFAULT_VISIBLE:SystemId[] = ['cardiac','sensory','skeletal','muscular','arterial','venous','nervous','respiratory','digestive','urinary','lymphatic','endocrine','reproductive','connective'];
 export const EXPLANATIONS:Record<string,string> = {
  'heart':'A muscular pump in the chest. Its right side sends blood to the lungs; its left side sends blood through the systemic circulation.',

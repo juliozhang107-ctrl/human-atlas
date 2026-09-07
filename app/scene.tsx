@@ -9,13 +9,13 @@ import {PointerTap} from './pointer-tap';
 import {SYSTEMS,type Atlas,type SceneState} from './anatomy';
 import {contributionFor,integrateBeam,bodySpan,isEnvelope,FILL_MU,type BeamReading,type Crossing,type Hit} from './radiograph';
 import {ctWindow,study as studyFor} from './modalities';
-import {loadVolume,extractSection,sliceCount,type Section,type Volume,type VolumeManifest} from './volume';
+import {loadVolume,extractSection,anchorsFor,sliceCount,type Anchor,type Section,type Structure,type Volume,type VolumeManifest} from './volume';
 /** Two millimetres a notch, matching the position slider. */
 export const SLICE_STEP=.002;
-interface Props {atlas:Atlas;state:SceneState;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void;onBeam:(reading:BeamReading|null)=>void;onSlice:(index:number)=>void;onStructure:(name:string)=>void;onVolume:(manifest:VolumeManifest|null)=>void}
-export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,onBeam,onSlice,onStructure,onVolume}:Props){
- const host=useRef<HTMLDivElement>(null),latest=useRef(state),select=useRef(onSelect),beam=useRef(onBeam),step=useRef(onSlice),structure=useRef(onStructure),volume=useRef(onVolume);
- latest.current=state;select.current=onSelect;beam.current=onBeam;step.current=onSlice;structure.current=onStructure;volume.current=onVolume;
+interface Props {atlas:Atlas;state:SceneState;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void;onBeam:(reading:BeamReading|null)=>void;onSlice:(index:number)=>void;onStructure:(name:string)=>void;onVolume:(manifest:VolumeManifest|null)=>void;onContents:(items:Structure[])=>void}
+export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,onBeam,onSlice,onStructure,onVolume,onContents}:Props){
+ const host=useRef<HTMLDivElement>(null),latest=useRef(state),select=useRef(onSelect),beam=useRef(onBeam),step=useRef(onSlice),structure=useRef(onStructure),volume=useRef(onVolume),contents=useRef(onContents);
+ latest.current=state;select.current=onSelect;beam.current=onBeam;step.current=onSlice;structure.current=onStructure;volume.current=onVolume;contents.current=onContents;
  useEffect(()=>{
   const el=host.current!;let disposed=false,frame=0,dirty=true,ready=false,lastView='',lastReset=-1,lastIsolate='',layoutKey='',amount=0;
   let lastState:SceneState|null=null;
@@ -191,8 +191,8 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
   const sliceContext=sliceCanvas.getContext('2d')!;
   const sliceBuffer=document.createElement('canvas'),sliceBufferContext=sliceBuffer.getContext('2d')!;
   const studies=new Map<string,Volume>();
-  let study:Volume|null=null,loading='',section:Section|null=null;
-  let sliceKey='',drawKey='',sliceActive=false,sliceCrop={x:0,y:0,w:0,h:0},sliceDraw={x:0,y:0,w:0,h:0};
+  let study:Volume|null=null,loading='',section:Section|null=null,anchors:Anchor[]=[];
+  let sliceKey='',drawKey='',sliceActive=false,sliceCrop={x:0,y:0,w:0,h:0},sliceDraw={x:0,y:0,w:0,h:0},markedIndex=0;
 
   const wanted=(mode:string)=>mode==='ct'||mode==='mr';
   /** Which study a state refers to, since both modalities now offer more than one. */
@@ -222,6 +222,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    // underlying grey is kept rather than replaced, so the tissue can still be read through the tint.
    const wanted=s.highlight.toLowerCase();
    const marked=wanted?study.manifest.structures.find(x=>x.name.toLowerCase()===wanted)?.index??0:0;
+   markedIndex=marked;
    sliceBuffer.width=section.width;sliceBuffer.height=section.height;
    const image=sliceBufferContext.createImageData(section.width,section.height);
    for(let i=0,o=0;i<section.grey.length;i++,o+=4){
@@ -234,6 +235,8 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
     image.data[o+3]=255;
    }
    sliceBufferContext.putImageData(image,0,0);
+   anchors=anchorsFor(section);
+   contents.current(anchors.map(a=>study!.named.get(a.index)).filter((x):x is Structure=>!!x));
   };
 
   /** The space the panels leave free. A section is a flat image with nothing to orbit, so rather
@@ -279,6 +282,43 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    sliceContext.fillStyle='#05070a';sliceContext.fillRect(0,0,sliceCanvas.width,sliceCanvas.height);
    sliceContext.imageSmoothingEnabled=true;sliceContext.imageSmoothingQuality='high';
    sliceContext.drawImage(sliceBuffer,0,0,section.width,section.height,sliceDraw.x,sliceDraw.y,w,h);
+   if(latest.current.labels)drawLabels();
+  };
+
+  /** Write the names onto the image. Larger structures are placed first and anything that would
+   *  collide with a name already written is left to the readout instead, so a section stays legible
+   *  rather than becoming a wall of text. Each name is tethered to the point it describes. */
+  const drawLabels=()=>{
+   if(!section||!study)return;
+   const scale=sliceCanvas.width/Math.max(1,el.clientWidth);
+   const size=Math.max(10,Math.round(11*scale));
+   sliceContext.font=`${size}px Inter, ui-sans-serif, system-ui, sans-serif`;
+   sliceContext.textBaseline='middle';
+   sliceContext.lineJoin='round';
+   const placed:{left:number;right:number;top:number;bottom:number}[]=[];
+   const minimum=section.width*section.height*.0016;
+   for(const anchor of anchors){
+    if(anchor.area<minimum)continue;
+    const named=study.named.get(anchor.index);
+    if(!named)continue;
+    const x=sliceDraw.x+(anchor.x+.5)/section.width*sliceDraw.w;
+    const y=sliceDraw.y+(anchor.y+.5)/section.height*sliceDraw.h;
+    const width=sliceContext.measureText(named.name).width;
+    const gap=size*.6;
+    const right=x+gap+width<sliceCanvas.width-4;
+    const box={left:right?x+gap:x-gap-width,right:right?x+gap+width:x-gap,
+               top:y-size*.7,bottom:y+size*.7};
+    if(box.left<2||box.right>sliceCanvas.width-2)continue;
+    if(placed.some(p=>box.left<p.right+4&&box.right>p.left-4&&box.top<p.bottom+2&&box.bottom>p.top-2))continue;
+    placed.push(box);
+    sliceContext.beginPath();sliceContext.arc(x,y,Math.max(1.5,scale*1.6),0,Math.PI*2);
+    sliceContext.fillStyle='#6ad9c8';sliceContext.fill();
+    sliceContext.textAlign=right?'left':'right';
+    sliceContext.lineWidth=Math.max(2,scale*2.6);sliceContext.strokeStyle='rgba(5,7,10,.92)';
+    sliceContext.strokeText(named.name,right?x+gap:x-gap,y);
+    sliceContext.fillStyle=named.index===markedIndex?'#8ff0dd':'#eaf2f6';
+    sliceContext.fillText(named.name,right?x+gap:x-gap,y);
+   }
   };
 
   const resizeSlice=()=>{
@@ -341,7 +381,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
     // The free area is remeasured each frame, so opening the inspector or the layer panel refits
     // the image instead of leaving it underneath.
     const area=sectionArea();
-    const draw=[build,el.clientWidth,el.clientHeight,Math.round(area.left),Math.round(area.right),Math.round(area.top),Math.round(area.bottom)].join('|');
+    const draw=[build,s.labels,el.clientWidth,el.clientHeight,Math.round(area.left),Math.round(area.right),Math.round(area.top),Math.round(area.bottom)].join('|');
     if(draw!==drawKey){drawKey=draw;resizeSlice();drawSlice(area);}
     return;
    }

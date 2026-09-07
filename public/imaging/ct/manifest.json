@@ -39,607 +39,708 @@
    "index": 1,
    "file": "liver",
    "name": "Liver",
-   "voxels": 441670
+   "voxels": 441670,
+   "latin": "Hepar"
   },
   {
    "index": 2,
    "file": "lung_upper_lobe_left",
-   "name": "Left lung upper lobe",
-   "voxels": 391917
+   "name": "Left upper lobe",
+   "voxels": 391917,
+   "latin": "Lobus superior pulmonis sinistri"
   },
   {
    "index": 3,
    "file": "lung_lower_lobe_right",
-   "name": "Right lung lower lobe",
-   "voxels": 340921
+   "name": "Right lower lobe",
+   "voxels": 340921,
+   "latin": "Lobus inferior pulmonis dextri"
   },
   {
    "index": 4,
    "file": "lung_lower_lobe_left",
-   "name": "Left lung lower lobe",
-   "voxels": 335402
+   "name": "Left lower lobe",
+   "voxels": 335402,
+   "latin": "Lobus inferior pulmonis sinistri"
   },
   {
    "index": 5,
    "file": "lung_upper_lobe_right",
-   "name": "Right lung upper lobe",
-   "voxels": 305488
+   "name": "Right upper lobe",
+   "voxels": 305488,
+   "latin": "Lobus superior pulmonis dextri"
   },
   {
    "index": 6,
    "file": "small_bowel",
    "name": "Small bowel",
-   "voxels": 294191
+   "voxels": 294191,
+   "latin": "Intestinum tenue"
   },
   {
    "index": 7,
    "file": "gluteus_maximus_right",
    "name": "Right gluteus maximus",
-   "voxels": 243818
+   "voxels": 243818,
+   "latin": "Musculus gluteus maximus dexter"
   },
   {
    "index": 8,
    "file": "heart",
    "name": "Heart",
-   "voxels": 224536
+   "voxels": 224536,
+   "latin": "Cor"
   },
   {
    "index": 9,
    "file": "gluteus_maximus_left",
    "name": "Left gluteus maximus",
-   "voxels": 222504
+   "voxels": 222504,
+   "latin": "Musculus gluteus maximus sinister"
   },
   {
    "index": 10,
    "file": "colon",
    "name": "Colon",
-   "voxels": 215709
+   "voxels": 215709,
+   "latin": "Colon"
   },
   {
    "index": 11,
    "file": "femur_left",
    "name": "Left femur",
-   "voxels": 201413
+   "voxels": 201413,
+   "latin": "Femur sinistrum"
   },
   {
    "index": 12,
    "file": "femur_right",
    "name": "Right femur",
-   "voxels": 193256
+   "voxels": 193256,
+   "latin": "Femur dextrum"
   },
   {
    "index": 13,
    "file": "lung_middle_lobe_right",
-   "name": "Right lung middle lobe",
-   "voxels": 174026
+   "name": "Right middle lobe",
+   "voxels": 174026,
+   "latin": "Lobus medius pulmonis dextri"
   },
   {
    "index": 14,
    "file": "autochthon_left",
-   "name": "Left autochthon",
-   "voxels": 146962
+   "name": "Left erector spinae",
+   "voxels": 146962,
+   "latin": "Musculi dorsi proprii sinistri"
   },
   {
    "index": 15,
    "file": "aorta",
    "name": "Aorta",
-   "voxels": 140992
+   "voxels": 140992,
+   "latin": "Aorta"
   },
   {
    "index": 16,
    "file": "autochthon_right",
-   "name": "Right autochthon",
-   "voxels": 138816
+   "name": "Right erector spinae",
+   "voxels": 138816,
+   "latin": "Musculi dorsi proprii dextri"
   },
   {
    "index": 17,
    "file": "hip_left",
-   "name": "Left hip",
-   "voxels": 119593
+   "name": "Left hip bone",
+   "voxels": 119593,
+   "latin": "Os coxae sinistrum"
   },
   {
    "index": 18,
    "file": "hip_right",
-   "name": "Right hip",
-   "voxels": 119009
+   "name": "Right hip bone",
+   "voxels": 119009,
+   "latin": "Os coxae dextrum"
   },
   {
    "index": 19,
    "file": "iliopsoas_left",
    "name": "Left iliopsoas",
-   "voxels": 88824
+   "voxels": 88824,
+   "latin": "Musculus iliopsoas sinister"
   },
   {
    "index": 20,
    "file": "gluteus_medius_right",
    "name": "Right gluteus medius",
-   "voxels": 88323
+   "voxels": 88323,
+   "latin": "Musculus gluteus medius dexter"
   },
   {
    "index": 21,
    "file": "gluteus_medius_left",
    "name": "Left gluteus medius",
-   "voxels": 77127
+   "voxels": 77127,
+   "latin": "Musculus gluteus medius sinister"
   },
   {
    "index": 22,
    "file": "iliopsoas_right",
    "name": "Right iliopsoas",
-   "voxels": 75982
+   "voxels": 75982,
+   "latin": "Musculus iliopsoas dexter"
   },
   {
    "index": 23,
    "file": "sacrum",
    "name": "Sacrum",
-   "voxels": 64027
+   "voxels": 64027,
+   "latin": "Os sacrum"
   },
   {
    "index": 24,
    "file": "kidney_right",
    "name": "Right kidney",
-   "voxels": 55080
+   "voxels": 55080,
+   "latin": "Ren dexter"
   },
   {
    "index": 25,
    "file": "costal_cartilages",
-   "name": "Ribl cartilages",
-   "voxels": 50425
+   "name": "Costal cartilages",
+   "voxels": 50425,
+   "latin": "Cartilagines costales"
   },
   {
    "index": 26,
    "file": "kidney_left",
    "name": "Left kidney",
-   "voxels": 46390
+   "voxels": 46390,
+   "latin": "Ren sinister"
   },
   {
    "index": 27,
    "file": "urinary_bladder",
    "name": "Urinary bladder",
-   "voxels": 42426
+   "voxels": 42426,
+   "latin": "Vesica urinaria"
   },
   {
    "index": 28,
    "file": "spleen",
    "name": "Spleen",
-   "voxels": 39790
+   "voxels": 39790,
+   "latin": "Splen"
   },
   {
    "index": 29,
    "file": "stomach",
    "name": "Stomach",
-   "voxels": 38308
+   "voxels": 38308,
+   "latin": "Gaster"
   },
   {
    "index": 30,
    "file": "inferior_vena_cava",
    "name": "Inferior vena cava",
-   "voxels": 33411
+   "voxels": 33411,
+   "latin": "Vena cava inferior"
   },
   {
    "index": 31,
    "file": "pancreas",
    "name": "Pancreas",
-   "voxels": 27475
+   "voxels": 27475,
+   "latin": "Pancreas"
   },
   {
    "index": 32,
    "file": "gluteus_minimus_right",
    "name": "Right gluteus minimus",
-   "voxels": 23623
+   "voxels": 23623,
+   "latin": "Musculus gluteus minimus dexter"
   },
   {
    "index": 33,
    "file": "spinal_cord",
    "name": "Spinal cord",
-   "voxels": 21704
+   "voxels": 21704,
+   "latin": "Medulla spinalis"
   },
   {
    "index": 34,
    "file": "gluteus_minimus_left",
    "name": "Left gluteus minimus",
-   "voxels": 21674
+   "voxels": 21674,
+   "latin": "Musculus gluteus minimus sinister"
   },
   {
    "index": 35,
    "file": "vertebrae_L4",
-   "name": "Vertebra L4",
-   "voxels": 20152
+   "name": "Fourth lumbar vertebra (L4)",
+   "voxels": 20152,
+   "latin": "Vertebra lumbalis 4"
   },
   {
    "index": 36,
    "file": "vertebrae_L3",
-   "name": "Vertebra L3",
-   "voxels": 18724
+   "name": "Third lumbar vertebra (L3)",
+   "voxels": 18724,
+   "latin": "Vertebra lumbalis 3"
   },
   {
    "index": 37,
    "file": "vertebrae_L5",
-   "name": "Vertebra L5",
-   "voxels": 18660
+   "name": "Fifth lumbar vertebra (L5)",
+   "voxels": 18660,
+   "latin": "Vertebra lumbalis 5"
   },
   {
    "index": 38,
    "file": "sternum",
    "name": "Sternum",
-   "voxels": 18336
+   "voxels": 18336,
+   "latin": "Sternum"
   },
   {
    "index": 39,
    "file": "duodenum",
    "name": "Duodenum",
-   "voxels": 17550
+   "voxels": 17550,
+   "latin": "Duodenum"
   },
   {
    "index": 40,
    "file": "vertebrae_S1",
-   "name": "Vertebra S1",
-   "voxels": 16656
+   "name": "First sacral vertebra (S1)",
+   "voxels": 16656,
+   "latin": "Vertebra sacralis 1"
   },
   {
    "index": 41,
    "file": "vertebrae_L2",
-   "name": "Vertebra L2",
-   "voxels": 16619
+   "name": "Second lumbar vertebra (L2)",
+   "voxels": 16619,
+   "latin": "Vertebra lumbalis 2"
   },
   {
    "index": 42,
    "file": "scapula_right",
    "name": "Right scapula",
-   "voxels": 16382
+   "voxels": 16382,
+   "latin": "Scapula dextra"
   },
   {
    "index": 43,
    "file": "scapula_left",
    "name": "Left scapula",
-   "voxels": 15275
+   "voxels": 15275,
+   "latin": "Scapula sinistra"
   },
   {
    "index": 44,
    "file": "vertebrae_L1",
-   "name": "Vertebra L1",
-   "voxels": 15119
+   "name": "First lumbar vertebra (L1)",
+   "voxels": 15119,
+   "latin": "Vertebra lumbalis 1"
   },
   {
    "index": 45,
    "file": "iliac_vena_left",
-   "name": "Left iliac vena",
-   "voxels": 13812
+   "name": "Left common iliac vein",
+   "voxels": 13812,
+   "latin": "Vena iliaca communis sinistra"
   },
   {
    "index": 46,
    "file": "vertebrae_T12",
-   "name": "Vertebra T12",
-   "voxels": 13751
+   "name": "Twelfth thoracic vertebra (T12)",
+   "voxels": 13751,
+   "latin": "Vertebra thoracica 12"
   },
   {
    "index": 47,
    "file": "vertebrae_T11",
-   "name": "Vertebra T11",
-   "voxels": 13500
+   "name": "Eleventh thoracic vertebra (T11)",
+   "voxels": 13500,
+   "latin": "Vertebra thoracica 11"
   },
   {
    "index": 48,
    "file": "iliac_artery_left",
-   "name": "Left iliac artery",
-   "voxels": 13024
+   "name": "Left common iliac artery",
+   "voxels": 13024,
+   "latin": "Arteria iliaca communis sinistra"
   },
   {
    "index": 49,
    "file": "iliac_artery_right",
-   "name": "Right iliac artery",
-   "voxels": 12453
+   "name": "Right common iliac artery",
+   "voxels": 12453,
+   "latin": "Arteria iliaca communis dextra"
   },
   {
    "index": 50,
    "file": "vertebrae_T10",
-   "name": "Vertebra T10",
-   "voxels": 12325
+   "name": "Tenth thoracic vertebra (T10)",
+   "voxels": 12325,
+   "latin": "Vertebra thoracica 10"
   },
   {
    "index": 51,
    "file": "vertebrae_T9",
-   "name": "Vertebra T9",
-   "voxels": 11725
+   "name": "Ninth thoracic vertebra (T9)",
+   "voxels": 11725,
+   "latin": "Vertebra thoracica 9"
   },
   {
    "index": 52,
    "file": "prostate",
    "name": "Prostate",
-   "voxels": 11425
+   "voxels": 11425,
+   "latin": "Prostata"
   },
   {
    "index": 53,
    "file": "vertebrae_T8",
-   "name": "Vertebra T8",
-   "voxels": 10604
+   "name": "Eighth thoracic vertebra (T8)",
+   "voxels": 10604,
+   "latin": "Vertebra thoracica 8"
   },
   {
    "index": 54,
    "file": "superior_vena_cava",
    "name": "Superior vena cava",
-   "voxels": 10284
+   "voxels": 10284,
+   "latin": "Vena cava superior"
   },
   {
    "index": 55,
    "file": "vertebrae_T7",
-   "name": "Vertebra T7",
-   "voxels": 9809
+   "name": "Seventh thoracic vertebra (T7)",
+   "voxels": 9809,
+   "latin": "Vertebra thoracica 7"
   },
   {
    "index": 56,
    "file": "iliac_vena_right",
-   "name": "Right iliac vena",
-   "voxels": 9352
+   "name": "Right common iliac vein",
+   "voxels": 9352,
+   "latin": "Vena iliaca communis dextra"
   },
   {
    "index": 57,
    "file": "esophagus",
-   "name": "Esophagus",
-   "voxels": 9225
+   "name": "Oesophagus",
+   "voxels": 9225,
+   "latin": "Oesophagus"
   },
   {
    "index": 58,
    "file": "vertebrae_T6",
-   "name": "Vertebra T6",
-   "voxels": 9080
+   "name": "Sixth thoracic vertebra (T6)",
+   "voxels": 9080,
+   "latin": "Vertebra thoracica 6"
   },
   {
    "index": 59,
    "file": "rib_left_7",
-   "name": "Rib left 7",
-   "voxels": 8874
+   "name": "Left seventh rib",
+   "voxels": 8874,
+   "latin": "Costa 7 sinistra"
   },
   {
    "index": 60,
    "file": "rib_right_7",
-   "name": "Rib right 7",
-   "voxels": 8721
+   "name": "Right seventh rib",
+   "voxels": 8721,
+   "latin": "Costa 7 dextra"
   },
   {
    "index": 61,
    "file": "vertebrae_T5",
-   "name": "Vertebra T5",
-   "voxels": 8556
+   "name": "Fifth thoracic vertebra (T5)",
+   "voxels": 8556,
+   "latin": "Vertebra thoracica 5"
   },
   {
    "index": 62,
    "file": "rib_left_6",
-   "name": "Rib left 6",
-   "voxels": 8040
+   "name": "Left sixth rib",
+   "voxels": 8040,
+   "latin": "Costa 6 sinistra"
   },
   {
    "index": 63,
    "file": "rib_left_8",
-   "name": "Rib left 8",
-   "voxels": 7980
+   "name": "Left eighth rib",
+   "voxels": 7980,
+   "latin": "Costa 8 sinistra"
   },
   {
    "index": 64,
    "file": "vertebrae_T4",
-   "name": "Vertebra T4",
-   "voxels": 7969
+   "name": "Fourth thoracic vertebra (T4)",
+   "voxels": 7969,
+   "latin": "Vertebra thoracica 4"
   },
   {
    "index": 65,
    "file": "rib_right_8",
-   "name": "Rib right 8",
-   "voxels": 7943
+   "name": "Right eighth rib",
+   "voxels": 7943,
+   "latin": "Costa 8 dextra"
   },
   {
    "index": 66,
    "file": "rib_right_6",
-   "name": "Rib right 6",
-   "voxels": 7888
+   "name": "Right sixth rib",
+   "voxels": 7888,
+   "latin": "Costa 6 dextra"
   },
   {
    "index": 67,
    "file": "pulmonary_vein",
-   "name": "Pulmonary vein",
-   "voxels": 7882
+   "name": "Pulmonary veins",
+   "voxels": 7882,
+   "latin": "Venae pulmonales"
   },
   {
    "index": 68,
    "file": "rib_right_9",
-   "name": "Rib right 9",
-   "voxels": 7584
+   "name": "Right ninth rib",
+   "voxels": 7584,
+   "latin": "Costa 9 dextra"
   },
   {
    "index": 69,
    "file": "trachea",
    "name": "Trachea",
-   "voxels": 7523
+   "voxels": 7523,
+   "latin": "Trachea"
   },
   {
    "index": 70,
    "file": "rib_left_9",
-   "name": "Rib left 9",
-   "voxels": 7264
+   "name": "Left ninth rib",
+   "voxels": 7264,
+   "latin": "Costa 9 sinistra"
   },
   {
    "index": 71,
    "file": "rib_right_10",
-   "name": "Rib right 10",
-   "voxels": 6681
+   "name": "Right tenth rib",
+   "voxels": 6681,
+   "latin": "Costa 10 dextra"
   },
   {
    "index": 72,
    "file": "rib_left_10",
-   "name": "Rib left 10",
-   "voxels": 6720
+   "name": "Left tenth rib",
+   "voxels": 6720,
+   "latin": "Costa 10 sinistra"
   },
   {
    "index": 73,
    "file": "rib_right_5",
-   "name": "Rib right 5",
-   "voxels": 6526
+   "name": "Right fifth rib",
+   "voxels": 6526,
+   "latin": "Costa 5 dextra"
   },
   {
    "index": 74,
    "file": "portal_vein_and_splenic_vein",
-   "name": "Portal vein and splenic vein",
-   "voxels": 6481
+   "name": "Portal and splenic veins",
+   "voxels": 6481,
+   "latin": "Vena portae hepatis et vena splenica"
   },
   {
    "index": 75,
    "file": "rib_left_5",
-   "name": "Rib left 5",
-   "voxels": 6486
+   "name": "Left fifth rib",
+   "voxels": 6486,
+   "latin": "Costa 5 sinistra"
   },
   {
    "index": 76,
    "file": "rib_right_4",
-   "name": "Rib right 4",
-   "voxels": 6197
+   "name": "Right fourth rib",
+   "voxels": 6197,
+   "latin": "Costa 4 dextra"
   },
   {
    "index": 77,
    "file": "rib_left_4",
-   "name": "Rib left 4",
-   "voxels": 5835
+   "name": "Left fourth rib",
+   "voxels": 5835,
+   "latin": "Costa 4 sinistra"
   },
   {
    "index": 78,
    "file": "rib_left_11",
-   "name": "Rib left 11",
-   "voxels": 5104
+   "name": "Left eleventh rib",
+   "voxels": 5104,
+   "latin": "Costa 11 sinistra"
   },
   {
    "index": 79,
    "file": "rib_right_11",
-   "name": "Rib right 11",
-   "voxels": 5053
+   "name": "Right eleventh rib",
+   "voxels": 5053,
+   "latin": "Costa 11 dextra"
   },
   {
    "index": 80,
    "file": "vertebrae_T3",
-   "name": "Vertebra T3",
-   "voxels": 4731
+   "name": "Third thoracic vertebra (T3)",
+   "voxels": 4731,
+   "latin": "Vertebra thoracica 3"
   },
   {
    "index": 81,
    "file": "brachiocephalic_vein_left",
    "name": "Left brachiocephalic vein",
-   "voxels": 4324
+   "voxels": 4324,
+   "latin": "Vena brachiocephalica sinistra"
   },
   {
    "index": 82,
    "file": "rib_left_3",
-   "name": "Rib left 3",
-   "voxels": 4280
+   "name": "Left third rib",
+   "voxels": 4280,
+   "latin": "Costa 3 sinistra"
   },
   {
    "index": 83,
    "file": "rib_right_3",
-   "name": "Rib right 3",
-   "voxels": 4101
+   "name": "Right third rib",
+   "voxels": 4101,
+   "latin": "Costa 3 dextra"
   },
   {
    "index": 84,
    "file": "rib_right_12",
-   "name": "Rib right 12",
-   "voxels": 3095
+   "name": "Right twelfth rib",
+   "voxels": 3095,
+   "latin": "Costa 12 dextra"
   },
   {
    "index": 85,
    "file": "rib_left_12",
-   "name": "Rib left 12",
-   "voxels": 2678
+   "name": "Left twelfth rib",
+   "voxels": 2678,
+   "latin": "Costa 12 sinistra"
   },
   {
    "index": 86,
    "file": "atrial_appendage_left",
    "name": "Left atrial appendage",
-   "voxels": 2638
+   "voxels": 2638,
+   "latin": "Auricula atrii sinistri"
   },
   {
    "index": 87,
    "file": "rib_right_2",
-   "name": "Rib right 2",
-   "voxels": 2328
+   "name": "Right second rib",
+   "voxels": 2328,
+   "latin": "Costa 2 dextra"
   },
   {
    "index": 88,
    "file": "brachiocephalic_trunk",
    "name": "Brachiocephalic trunk",
-   "voxels": 2128
+   "voxels": 2128,
+   "latin": "Truncus brachiocephalicus"
   },
   {
    "index": 89,
    "file": "adrenal_gland_left",
    "name": "Left adrenal gland",
-   "voxels": 1816
+   "voxels": 1816,
+   "latin": "Glandula suprarenalis sinistra"
   },
   {
    "index": 90,
    "file": "adrenal_gland_right",
    "name": "Right adrenal gland",
-   "voxels": 1804
+   "voxels": 1804,
+   "latin": "Glandula suprarenalis dextra"
   },
   {
    "index": 91,
    "file": "brachiocephalic_vein_right",
    "name": "Right brachiocephalic vein",
-   "voxels": 1600
+   "voxels": 1600,
+   "latin": "Vena brachiocephalica dextra"
   },
   {
    "index": 92,
    "file": "rib_left_2",
-   "name": "Rib left 2",
-   "voxels": 820
+   "name": "Left second rib",
+   "voxels": 820,
+   "latin": "Costa 2 sinistra"
   },
   {
    "index": 93,
    "file": "rib_right_1",
-   "name": "Rib right 1",
-   "voxels": 700
+   "name": "Right first rib",
+   "voxels": 700,
+   "latin": "Costa 1 dextra"
   },
   {
    "index": 94,
    "file": "subclavian_artery_right",
    "name": "Right subclavian artery",
-   "voxels": 673
+   "voxels": 673,
+   "latin": "Arteria subclavia dextra"
   },
   {
    "index": 95,
    "file": "subclavian_artery_left",
    "name": "Left subclavian artery",
-   "voxels": 586
+   "voxels": 586,
+   "latin": "Arteria subclavia sinistra"
   },
   {
    "index": 96,
    "file": "common_carotid_artery_left",
    "name": "Left common carotid artery",
-   "voxels": 521
+   "voxels": 521,
+   "latin": "Arteria carotis communis sinistra"
   },
   {
    "index": 97,
    "file": "rib_left_1",
-   "name": "Rib left 1",
-   "voxels": 237
+   "name": "Left first rib",
+   "voxels": 237,
+   "latin": "Costa 1 sinistra"
   },
   {
    "index": 98,
    "file": "vertebrae_T2",
-   "name": "Vertebra T2",
-   "voxels": 37
+   "name": "Second thoracic vertebra (T2)",
+   "voxels": 37,
+   "latin": "Vertebra thoracica 2"
   },
   {
    "index": 99,
    "file": "clavicula_right",
-   "name": "Right clavicula",
-   "voxels": 31
+   "name": "Right clavicle",
+   "voxels": 31,
+   "latin": "Clavicula dextra"
   },
   {
    "index": 100,
    "file": "common_carotid_artery_right",
    "name": "Right common carotid artery",
-   "voxels": 28
+   "voxels": 28,
+   "latin": "Arteria carotis communis dextra"
   },
   {
    "index": 101,
    "file": "clavicula_left",
-   "name": "Left clavicula",
-   "voxels": 7
+   "name": "Left clavicle",
+   "voxels": 7,
+   "latin": "Clavicula sinistra"
   }
  ],
  "source": {

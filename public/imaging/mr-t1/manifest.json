@@ -40,319 +40,372 @@
    "index": 1,
    "file": "lung_right",
    "name": "Right lung",
-   "voxels": 326961
+   "voxels": 326961,
+   "latin": "Pulmo dexter"
   },
   {
    "index": 2,
    "file": "brain",
    "name": "Brain",
-   "voxels": 278752
+   "voxels": 278752,
+   "latin": "Encephalon"
   },
   {
    "index": 3,
    "file": "lung_left",
    "name": "Left lung",
-   "voxels": 209470
+   "voxels": 209470,
+   "latin": "Pulmo sinister"
   },
   {
    "index": 4,
    "file": "liver",
    "name": "Liver",
-   "voxels": 182978
+   "voxels": 182978,
+   "latin": "Hepar"
   },
   {
    "index": 5,
    "file": "heart",
    "name": "Heart",
-   "voxels": 128959
+   "voxels": 128959,
+   "latin": "Cor"
   },
   {
    "index": 6,
    "file": "quadriceps_femoris_left",
    "name": "Left quadriceps femoris",
-   "voxels": 113403
+   "voxels": 113403,
+   "latin": "Musculus quadriceps femoris sinister"
   },
   {
    "index": 7,
    "file": "thigh_medial_compartment_left",
-   "name": "Left thigh medial compartment",
-   "voxels": 93674
+   "name": "Left medial thigh compartment (adductors)",
+   "voxels": 93674,
+   "latin": "Compartimentum femoris mediale sinistrum"
   },
   {
    "index": 8,
    "file": "thigh_medial_compartment_right",
-   "name": "Right thigh medial compartment",
-   "voxels": 90763
+   "name": "Right medial thigh compartment (adductors)",
+   "voxels": 90763,
+   "latin": "Compartimentum femoris mediale dextrum"
   },
   {
    "index": 9,
    "file": "quadriceps_femoris_right",
    "name": "Right quadriceps femoris",
-   "voxels": 85844
+   "voxels": 85844,
+   "latin": "Musculus quadriceps femoris dexter"
   },
   {
    "index": 10,
    "file": "colon",
    "name": "Colon",
-   "voxels": 76612
+   "voxels": 76612,
+   "latin": "Colon"
   },
   {
    "index": 11,
    "file": "gluteus_maximus_left",
    "name": "Left gluteus maximus",
-   "voxels": 64559
+   "voxels": 64559,
+   "latin": "Musculus gluteus maximus sinister"
   },
   {
    "index": 12,
    "file": "gluteus_maximus_right",
    "name": "Right gluteus maximus",
-   "voxels": 60857
+   "voxels": 60857,
+   "latin": "Musculus gluteus maximus dexter"
   },
   {
    "index": 13,
    "file": "small_bowel",
    "name": "Small bowel",
-   "voxels": 56007
+   "voxels": 56007,
+   "latin": "Intestinum tenue"
   },
   {
    "index": 14,
    "file": "spleen",
    "name": "Spleen",
-   "voxels": 55203
+   "voxels": 55203,
+   "latin": "Splen"
   },
   {
    "index": 15,
    "file": "autochthon_left",
-   "name": "Left autochthon",
-   "voxels": 50907
+   "name": "Left erector spinae",
+   "voxels": 50907,
+   "latin": "Musculi dorsi proprii sinistri"
   },
   {
    "index": 16,
    "file": "autochthon_right",
-   "name": "Right autochthon",
-   "voxels": 48281
+   "name": "Right erector spinae",
+   "voxels": 48281,
+   "latin": "Musculi dorsi proprii dextri"
   },
   {
    "index": 17,
    "file": "vertebrae",
-   "name": "Vertebra",
-   "voxels": 39738
+   "name": "Vertebral column",
+   "voxels": 39738,
+   "latin": "Columna vertebralis"
   },
   {
    "index": 18,
    "file": "femur_right",
    "name": "Right femur",
-   "voxels": 38194
+   "voxels": 38194,
+   "latin": "Femur dextrum"
   },
   {
    "index": 19,
    "file": "femur_left",
    "name": "Left femur",
-   "voxels": 38099
+   "voxels": 38099,
+   "latin": "Femur sinistrum"
   },
   {
    "index": 20,
    "file": "urinary_bladder",
    "name": "Urinary bladder",
-   "voxels": 37264
+   "voxels": 37264,
+   "latin": "Vesica urinaria"
   },
   {
    "index": 21,
    "file": "iliopsoas_right",
    "name": "Right iliopsoas",
-   "voxels": 36029
+   "voxels": 36029,
+   "latin": "Musculus iliopsoas dexter"
   },
   {
    "index": 22,
    "file": "iliopsoas_left",
    "name": "Left iliopsoas",
-   "voxels": 33193
+   "voxels": 33193,
+   "latin": "Musculus iliopsoas sinister"
   },
   {
    "index": 23,
    "file": "hip_left",
-   "name": "Left hip",
-   "voxels": 33863
+   "name": "Left hip bone",
+   "voxels": 33863,
+   "latin": "Os coxae sinistrum"
   },
   {
    "index": 24,
    "file": "aorta",
    "name": "Aorta",
-   "voxels": 32201
+   "voxels": 32201,
+   "latin": "Aorta"
   },
   {
    "index": 25,
    "file": "hip_right",
-   "name": "Right hip",
-   "voxels": 31820
+   "name": "Right hip bone",
+   "voxels": 31820,
+   "latin": "Os coxae dextrum"
   },
   {
    "index": 26,
    "file": "gluteus_medius_left",
    "name": "Left gluteus medius",
-   "voxels": 29343
+   "voxels": 29343,
+   "latin": "Musculus gluteus medius sinister"
   },
   {
    "index": 27,
    "file": "gluteus_medius_right",
    "name": "Right gluteus medius",
-   "voxels": 25792
+   "voxels": 25792,
+   "latin": "Musculus gluteus medius dexter"
   },
   {
    "index": 28,
    "file": "kidney_left",
    "name": "Left kidney",
-   "voxels": 23121
+   "voxels": 23121,
+   "latin": "Ren sinister"
   },
   {
    "index": 29,
    "file": "kidney_right",
    "name": "Right kidney",
-   "voxels": 22551
+   "voxels": 22551,
+   "latin": "Ren dexter"
   },
   {
    "index": 30,
    "file": "sacrum",
    "name": "Sacrum",
-   "voxels": 22324
+   "voxels": 22324,
+   "latin": "Os sacrum"
   },
   {
    "index": 31,
    "file": "stomach",
    "name": "Stomach",
-   "voxels": 21617
+   "voxels": 21617,
+   "latin": "Gaster"
   },
   {
    "index": 32,
    "file": "intervertebral_discs",
    "name": "Intervertebral discs",
-   "voxels": 18505
+   "voxels": 18505,
+   "latin": "Disci intervertebrales"
   },
   {
    "index": 33,
    "file": "humerus_right",
    "name": "Right humerus",
-   "voxels": 17772
+   "voxels": 17772,
+   "latin": "Humerus dexter"
   },
   {
    "index": 34,
    "file": "thigh_posterior_compartment_left",
-   "name": "Left thigh posterior compartment",
-   "voxels": 14154
+   "name": "Left posterior thigh compartment (hamstrings)",
+   "voxels": 14154,
+   "latin": "Compartimentum femoris posterius sinistrum"
   },
   {
    "index": 35,
    "file": "thigh_posterior_compartment_right",
-   "name": "Right thigh posterior compartment",
-   "voxels": 10779
+   "name": "Right posterior thigh compartment (hamstrings)",
+   "voxels": 10779,
+   "latin": "Compartimentum femoris posterius dextrum"
   },
   {
    "index": 36,
    "file": "humerus_left",
    "name": "Left humerus",
-   "voxels": 9364
+   "voxels": 9364,
+   "latin": "Humerus sinister"
   },
   {
    "index": 37,
    "file": "gluteus_minimus_right",
    "name": "Right gluteus minimus",
-   "voxels": 8144
+   "voxels": 8144,
+   "latin": "Musculus gluteus minimus dexter"
   },
   {
    "index": 38,
    "file": "gluteus_minimus_left",
    "name": "Left gluteus minimus",
-   "voxels": 8006
+   "voxels": 8006,
+   "latin": "Musculus gluteus minimus sinister"
   },
   {
    "index": 39,
    "file": "spinal_cord",
    "name": "Spinal cord",
-   "voxels": 7126
+   "voxels": 7126,
+   "latin": "Medulla spinalis"
   },
   {
    "index": 40,
    "file": "inferior_vena_cava",
    "name": "Inferior vena cava",
-   "voxels": 6891
+   "voxels": 6891,
+   "latin": "Vena cava inferior"
   },
   {
    "index": 41,
    "file": "sartorius_left",
    "name": "Left sartorius",
-   "voxels": 5446
+   "voxels": 5446,
+   "latin": "Musculus sartorius sinister"
   },
   {
    "index": 42,
    "file": "esophagus",
-   "name": "Esophagus",
-   "voxels": 4508
+   "name": "Oesophagus",
+   "voxels": 4508,
+   "latin": "Oesophagus"
   },
   {
    "index": 43,
    "file": "sartorius_right",
    "name": "Right sartorius",
-   "voxels": 4445
+   "voxels": 4445,
+   "latin": "Musculus sartorius dexter"
   },
   {
    "index": 44,
    "file": "pancreas",
    "name": "Pancreas",
-   "voxels": 4282
+   "voxels": 4282,
+   "latin": "Pancreas"
   },
   {
    "index": 45,
    "file": "iliac_vena_right",
-   "name": "Right iliac vena",
-   "voxels": 2942
+   "name": "Right common iliac vein",
+   "voxels": 2942,
+   "latin": "Vena iliaca communis dextra"
   },
   {
    "index": 46,
    "file": "iliac_vena_left",
-   "name": "Left iliac vena",
-   "voxels": 2695
+   "name": "Left common iliac vein",
+   "voxels": 2695,
+   "latin": "Vena iliaca communis sinistra"
   },
   {
    "index": 47,
    "file": "iliac_artery_right",
-   "name": "Right iliac artery",
-   "voxels": 1405
+   "name": "Right common iliac artery",
+   "voxels": 1405,
+   "latin": "Arteria iliaca communis dextra"
   },
   {
    "index": 48,
    "file": "iliac_artery_left",
-   "name": "Left iliac artery",
-   "voxels": 1322
+   "name": "Left common iliac artery",
+   "voxels": 1322,
+   "latin": "Arteria iliaca communis sinistra"
   },
   {
    "index": 49,
    "file": "portal_vein_and_splenic_vein",
-   "name": "Portal vein and splenic vein",
-   "voxels": 1246
+   "name": "Portal and splenic veins",
+   "voxels": 1246,
+   "latin": "Vena portae hepatis et vena splenica"
   },
   {
    "index": 50,
    "file": "duodenum",
    "name": "Duodenum",
-   "voxels": 1149
+   "voxels": 1149,
+   "latin": "Duodenum"
   },
   {
    "index": 51,
    "file": "adrenal_gland_right",
    "name": "Right adrenal gland",
-   "voxels": 12
+   "voxels": 12,
+   "latin": "Glandula suprarenalis dextra"
   },
   {
    "index": 52,
    "file": "adrenal_gland_left",
    "name": "Left adrenal gland",
-   "voxels": 10
+   "voxels": 10,
+   "latin": "Glandula suprarenalis sinistra"
   },
   {
    "index": 53,
    "file": "prostate",
    "name": "Prostate",
-   "voxels": 1
+   "voxels": 1,
+   "latin": "Prostata"
   }
  ],
  "source": {

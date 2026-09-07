@@ -13,14 +13,14 @@ import {DEFAULT_VISIBLE,SYSTEMS,EXPLANATIONS,explanation,type Atlas,type Concept
 import {DEFAULT_WINDOW,PROJECTIONS,TISSUES,projection,tissueFor,isEnvelope,transmission,FILL_TISSUE,type BeamReading,type ProjectionId} from './radiograph';
 import {PLANES,plane,type PlaneId} from './slice';
 import {MODALITIES,CT_WINDOWS,modality,ctWindow,studiesFor,study as studyFor} from './modalities';
-import {planeAxis,type VolumeManifest} from './volume';
+import {planeAxis,type Structure,type VolumeManifest} from './volume';
 const PLANE_ABBR:Record<PlaneId,string>={axial:'AX',coronal:'COR',sagittal:'SAG'};
 /** Each radiographic projection is a camera preset; orbiting freely gives any other angle. */
 const PROJECTION_VIEW:Record<ProjectionId,View>={ap:'front',pa:'back',lateral:'side',oblique:'three-quarter'};
-const initial:SceneState={explode:0,visible:DEFAULT_VISIBLE,selected:[],isolate:false,view:'three-quarter',rotate:false,reset:0,mode:'anatomy',level:DEFAULT_WINDOW.level,window:DEFAULT_WINDOW.width,plane:'axial',slice:0,ctWindow:'soft',study:'body',highlight:''};
+const initial:SceneState={explode:0,visible:DEFAULT_VISIBLE,selected:[],isolate:false,view:'three-quarter',rotate:false,reset:0,mode:'anatomy',level:DEFAULT_WINDOW.level,window:DEFAULT_WINDOW.width,plane:'axial',slice:0,ctWindow:'soft',study:'body',highlight:'',labels:true};
 export default function Home(){
  const detailTitle=useRef<HTMLHeadingElement>(null);
- const [atlas,setAtlas]=useState<Atlas|null>(null),[state,setState]=useState(initial),[progress,setProgress]=useState(0),[error,setError]=useState(''),[panel,setPanel]=useState<'layers'|'search'|null>(null),[details,setDetails]=useState(false),[about,setAbout]=useState(false),[query,setQuery]=useState(''),[chosen,setChosen]=useState<Concept|null>(null),[beam,setBeam]=useState<ProjectionId>('ap'),[reading,setReading]=useState<BeamReading|null>(null),[study,setStudy]=useState<VolumeManifest|null>(null),[picked,setPicked]=useState<string|null>(null);
+ const [atlas,setAtlas]=useState<Atlas|null>(null),[state,setState]=useState(initial),[progress,setProgress]=useState(0),[error,setError]=useState(''),[panel,setPanel]=useState<'layers'|'search'|null>(null),[details,setDetails]=useState(false),[about,setAbout]=useState(false),[query,setQuery]=useState(''),[chosen,setChosen]=useState<Concept|null>(null),[beam,setBeam]=useState<ProjectionId>('ap'),[reading,setReading]=useState<BeamReading|null>(null),[study,setStudy]=useState<VolumeManifest|null>(null),[picked,setPicked]=useState<string|null>(null),[contents,setContents]=useState<Structure[]>([]);
  useEffect(()=>{const abort=new AbortController();setProgress(0);setError('');setAtlas(null);setChosen(null);setDetails(false);setState({...initial,visible:DEFAULT_VISIBLE});fetch('/models/atlas.json',{signal:abort.signal}).then(r=>{if(!r.ok)throw new Error('The anatomy catalogue could not be loaded.');return r.json();}).then(data=>setAtlas(data as Atlas)).catch(e=>{if(e.name!=='AbortError')setError(e.message);});return()=>abort.abort();},[]);
  useEffect(()=>{const key=(e:KeyboardEvent)=>{if(e.key==='/'&&!(e.target instanceof HTMLInputElement)&&!(e.target instanceof HTMLTextAreaElement)){e.preventDefault();setPanel('search');setDetails(false);}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[]);
  const parts=useMemo(()=>new Map(atlas?.parts.map(p=>[p.id,p])),[atlas]);
@@ -62,7 +62,7 @@ export default function Home(){
   if(manifest)setState(s=>s.slice?s:{...s,slice:Math.floor(manifest.dims[planeAxis(s.plane)]/2)});
  };
  return <main className="studio">
-  {atlas&&<AnatomyScene atlas={atlas} state={{...state,inspectorOpen:details&&selectedParts.length>0,highlight:chosen?.name??''}} onSelect={choosePart} onProgress={n=>{setProgress(n);if(n===100)setError('');}} onError={setError} onBeam={setReading} onSlice={index=>setState(s=>({...s,slice:index}))} onStructure={nameStructure} onVolume={onStudy}/>}
+  {atlas&&<AnatomyScene atlas={atlas} state={{...state,inspectorOpen:details&&selectedParts.length>0,highlight:chosen?.name??''}} onSelect={choosePart} onProgress={n=>{setProgress(n);if(n===100)setError('');}} onError={setError} onBeam={setReading} onSlice={index=>setState(s=>({...s,slice:index}))} onStructure={nameStructure} onVolume={onStudy} onContents={setContents}/>}
   <div className="vignette"/>
   <header className="identity"><div className="eyebrow"><span className="status-dot"/> INTERACTIVE ANATOMY</div><h1>Human Atlas<Badge variant="outline" className="edition">3D</Badge></h1><div className="identity-meta">{atlas?atlas.parts.length.toLocaleString():'2,234'} modeled pieces <span>·</span> BodyParts3D</div></header>
   <nav className="top-actions" aria-label="Explorer panels"><Button variant="ghost" className={panel==='search'?'active':''} onClick={()=>openPanel('search')} aria-label="Search anatomy"><Search size={18}/><span>Find a structure</span><kbd>/</kbd></Button><Button variant="ghost" className={imaging?'active':''} aria-pressed={imaging} onClick={enterImaging} aria-label="Imaging modalities"><Scan size={18}/><span>Imaging</span></Button><Button variant="ghost" className="icon-button" aria-label="About this atlas" onClick={()=>{setDetails(false);setPanel(null);setAbout(true);}}><Info size={18}/></Button></nav>
@@ -93,8 +93,16 @@ export default function Home(){
      <div className="preset-group"><div className="preset-label" id="study-presets">{state.mode==='mr'?'Sequence':'Region'}</div><div className="preset-row" role="group" aria-labelledby="study-presets">{studiesFor(state.mode).map(q=><Button variant="ghost" key={q.id} className={state.study===q.id?'active':''} aria-pressed={state.study===q.id} title={`${q.description} Covers ${q.coverage}.`} onClick={()=>chooseStudy(q.id)}>{q.label}</Button>)}</div></div>
      <p className="projection-note">{studyFor(state.mode,state.study).description} Covers {studyFor(state.mode,state.study).coverage}.</p>
      <p className="projection-note">{state.mode==='mr'?'One acquisition carries one weighting, so each sequence is a separate study of a different patient.':'No single clinical study covers a whole body, so the body arrives in two studies of two patients that overlap at the shoulders.'} {state.mode==='mr'?'The weighting was measured from each study’s own tissue signals.':''}</p>
+     <div className="preset-group"><div className="preset-label" id="label-toggle">Names on the image</div>
+      <div className="preset-row" role="group" aria-labelledby="label-toggle">
+       <Button variant="ghost" className={state.labels?'active':''} aria-pressed={state.labels} onClick={()=>setState(s=>({...s,labels:true}))}>Shown</Button>
+       <Button variant="ghost" className={!state.labels?'active':''} aria-pressed={!state.labels} onClick={()=>setState(s=>({...s,labels:false}))}>Hidden</Button>
+      </div></div>
+     {contents.length>0&&<div className="preset-group"><div className="preset-label">In this slice <span className="small-number">{contents.length}</span></div>
+      <div className="slice-contents">{contents.map(item=><button key={item.index} className={`slice-row ${chosen?.name.toLowerCase()===item.name.toLowerCase()?'active':''}`} onClick={()=>nameStructure(item.name)}>
+       <span className="slice-name">{item.name}</span>{item.latin&&<span className="slice-latin">{item.latin}</span>}</button>)}</div></div>}
      {picked?<div className="beam-summary"><span>Under the pointer<strong>{picked}</strong></span></div>
-      :<p className="beam-hint">Hover or tap the image to name the structure under the pointer.</p>}
+      :<p className="beam-hint">Hover or tap the image to name the structure under the pointer. Names on the image are written for the larger structures; the list holds every one.</p>}
      <p className="phantom-note">{study.source.dataset} subject {study.source.subject} · {study.structures.length} structures segmented · {study.dims.join('×')} at {study.spacing.map(v=>v.toFixed(2)).join('×')} mm.<br/>{study.source.attribution}. Licensed {study.source.licence}.</p>
     </>:<p className="beam-hint">Loading the study. The volume and its segmentations are fetched once and kept.</p>}
    </>}
