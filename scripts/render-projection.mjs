@@ -6,7 +6,7 @@
 // attenuation coefficient. That is the same quantity the shader accumulates in the browser.
 import fs from 'node:fs';
 import zlib from 'node:zlib';
-import {projection,PROJECTIONS,contributionFor,isEnvelope,tissueFor,TISSUES,displayValue} from '../app/radiograph.ts';
+import {projection,PROJECTIONS,contributionFor,isEnvelope,tissueFor,TISSUES,FILL_MU,FILL_TISSUE,displayValue} from '../app/radiograph.ts';
 
 const argv=process.argv.slice(2),opt=(name,fallback)=>{const i=argv.indexOf(`--${name}`);return i<0?fallback:argv[i+1];};
 if(argv.includes('--help')){
@@ -64,18 +64,23 @@ if(region!=='full'){
 }
 const height=Math.max(64,Math.round(width*(v1-v0)/(u1-u0)));
 const W=width*ss,H=height*ss,accum=new Float64Array(W*H);
+// The skin is a thin shell rather than a solid body, so the beam's path through soft tissue is the
+// span between the first and last time it meets that shell. Those two depths are tracked per pixel
+// and the soft-tissue fill is added once at the end, rather than accumulated face by face.
+const near=new Float64Array(W*H).fill(Infinity),far=new Float64Array(W*H).fill(-Infinity);
 const scaleU=W/(u1-u0),scaleV=H/(v1-v0);
 
 let triangles=0,rendered=0;
 const started=Date.now();
 for(const part of parts){
+ const shell=isEnvelope(part);
  const mu=contributionFor(part,envelopePresent);
  const buf=chunks[part.chunk];
  const pos=new Float32Array(buf.buffer,buf.byteOffset+part.positions,part.vertexCount*3);
  const nor=new Int16Array(buf.buffer,buf.byteOffset+part.normals,part.vertexCount*3);
  const idx=new Uint32Array(buf.buffer,buf.byteOffset+part.indices,part.indexCount);
  rendered++;
- if(mu===0){triangles+=idx.length/3;continue;}
+ if(mu===0&&!shell){triangles+=idx.length/3;continue;}
  for(let t=0;t<idx.length;t+=3){
   triangles++;
   const a=idx[t]*3,b=idx[t+1]*3,c=idx[t+2]*3;
@@ -107,11 +112,14 @@ for(const part of parts){
     const w1=((cx2-pau)*(pcv-pav)-(cy2-pav)*(pcu-pau))*inv;
     if(w0<0||w1<0||w0+w1>1)continue;
     const depth=pad+(pbd-pad)*w1+(pcd-pad)*w0;
-    accum[row+px]+=sign*mu*depth*100;
+    if(shell){const i=row+px;if(depth<near[i])near[i]=depth;if(depth>far[i])far[i]=depth;}
+    else accum[row+px]+=sign*mu*depth*100;
    }
   }
  }
 }
+
+if(envelopePresent)for(let i=0;i<accum.length;i++)if(far[i]>near[i])accum[i]+=FILL_MU*(far[i]-near[i])*100;
 
 // Downsample the supersampled accumulator.
 const pixels=new Float64Array(width*height);
@@ -155,6 +163,6 @@ for(const p of parts){const t=tissueFor(p);tissues.set(t,(tissues.get(t)??0)+1);
 console.log(`${view.name} (${view.abbr}) · ${view.description}`);
 console.log(`${rendered} structures, ${triangles.toLocaleString()} triangles, ${ss}x supersampled, ${((Date.now()-started)/1000).toFixed(1)}s`);
 console.log(`Tissues in beam: ${[...tissues].sort((a,b)=>TISSUES[b[0]].mu-TISSUES[a[0]].mu).map(([t,n])=>`${t} ${n}`).join(', ')}`);
-console.log(`Soft-tissue envelope: ${envelopePresent?'present, structures shown as excess over soft tissue':'absent, structures shown at their own coefficient'}`);
+console.log(`Body fill: ${envelopePresent?`the span enclosed by the skin shell, filled with ${FILL_TISSUE}; structures shown as excess over it`:'absent, structures shown at their own coefficient'}`);
 console.log(`Window level ${level.toFixed(2)}, width ${window.toFixed(2)} (attenuation units)`);
 console.log(`Field: ${region}${region==='full'?'':' (collimated)'} · wrote ${out} at ${width}x${height}`);

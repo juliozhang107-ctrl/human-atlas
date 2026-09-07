@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
-import {TISSUES,PROJECTIONS,projection,tissueFor,muFor,contributionFor,isEnvelope,integrateBeam,transmission,displayValue,DEFAULT_WINDOW} from '../app/radiograph.ts';
+import {TISSUES,PROJECTIONS,projection,tissueFor,muFor,contributionFor,isEnvelope,integrateBeam,bodySpan,transmission,displayValue,DEFAULT_WINDOW,FILL_TISSUE,FILL_MU} from '../app/radiograph.ts';
 
 const atlas=JSON.parse(await readFile(new URL('../public/models/atlas.json',import.meta.url)));
 
@@ -39,14 +39,30 @@ for(const lobe of liver)assert.equal(tissueFor(lobe),'organ',`${lobe.name}: live
 const costal=atlas.parts.filter(p=>/costal cartilage/i.test(p.name));
 assert.ok(costal.length>=10&&costal.every(p=>tissueFor(p)==='cartilage'),'costal cartilages must not read as bone');
 
-// With the envelope in the beam, internal structures carry only their excess over soft tissue, so
-// bone stays positive, bowel gas goes negative, and blood is nearly invisible.
+// The body is filled with the interstitial tissue that no mesh models, and every structure carries
+// only its excess over that fill: bone adds strongly, an air-filled airway subtracts, and blood
+// sits close to the fill because the two attenuate similarly.
 const rib=named('Left tenth rib'),bronchus=named('Left main bronchus'),aorta=named('Descending thoracic aorta');
-assert.ok(contributionFor(rib,true)>0,'bone must add attenuation');
-assert.ok(contributionFor(bronchus,true)<0,'an air-filled airway must subtract attenuation');
-assert.ok(Math.abs(contributionFor(aorta,true))<.02,'blood must be close to soft-tissue neutral');
-assert.equal(contributionFor(named('Skin'),true),TISSUES.soft.mu,'the envelope carries the soft-tissue fill');
-assert.equal(contributionFor(rib,false),TISSUES.bone.mu,'without an envelope a structure carries its own coefficient');
+assert.equal(FILL_MU,TISSUES[FILL_TISSUE].mu);
+assert.ok(contributionFor(rib,true)>.25,'bone must add strongly');
+assert.ok(contributionFor(bronchus,true)<-.15,'an air-filled airway must subtract close to the whole fill');
+assert.ok(contributionFor(aorta,true)>0&&contributionFor(aorta,true)<contributionFor(rib,true)/5,'blood must sit near the fill');
+assert.equal(contributionFor(named('Skin'),true),FILL_MU,'the envelope carries the fill');
+assert.equal(contributionFor(named('Skin'),false),0,'without a fill the envelope contributes nothing on its own');
+assert.equal(contributionFor(rib,false),TISSUES.bone.mu,'without a fill a structure carries its own coefficient');
+
+// The skin is a shell, so the path through the body is the span it encloses, not its thickness.
+// Reading the shell as a solid would put a few millimetres of tissue in the beam instead of tens of
+// centimetres, which is the difference between a radiograph and an outline.
+const skinIndex=atlas.parts.findIndex(isEnvelope);
+const shellHits=[{index:skinIndex,distance:.10,front:true},{index:skinIndex,distance:.104,front:false},
+                 {index:skinIndex,distance:.32,front:true},{index:skinIndex,distance:.324,front:false}];
+assert.ok(Math.abs(bodySpan(shellHits,skinIndex)-.224)<1e-9,'the body span runs from the first to the last meeting with the shell');
+const shellOnly=integrateBeam(shellHits,()=>FILL_MU);
+assert.ok(shellOnly.crossings[0].thickness<.01,'an even–odd reading of a shell gives only its rim');
+assert.ok(bodySpan(shellHits,skinIndex)>20*shellOnly.crossings[0].thickness,'the enclosed span must dwarf the rim');
+assert.equal(bodySpan(shellHits,skinIndex+1),0,'a structure the beam never meets encloses nothing');
+assert.equal(bodySpan([{index:skinIndex,distance:.1,front:true}],skinIndex),0,'a single meeting encloses nothing');
 
 // Path integration. A 10 cm slab of bone at 0.48 cm^-1 attenuates by 4.8.
 const slab=integrateBeam([{index:0,distance:.20,front:true},{index:0,distance:.30,front:false}],()=>TISSUES.bone.mu);

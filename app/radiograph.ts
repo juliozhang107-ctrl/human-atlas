@@ -22,10 +22,17 @@ export const TISSUES: Record<TissueId,{name:string;density:number;mu:number}> = 
  tooth:    {name:'Dental enamel',      density:2.96,  mu:1.010},
 };
 
-/** The single mesh that encloses the whole body. It is filled with soft tissue and every other
- *  structure displaces some of that fill, so internal structures contribute only their excess
- *  attenuation over soft tissue. Without the envelope the beam sees each structure in isolation. */
+/** The single mesh that bounds the body. It is a thin shell in this atlas, not a solid volume, so
+ *  what it contributes is the span it encloses rather than its own thickness: a beam is filled with
+ *  tissue between the first and last time it meets the shell, and a section is filled by flooding
+ *  inward from its outline.
+ *
+ *  That fill is adipose rather than water. The space inside the body that no mesh models is mostly
+ *  fat and loose connective tissue, which is why it reads dark on a section. Every modelled
+ *  structure then contributes only its excess over that fill, so the same assumption holds whether
+ *  the anatomy is projected or sectioned. */
 export const ENVELOPE_PART = 'Skin';
+export const FILL_TISSUE:TissueId = 'fat';
 export function isEnvelope(part:{name:string;system:SystemId}){return part.system==='integumentary' && part.name===ENVELOPE_PART;}
 
 const RULES: [RegExp,TissueId][] = [
@@ -62,10 +69,29 @@ export function tissueFor(part:{name:string;system:SystemId}):TissueId{
 }
 export function muFor(part:{name:string;system:SystemId}){return TISSUES[tissueFor(part)].mu;}
 
-/** Attenuation a structure adds to the beam, in cm^-1. */
+/** In a projection the envelope carries the soft-tissue fill of the whole body. In a cross-section
+ *  it means something narrower: once every modelled structure has been drawn, what is still labelled
+ *  envelope is the subcutaneous and interstitial space, which is mostly fat. Reading it as fat is
+ *  what gives a section its dark rim under the skin and its contrast between muscle and the planes
+ *  around it. */
+export function sectionTissue(part:{name:string;system:SystemId}):TissueId{
+ return isEnvelope(part)?FILL_TISSUE:tissueFor(part);
+}
+
+/** Attenuation a structure adds to the beam, in cm^-1. With the body filled, a structure adds only
+ *  what it has over the fill it displaces, so gas-filled airways subtract and bone adds strongly.
+ *  The envelope itself is handled by the span it encloses, not by this value. */
+export const FILL_MU=TISSUES[FILL_TISSUE].mu;
 export function contributionFor(part:{name:string;system:SystemId},envelopePresent:boolean){
- if(isEnvelope(part)) return TISSUES.soft.mu;
- return envelopePresent ? muFor(part)-TISSUES.soft.mu : muFor(part);
+ if(isEnvelope(part)) return envelopePresent?FILL_MU:0;
+ return envelopePresent ? muFor(part)-FILL_MU : muFor(part);
+}
+
+/** The beam's path through the body: the span between the first and last meeting with the shell. */
+export function bodySpan(hits:Hit[],envelopeIndex:number){
+ let near=Infinity,far=-Infinity;
+ for(const hit of hits)if(hit.index===envelopeIndex){if(hit.distance<near)near=hit.distance;if(hit.distance>far)far=hit.distance;}
+ return far>near?far-near:0;
 }
 
 export type ProjectionId = 'ap'|'pa'|'lateral'|'oblique';
@@ -115,12 +141,19 @@ export function integrateBeam(hits:Hit[],contribution:(index:number)=>number){
  return {total,crossings};
 }
 
+/** Hounsfield units are defined from the same linear attenuation coefficients the beam pass uses,
+ *  so the radiograph and the CT numbers cannot drift apart. One caveat follows from the geometry:
+ *  each bone is a single mesh with no separate cortex, trabecular bone or marrow, so bone reads at
+ *  a cortical value throughout rather than the lower average of a real vertebral body. */
+export const MU_WATER=TISSUES.fluid.mu;
+export function hounsfield(tissue:TissueId){return Math.round(1000*(TISSUES[tissue].mu-MU_WATER)/MU_WATER);}
+
 /** Beer–Lambert transmission through the accumulated attenuation. */
 export function transmission(total:number){return Math.exp(-total);}
 
 /** Radiographic greyscale. Attenuation maps to brightness, so bone reads white and air reads black,
  *  windowed the way a viewing console windows a study. */
-export const DEFAULT_WINDOW={level:1,width:2};
+export const DEFAULT_WINDOW={level:2.9,width:5.8};
 export function displayValue(total:number,level=DEFAULT_WINDOW.level,width=DEFAULT_WINDOW.width){
  const low=level-width/2;
  return Math.min(1,Math.max(0,(total-low)/Math.max(1e-6,width)));
