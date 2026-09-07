@@ -45,8 +45,12 @@ for(const id of ['ct',...MR_STUDIES.map(s=>s.path)]){
 
  // ── Manifest integrity ─────────────────────────────────────────────────────────────────────────
  assert.equal(manifest.modality,id==='ct'?'ct':'mr',`${id}: manifest names a different modality`);
- assert.ok(manifest.dims.every(d=>d>32),`${id}: implausible dimensions`);
+ // A clinical study can be thin in one direction: a T2 abdomen is often thirty-odd slices at six
+ // millimetres. What matters is that each axis covers a real distance, not that it has many voxels.
+ assert.ok(manifest.dims.every(d=>d>16),`${id}: implausible dimensions ${manifest.dims}`);
  assert.ok(manifest.spacing.every(s=>s>0&&s<10),`${id}: implausible voxel spacing`);
+ const extent=manifest.dims.map((d,i)=>d*manifest.spacing[i]/10);
+ assert.ok(extent.every(cm=>cm>8),`${id}: field of view too small (${extent.map(c=>c.toFixed(0)).join('×')} cm)`);
  assert.ok(manifest.structures.length>20,`${id}: too few structures to be useful`);
  for(const field of ['dataset','subject','doi','url','licence','attribution'])
   assert.ok(manifest.source[field],`${id}: source is missing ${field}`);

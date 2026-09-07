@@ -1,0 +1,286 @@
+{
+ "modality": "mr",
+ "subject": "s0173",
+ "weighting": "T2",
+ "dims": [
+  384,
+  384,
+  32
+ ],
+ "spacing": [
+  1.0417,
+  1.0417,
+  6.0
+ ],
+ "axes": "x patient left, y superior, z anterior",
+ "crop": [
+  [
+   0,
+   384
+  ],
+  [
+   0,
+   384
+  ],
+  [
+   0,
+   32
+  ]
+ ],
+ "intensity": {
+  "dtype": "uint8",
+  "encoding": "plain",
+  "slope": 1,
+  "inter": 0,
+  "unit": "stored 0-255",
+  "ceiling": 1817.0
+ },
+ "structures": [
+  {
+   "index": 1,
+   "file": "liver",
+   "name": "Liver",
+   "voxels": 220757
+  },
+  {
+   "index": 2,
+   "file": "lung_right",
+   "name": "Right lung",
+   "voxels": 149784
+  },
+  {
+   "index": 3,
+   "file": "lung_left",
+   "name": "Left lung",
+   "voxels": 135812
+  },
+  {
+   "index": 4,
+   "file": "colon",
+   "name": "Colon",
+   "voxels": 81228
+  },
+  {
+   "index": 5,
+   "file": "autochthon_left",
+   "name": "Left autochthon",
+   "voxels": 56711
+  },
+  {
+   "index": 6,
+   "file": "heart",
+   "name": "Heart",
+   "voxels": 55900
+  },
+  {
+   "index": 7,
+   "file": "small_bowel",
+   "name": "Small bowel",
+   "voxels": 55025
+  },
+  {
+   "index": 8,
+   "file": "autochthon_right",
+   "name": "Right autochthon",
+   "voxels": 49950
+  },
+  {
+   "index": 9,
+   "file": "vertebrae",
+   "name": "Vertebra",
+   "voxels": 33267
+  },
+  {
+   "index": 10,
+   "file": "spleen",
+   "name": "Spleen",
+   "voxels": 26389
+  },
+  {
+   "index": 11,
+   "file": "kidney_right",
+   "name": "Right kidney",
+   "voxels": 17090
+  },
+  {
+   "index": 12,
+   "file": "kidney_left",
+   "name": "Left kidney",
+   "voxels": 17056
+  },
+  {
+   "index": 13,
+   "file": "iliopsoas_left",
+   "name": "Left iliopsoas",
+   "voxels": 16931
+  },
+  {
+   "index": 14,
+   "file": "intervertebral_discs",
+   "name": "Intervertebral discs",
+   "voxels": 16343
+  },
+  {
+   "index": 15,
+   "file": "iliopsoas_right",
+   "name": "Right iliopsoas",
+   "voxels": 15839
+  },
+  {
+   "index": 16,
+   "file": "stomach",
+   "name": "Stomach",
+   "voxels": 14442
+  },
+  {
+   "index": 17,
+   "file": "spinal_cord",
+   "name": "Spinal cord",
+   "voxels": 11095
+  },
+  {
+   "index": 18,
+   "file": "gallbladder",
+   "name": "Gallbladder",
+   "voxels": 5962
+  },
+  {
+   "index": 19,
+   "file": "pancreas",
+   "name": "Pancreas",
+   "voxels": 5317
+  },
+  {
+   "index": 20,
+   "file": "gluteus_medius_right",
+   "name": "Right gluteus medius",
+   "voxels": 4228
+  },
+  {
+   "index": 21,
+   "file": "gluteus_medius_left",
+   "name": "Left gluteus medius",
+   "voxels": 3815
+  },
+  {
+   "index": 22,
+   "file": "duodenum",
+   "name": "Duodenum",
+   "voxels": 2634
+  },
+  {
+   "index": 23,
+   "file": "hip_right",
+   "name": "Right hip",
+   "voxels": 2326
+  },
+  {
+   "index": 24,
+   "file": "sacrum",
+   "name": "Sacrum",
+   "voxels": 1665
+  },
+  {
+   "index": 25,
+   "file": "esophagus",
+   "name": "Esophagus",
+   "voxels": 1580
+  },
+  {
+   "index": 26,
+   "file": "hip_left",
+   "name": "Left hip",
+   "voxels": 1568
+  },
+  {
+   "index": 27,
+   "file": "inferior_vena_cava",
+   "name": "Inferior vena cava",
+   "voxels": 1066
+  },
+  {
+   "index": 28,
+   "file": "portal_vein_and_splenic_vein",
+   "name": "Portal vein and splenic vein",
+   "voxels": 793
+  },
+  {
+   "index": 29,
+   "file": "aorta",
+   "name": "Aorta",
+   "voxels": 638
+  },
+  {
+   "index": 30,
+   "file": "iliac_artery_right",
+   "name": "Right iliac artery",
+   "voxels": 564
+  },
+  {
+   "index": 31,
+   "file": "iliac_artery_left",
+   "name": "Left iliac artery",
+   "voxels": 377
+  },
+  {
+   "index": 32,
+   "file": "iliac_vena_left",
+   "name": "Left iliac vena",
+   "voxels": 320
+  },
+  {
+   "index": 33,
+   "file": "adrenal_gland_left",
+   "name": "Left adrenal gland",
+   "voxels": 299
+  },
+  {
+   "index": 34,
+   "file": "gluteus_maximus_right",
+   "name": "Right gluteus maximus",
+   "voxels": 283
+  },
+  {
+   "index": 35,
+   "file": "gluteus_maximus_left",
+   "name": "Left gluteus maximus",
+   "voxels": 189
+  },
+  {
+   "index": 36,
+   "file": "adrenal_gland_right",
+   "name": "Right adrenal gland",
+   "voxels": 177
+  },
+  {
+   "index": 37,
+   "file": "iliac_vena_right",
+   "name": "Right iliac vena",
+   "voxels": 173
+  },
+  {
+   "index": 38,
+   "file": "gluteus_minimus_right",
+   "name": "Right gluteus minimus",
+   "voxels": 49
+  },
+  {
+   "index": 39,
+   "file": "gluteus_minimus_left",
+   "name": "Left gluteus minimus",
+   "voxels": 41
+  }
+ ],
+ "source": {
+  "dataset": "TotalSegmentator MRI",
+  "subject": "s0173",
+  "doi": "10.5281/zenodo.11367005",
+  "url": "https://zenodo.org/records/11367005",
+  "licence": "CC BY-NC-SA 2.0",
+  "attribution": "Akinci D\u2019Antonoli et al., TotalSegmentator MRI, University Hospital Basel"
+ },
+ "bytes": {
+  "volume": 3981531,
+  "labels": 72603
+ }
+}

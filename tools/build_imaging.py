@@ -145,9 +145,12 @@ if __name__ == '__main__':
     }
     # Weighting is measured from each study rather than read from its metadata, whose repetition and
     # echo times are recorded in mixed units across this collection. See tools/weighting.py.
-    build('data/raw/ct/s0287', 'public/imaging/ct', 'ct', 's0287', SOURCES['ct'],
-          target_spacing=(2.5, 2.5, 2.5))
+    # The CT keeps the sampling the collection distributes, 1.5 mm, rather than being reduced
+    # further: that is as fine as this source goes.
+    build('data/raw/ct/s0287', 'public/imaging/ct', 'ct', 's0287', SOURCES['ct'])
     build('data/raw/mri/s0175', 'public/imaging/mr-t1', 'mr', 's0175',
           dict(SOURCES['mri'], subject='s0175'), weighting='T1')
+    build('data/raw/mri/s0173', 'public/imaging/mr-t2', 'mr', 's0173',
+          dict(SOURCES['mri'], subject='s0173'), weighting='T2')
     build('data/raw/mri/s0190', 'public/imaging/mr-stir', 'mr', 's0190',
           dict(SOURCES['mri'], subject='s0190'), weighting='STIR')

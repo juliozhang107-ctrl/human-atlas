@@ -3,14 +3,14 @@
  "subject": "s0287",
  "weighting": null,
  "dims": [
-  184,
-  501,
-  148
+  306,
+  835,
+  246
  ],
  "spacing": [
-  2.5,
-  2.5,
-  2.5
+  1.5,
+  1.5,
+  1.5
  ],
  "axes": "x patient left, y superior, z anterior",
  "crop": [
@@ -657,7 +657,7 @@
   "attribution": "Wasserthal et al., TotalSegmentator, University Hospital Basel"
  },
  "bytes": {
-  "volume": 11199346,
-  "labels": 195610
+  "volume": 51514466,
+  "labels": 600265
  }
 }

@@ -28,8 +28,10 @@ export interface Study {id:string;path:string;label:string;subject:string;covera
 export const MR_STUDIES: Study[] = [
  {id:'t1',  path:'mr-t1',  label:'T1',  subject:'s0175', coverage:'head to thigh, 108 cm',
   description:'Fat and marrow bright, urine dark against liver. The study to read anatomy from.'},
+ {id:'t2',  path:'mr-t2',  label:'T2',  subject:'s0173', coverage:'abdomen, 40 cm',
+  description:'Fluid and spleen bright, muscle dark, fat still bright. Where most pathology shows.'},
  {id:'stir',path:'mr-stir',label:'STIR',subject:'s0190', coverage:'chest to pelvis, 50 cm',
-  description:'Inversion recovery with fat nulled. Fluid and spinal cord bright, fat and muscle dark.'},
+  description:'Inversion recovery with fat nulled, so only fluid stays bright. For oedema and marrow.'},
 ];
 export function mrStudy(id:string){const study=MR_STUDIES.find(s=>s.id===id);if(!study)throw new Error(`Unknown study: ${id}. Expected one of ${MR_STUDIES.map(s=>s.id).join(', ')}.`);return study;}
 
