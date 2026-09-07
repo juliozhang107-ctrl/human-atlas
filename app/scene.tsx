@@ -8,7 +8,7 @@ import {decodeModelResponse} from './model-download';
 import {PointerTap} from './pointer-tap';
 import {SYSTEMS,type Atlas,type SceneState} from './anatomy';
 import {contributionFor,integrateBeam,bodySpan,isEnvelope,FILL_MU,type BeamReading,type Crossing,type Hit} from './radiograph';
-import {ctWindow} from './modalities';
+import {ctWindow,mrStudy} from './modalities';
 import {loadVolume,extractSection,sliceCount,type Section,type Volume,type VolumeManifest} from './volume';
 /** Two millimetres a notch, matching the position slider. */
 export const SLICE_STEP=.002;
@@ -195,6 +195,8 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
   let sliceKey='',drawKey='',sliceActive=false,sliceCrop={x:0,y:0,w:0,h:0},sliceDraw={x:0,y:0,w:0,h:0};
 
   const wanted=(mode:string)=>mode==='ct'||mode==='mr';
+  /** Which study a state refers to: the single CT, or the chosen magnetic resonance acquisition. */
+  const studyPath=(s:SceneState)=>s.mode==='ct'?'ct':mrStudy(s.study).path;
   const ensureStudy=(mode:string)=>{
    const held=studies.get(mode);
    if(held){if(study!==held){study=held;sliceKey='';volume.current(held.manifest);}return true;}
@@ -203,7 +205,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    loadVolume(`/imaging/${mode}`,abort.signal).then(loaded=>{
     if(disposed)return;
     studies.set(mode,loaded);
-    if(latest.current.mode===mode){study=loaded;sliceKey='';volume.current(loaded.manifest);dirty=true;}
+    if(studyPath(latest.current)===mode){study=loaded;sliceKey='';volume.current(loaded.manifest);dirty=true;}
    }).catch(e=>{if(!disposed&&e.name!=='AbortError')onError(e instanceof Error?e.message:'The imaging study could not be loaded.');})
     .finally(()=>{if(loading===mode)loading='';});
    return false;
@@ -211,7 +213,9 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
 
   const buildSlice=(s:SceneState)=>{
    if(!study)return;
-   const window=s.mode==='ct'?ctWindow(s.ctWindow):{width:s.mrWindow,level:s.mrLevel};
+   // A magnetic resonance study is stored normalised to its own upper percentile, so the whole
+   // stored range is the window; there is nothing absolute to window against.
+   const window=s.mode==='ct'?ctWindow(s.ctWindow):{width:256,level:128};
    section=extractSection(study,s.plane,s.slice,window.width,window.level);
    sliceBuffer.width=section.width;sliceBuffer.height=section.height;
    const image=sliceBufferContext.createImageData(section.width,section.height);
@@ -320,8 +324,8 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    const cross=wanted(s.mode);
    if(cross!==sliceActive){sliceActive=cross;sliceCanvas.hidden=!cross;renderer.domElement.style.visibility=cross?'hidden':'visible';hover.hidden=true;}
    if(cross){
-    if(!ensureStudy(s.mode))return;
-    const build=[s.mode,s.plane,s.slice,s.ctWindow,s.mrLevel,s.mrWindow].join('|');
+    if(!ensureStudy(studyPath(s)))return;
+    const build=[studyPath(s),s.plane,s.slice,s.ctWindow].join('|');
     if(build!==sliceKey){sliceKey=build;buildSlice(s);drawKey='';}
     // The free area is remeasured each frame, so opening the inspector or the layer panel refits
     // the image instead of leaving it underneath.

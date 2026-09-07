@@ -1,0 +1,256 @@
+{
+ "modality": "mr",
+ "subject": "s0190",
+ "weighting": "STIR",
+ "dims": [
+  384,
+  384,
+  39
+ ],
+ "spacing": [
+  1.3021,
+  1.3021,
+  6.0
+ ],
+ "axes": "x patient left, y superior, z anterior",
+ "crop": [
+  [
+   0,
+   384
+  ],
+  [
+   0,
+   384
+  ],
+  [
+   0,
+   39
+  ]
+ ],
+ "intensity": {
+  "dtype": "uint8",
+  "encoding": "plain",
+  "slope": 1,
+  "inter": 0,
+  "unit": "stored 0-255",
+  "ceiling": 213.0
+ },
+ "structures": [
+  {
+   "index": 1,
+   "file": "liver",
+   "name": "Liver",
+   "voxels": 92813
+  },
+  {
+   "index": 2,
+   "file": "lung_right",
+   "name": "Right lung",
+   "voxels": 60654
+  },
+  {
+   "index": 3,
+   "file": "lung_left",
+   "name": "Left lung",
+   "voxels": 29890
+  },
+  {
+   "index": 4,
+   "file": "autochthon_right",
+   "name": "Right autochthon",
+   "voxels": 23973
+  },
+  {
+   "index": 5,
+   "file": "vertebrae",
+   "name": "Vertebra",
+   "voxels": 23277
+  },
+  {
+   "index": 6,
+   "file": "autochthon_left",
+   "name": "Left autochthon",
+   "voxels": 23261
+  },
+  {
+   "index": 7,
+   "file": "stomach",
+   "name": "Stomach",
+   "voxels": 19317
+  },
+  {
+   "index": 8,
+   "file": "heart",
+   "name": "Heart",
+   "voxels": 17785
+  },
+  {
+   "index": 9,
+   "file": "iliopsoas_right",
+   "name": "Right iliopsoas",
+   "voxels": 17464
+  },
+  {
+   "index": 10,
+   "file": "iliopsoas_left",
+   "name": "Left iliopsoas",
+   "voxels": 15919
+  },
+  {
+   "index": 11,
+   "file": "sacrum",
+   "name": "Sacrum",
+   "voxels": 15377
+  },
+  {
+   "index": 12,
+   "file": "hip_left",
+   "name": "Left hip",
+   "voxels": 14858
+  },
+  {
+   "index": 13,
+   "file": "hip_right",
+   "name": "Right hip",
+   "voxels": 14082
+  },
+  {
+   "index": 14,
+   "file": "colon",
+   "name": "Colon",
+   "voxels": 14081
+  },
+  {
+   "index": 15,
+   "file": "spleen",
+   "name": "Spleen",
+   "voxels": 12248
+  },
+  {
+   "index": 16,
+   "file": "kidney_left",
+   "name": "Left kidney",
+   "voxels": 11517
+  },
+  {
+   "index": 17,
+   "file": "gluteus_maximus_left",
+   "name": "Left gluteus maximus",
+   "voxels": 11479
+  },
+  {
+   "index": 18,
+   "file": "kidney_right",
+   "name": "Right kidney",
+   "voxels": 11212
+  },
+  {
+   "index": 19,
+   "file": "intervertebral_discs",
+   "name": "Intervertebral discs",
+   "voxels": 9790
+  },
+  {
+   "index": 20,
+   "file": "spinal_cord",
+   "name": "Spinal cord",
+   "voxels": 9119
+  },
+  {
+   "index": 21,
+   "file": "gluteus_maximus_right",
+   "name": "Right gluteus maximus",
+   "voxels": 3541
+  },
+  {
+   "index": 22,
+   "file": "femur_left",
+   "name": "Left femur",
+   "voxels": 3424
+  },
+  {
+   "index": 23,
+   "file": "humerus_right",
+   "name": "Right humerus",
+   "voxels": 2998
+  },
+  {
+   "index": 24,
+   "file": "humerus_left",
+   "name": "Left humerus",
+   "voxels": 2727
+  },
+  {
+   "index": 25,
+   "file": "femur_right",
+   "name": "Right femur",
+   "voxels": 2530
+  },
+  {
+   "index": 26,
+   "file": "gluteus_minimus_left",
+   "name": "Left gluteus minimus",
+   "voxels": 2123
+  },
+  {
+   "index": 27,
+   "file": "gluteus_minimus_right",
+   "name": "Right gluteus minimus",
+   "voxels": 1953
+  },
+  {
+   "index": 28,
+   "file": "gallbladder",
+   "name": "Gallbladder",
+   "voxels": 609
+  },
+  {
+   "index": 29,
+   "file": "pancreas",
+   "name": "Pancreas",
+   "voxels": 393
+  },
+  {
+   "index": 30,
+   "file": "esophagus",
+   "name": "Esophagus",
+   "voxels": 360
+  },
+  {
+   "index": 31,
+   "file": "gluteus_medius_right",
+   "name": "Right gluteus medius",
+   "voxels": 349
+  },
+  {
+   "index": 32,
+   "file": "portal_vein_and_splenic_vein",
+   "name": "Portal vein and splenic vein",
+   "voxels": 82
+  },
+  {
+   "index": 33,
+   "file": "small_bowel",
+   "name": "Small bowel",
+   "voxels": 75
+  },
+  {
+   "index": 34,
+   "file": "iliac_vena_right",
+   "name": "Right iliac vena",
+   "voxels": 56
+  }
+ ],
+ "source": {
+  "dataset": "TotalSegmentator MRI",
+  "subject": "s0190",
+  "doi": "10.5281/zenodo.11367005",
+  "url": "https://zenodo.org/records/11367005",
+  "licence": "CC BY-NC-SA 2.0",
+  "attribution": "Akinci D\u2019Antonoli et al., TotalSegmentator MRI, University Hospital Basel"
+ },
+ "bytes": {
+  "volume": 3037728,
+  "labels": 58973
+ }
+}

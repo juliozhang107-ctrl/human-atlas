@@ -40,7 +40,7 @@ def resample(volume, source_spacing, target_spacing, nearest=False):
         out = np.moveaxis(out, 0, axis)
     return out
 
-def build(subject_dir, out_dir, modality, subject, source, target_spacing=None):
+def build(subject_dir, out_dir, modality, subject, source, target_spacing=None, weighting=None):
     volume_file = os.path.join(subject_dir, 'ct.nii.gz' if modality == 'ct' else 'mri.nii.gz')
     # The directory name matches the modality id the app uses, so the viewer's fetch path is simply
     # /imaging/<modality>.
@@ -121,7 +121,7 @@ def build(subject_dir, out_dir, modality, subject, source, target_spacing=None):
 
     vol_gz, vol_raw = write('volume.bin.gz', stored)
     lab_gz, lab_raw = write('labels.bin.gz', labels)
-    manifest = {'modality': modality, 'subject': subject,
+    manifest = {'modality': modality, 'subject': subject, 'weighting': weighting,
                 'dims': list(values.shape), 'spacing': [round(s, 4) for s in spacing],
                 'axes': 'x patient left, y superior, z anterior',
                 'crop': [[int(lo), int(hi)] for lo, hi in box],
@@ -134,7 +134,7 @@ def build(subject_dir, out_dir, modality, subject, source, target_spacing=None):
 
 if __name__ == '__main__':
     SOURCES = {
-     'ct': {'dataset': 'TotalSegmentator', 'subject': 's0250',
+     'ct': {'dataset': 'TotalSegmentator', 'subject': 's0287',
             'doi': '10.5281/zenodo.10047292', 'url': 'https://zenodo.org/records/10047292',
             'licence': 'CC BY 4.0',
             'attribution': 'Wasserthal et al., TotalSegmentator, University Hospital Basel'},
@@ -143,6 +143,11 @@ if __name__ == '__main__':
              'licence': 'CC BY-NC-SA 2.0',
              'attribution': 'Akinci D’Antonoli et al., TotalSegmentator MRI, University Hospital Basel'},
     }
-    build('data/raw/ct/s0250', 'public/imaging/ct', 'ct', 's0250', SOURCES['ct'],
-          target_spacing=(2.0, 2.0, 2.0))
-    build('data/raw/mri/s0175', 'public/imaging/mr', 'mr', 's0175', SOURCES['mri'])
+    # Weighting is measured from each study rather than read from its metadata, whose repetition and
+    # echo times are recorded in mixed units across this collection. See tools/weighting.py.
+    build('data/raw/ct/s0287', 'public/imaging/ct', 'ct', 's0287', SOURCES['ct'],
+          target_spacing=(2.5, 2.5, 2.5))
+    build('data/raw/mri/s0175', 'public/imaging/mr-t1', 'mr', 's0175',
+          dict(SOURCES['mri'], subject='s0175'), weighting='T1')
+    build('data/raw/mri/s0190', 'public/imaging/mr-stir', 'mr', 's0190',
+          dict(SOURCES['mri'], subject='s0190'), weighting='STIR')

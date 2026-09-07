@@ -20,6 +20,19 @@ export function windowed(value:number,width:number,level:number){
  return Math.min(1,Math.max(0,(value-(level-width/2))/Math.max(1e-6,width)));
 }
 
+/** Magnetic resonance has no absolute scale, and one acquisition carries one weighting: a T2 cannot
+ *  be derived from a T1 the way a bone window can be derived from a soft-tissue one. So a sequence
+ *  here means a different study, and each is labelled with the weighting measured from its own
+ *  tissue signals rather than read from metadata this collection records in mixed units. */
+export interface Study {id:string;path:string;label:string;subject:string;coverage:string;description:string}
+export const MR_STUDIES: Study[] = [
+ {id:'t1',  path:'mr-t1',  label:'T1',  subject:'s0175', coverage:'head to thigh, 108 cm',
+  description:'Fat and marrow bright, urine dark against liver. The study to read anatomy from.'},
+ {id:'stir',path:'mr-stir',label:'STIR',subject:'s0190', coverage:'chest to pelvis, 50 cm',
+  description:'Inversion recovery with fat nulled. Fluid and spinal cord bright, fat and muscle dark.'},
+];
+export function mrStudy(id:string){const study=MR_STUDIES.find(s=>s.id===id);if(!study)throw new Error(`Unknown study: ${id}. Expected one of ${MR_STUDIES.map(s=>s.id).join(', ')}.`);return study;}
+
 export type ModalityId = 'radiograph'|'ct'|'mr'|'us';
 /** `interactive` marks the modalities the browser offers. Ultrasound stays in the renderer and its
  *  physics stays tested, but it is not offered in the app: a sector traced through surface meshes

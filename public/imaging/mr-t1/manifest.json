@@ -1,6 +1,7 @@
 {
  "modality": "mr",
  "subject": "s0175",
+ "weighting": "T1",
  "dims": [
   320,
   360,

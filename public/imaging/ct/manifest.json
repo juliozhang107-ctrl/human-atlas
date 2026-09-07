@@ -1,29 +1,30 @@
 {
  "modality": "ct",
- "subject": "s0250",
+ "subject": "s0287",
+ "weighting": null,
  "dims": [
-  225,
-  226,
-  218
+  184,
+  501,
+  148
  ],
  "spacing": [
-  2.0,
-  2.0,
-  2.0
+  2.5,
+  2.5,
+  2.5
  ],
  "axes": "x patient left, y superior, z anterior",
  "crop": [
   [
-   0,
-   300
+   1,
+   307
   ],
   [
    0,
-   301
+   835
   ],
   [
    0,
-   290
+   246
   ]
  ],
  "intensity": {
@@ -38,433 +39,625 @@
    "index": 1,
    "file": "liver",
    "name": "Liver",
-   "voxels": 724066
+   "voxels": 441670
   },
   {
    "index": 2,
-   "file": "small_bowel",
-   "name": "Small bowel",
-   "voxels": 492573
+   "file": "lung_upper_lobe_left",
+   "name": "Left lung upper lobe",
+   "voxels": 391917
   },
   {
    "index": 3,
-   "file": "colon",
-   "name": "Colon",
-   "voxels": 305061
+   "file": "lung_lower_lobe_right",
+   "name": "Right lung lower lobe",
+   "voxels": 340963
   },
   {
    "index": 4,
-   "file": "gluteus_maximus_right",
-   "name": "Right gluteus maximus",
-   "voxels": 220482
+   "file": "lung_lower_lobe_left",
+   "name": "Left lung lower lobe",
+   "voxels": 335407
   },
   {
    "index": 5,
-   "file": "gluteus_maximus_left",
-   "name": "Left gluteus maximus",
-   "voxels": 211480
+   "file": "lung_upper_lobe_right",
+   "name": "Right lung upper lobe",
+   "voxels": 305491
   },
   {
    "index": 6,
-   "file": "lung_lower_lobe_right",
-   "name": "Right lung lower lobe",
-   "voxels": 169807
+   "file": "small_bowel",
+   "name": "Small bowel",
+   "voxels": 294445
   },
   {
    "index": 7,
-   "file": "lung_lower_lobe_left",
-   "name": "Left lung lower lobe",
-   "voxels": 137321
+   "file": "gluteus_maximus_right",
+   "name": "Right gluteus maximus",
+   "voxels": 243818
   },
   {
    "index": 8,
-   "file": "hip_right",
-   "name": "Right hip",
-   "voxels": 127506
+   "file": "heart",
+   "name": "Heart",
+   "voxels": 224536
   },
   {
    "index": 9,
-   "file": "autochthon_right",
-   "name": "Right autochthon",
-   "voxels": 126376
+   "file": "gluteus_maximus_left",
+   "name": "Left gluteus maximus",
+   "voxels": 222504
   },
   {
    "index": 10,
-   "file": "hip_left",
-   "name": "Left hip",
-   "voxels": 123709
+   "file": "colon",
+   "name": "Colon",
+   "voxels": 215709
   },
   {
    "index": 11,
-   "file": "iliopsoas_left",
-   "name": "Left iliopsoas",
-   "voxels": 120964
+   "file": "femur_left",
+   "name": "Left femur",
+   "voxels": 201413
   },
   {
    "index": 12,
-   "file": "autochthon_left",
-   "name": "Left autochthon",
-   "voxels": 118372
+   "file": "femur_right",
+   "name": "Right femur",
+   "voxels": 193256
   },
   {
    "index": 13,
-   "file": "spleen",
-   "name": "Spleen",
-   "voxels": 113030
+   "file": "lung_middle_lobe_right",
+   "name": "Right lung middle lobe",
+   "voxels": 174026
   },
   {
    "index": 14,
-   "file": "iliopsoas_right",
-   "name": "Right iliopsoas",
-   "voxels": 106617
+   "file": "autochthon_left",
+   "name": "Left autochthon",
+   "voxels": 146962
   },
   {
    "index": 15,
-   "file": "gluteus_medius_right",
-   "name": "Right gluteus medius",
-   "voxels": 82127
+   "file": "aorta",
+   "name": "Aorta",
+   "voxels": 140992
   },
   {
    "index": 16,
-   "file": "gluteus_medius_left",
-   "name": "Left gluteus medius",
-   "voxels": 77389
+   "file": "autochthon_right",
+   "name": "Right autochthon",
+   "voxels": 139519
   },
   {
    "index": 17,
-   "file": "kidney_left",
-   "name": "Left kidney",
-   "voxels": 69116
+   "file": "hip_left",
+   "name": "Left hip",
+   "voxels": 119596
   },
   {
    "index": 18,
-   "file": "stomach",
-   "name": "Stomach",
-   "voxels": 65754
+   "file": "hip_right",
+   "name": "Right hip",
+   "voxels": 119009
   },
   {
    "index": 19,
-   "file": "sacrum",
-   "name": "Sacrum",
-   "voxels": 61331
+   "file": "iliopsoas_left",
+   "name": "Left iliopsoas",
+   "voxels": 88824
   },
   {
    "index": 20,
-   "file": "heart",
-   "name": "Heart",
-   "voxels": 60735
+   "file": "gluteus_medius_right",
+   "name": "Right gluteus medius",
+   "voxels": 88323
   },
   {
    "index": 21,
-   "file": "femur_right",
-   "name": "Right femur",
-   "voxels": 60168
+   "file": "gluteus_medius_left",
+   "name": "Left gluteus medius",
+   "voxels": 77879
   },
   {
    "index": 22,
-   "file": "femur_left",
-   "name": "Left femur",
-   "voxels": 59025
+   "file": "iliopsoas_right",
+   "name": "Right iliopsoas",
+   "voxels": 75982
   },
   {
    "index": 23,
-   "file": "kidney_right",
-   "name": "Right kidney",
-   "voxels": 58408
+   "file": "sacrum",
+   "name": "Sacrum",
+   "voxels": 64027
   },
   {
    "index": 24,
-   "file": "lung_middle_lobe_right",
-   "name": "Right lung middle lobe",
-   "voxels": 51333
+   "file": "kidney_right",
+   "name": "Right kidney",
+   "voxels": 55080
   },
   {
    "index": 25,
-   "file": "aorta",
-   "name": "Aorta",
-   "voxels": 48872
+   "file": "costal_cartilages",
+   "name": "Ribl cartilages",
+   "voxels": 52930
   },
   {
    "index": 26,
-   "file": "lung_upper_lobe_left",
-   "name": "Left lung upper lobe",
-   "voxels": 35123
+   "file": "kidney_left",
+   "name": "Left kidney",
+   "voxels": 46390
   },
   {
    "index": 27,
    "file": "urinary_bladder",
    "name": "Urinary bladder",
-   "voxels": 34254
+   "voxels": 42426
   },
   {
    "index": 28,
-   "file": "pancreas",
-   "name": "Pancreas",
-   "voxels": 25276
+   "file": "spleen",
+   "name": "Spleen",
+   "voxels": 39790
   },
   {
    "index": 29,
-   "file": "inferior_vena_cava",
-   "name": "Inferior vena cava",
-   "voxels": 24224
+   "file": "stomach",
+   "name": "Stomach",
+   "voxels": 38308
   },
   {
    "index": 30,
-   "file": "costal_cartilages",
-   "name": "Ribl cartilages",
-   "voxels": 23030
+   "file": "inferior_vena_cava",
+   "name": "Inferior vena cava",
+   "voxels": 33411
   },
   {
    "index": 31,
-   "file": "duodenum",
-   "name": "Duodenum",
-   "voxels": 22006
+   "file": "pancreas",
+   "name": "Pancreas",
+   "voxels": 27475
   },
   {
    "index": 32,
-   "file": "vertebrae_L3",
-   "name": "Vertebra L3",
-   "voxels": 21767
+   "file": "gluteus_minimus_right",
+   "name": "Right gluteus minimus",
+   "voxels": 23623
   },
   {
    "index": 33,
-   "file": "vertebrae_L4",
-   "name": "Vertebra L4",
-   "voxels": 21485
+   "file": "spinal_cord",
+   "name": "Spinal cord",
+   "voxels": 21704
   },
   {
    "index": 34,
-   "file": "gluteus_minimus_right",
-   "name": "Right gluteus minimus",
-   "voxels": 20299
+   "file": "gluteus_minimus_left",
+   "name": "Left gluteus minimus",
+   "voxels": 21674
   },
   {
    "index": 35,
-   "file": "vertebrae_L5",
-   "name": "Vertebra L5",
-   "voxels": 20089
+   "file": "vertebrae_L4",
+   "name": "Vertebra L4",
+   "voxels": 20154
   },
   {
    "index": 36,
-   "file": "gluteus_minimus_left",
-   "name": "Left gluteus minimus",
-   "voxels": 19138
+   "file": "vertebrae_L3",
+   "name": "Vertebra L3",
+   "voxels": 18724
   },
   {
    "index": 37,
-   "file": "vertebrae_L2",
-   "name": "Vertebra L2",
-   "voxels": 19059
+   "file": "vertebrae_L5",
+   "name": "Vertebra L5",
+   "voxels": 18660
   },
   {
    "index": 38,
-   "file": "vertebrae_L1",
-   "name": "Vertebra L1",
-   "voxels": 18193
+   "file": "sternum",
+   "name": "Sternum",
+   "voxels": 18336
   },
   {
    "index": 39,
-   "file": "vertebrae_T12",
-   "name": "Vertebra T12",
-   "voxels": 16259
+   "file": "duodenum",
+   "name": "Duodenum",
+   "voxels": 17550
   },
   {
    "index": 40,
    "file": "vertebrae_S1",
    "name": "Vertebra S1",
-   "voxels": 14980
+   "voxels": 16656
   },
   {
    "index": 41,
-   "file": "vertebrae_T11",
-   "name": "Vertebra T11",
-   "voxels": 14648
+   "file": "vertebrae_L2",
+   "name": "Vertebra L2",
+   "voxels": 16619
   },
   {
    "index": 42,
-   "file": "spinal_cord",
-   "name": "Spinal cord",
-   "voxels": 13866
+   "file": "scapula_right",
+   "name": "Right scapula",
+   "voxels": 16382
   },
   {
    "index": 43,
-   "file": "vertebrae_T10",
-   "name": "Vertebra T10",
-   "voxels": 12571
+   "file": "scapula_left",
+   "name": "Left scapula",
+   "voxels": 15275
   },
   {
    "index": 44,
-   "file": "prostate",
-   "name": "Prostate",
-   "voxels": 11835
+   "file": "vertebrae_L1",
+   "name": "Vertebra L1",
+   "voxels": 15119
   },
   {
    "index": 45,
-   "file": "portal_vein_and_splenic_vein",
-   "name": "Portal vein and splenic vein",
-   "voxels": 11732
+   "file": "iliac_vena_left",
+   "name": "Left iliac vena",
+   "voxels": 13812
   },
   {
    "index": 46,
-   "file": "iliac_vena_left",
-   "name": "Left iliac vena",
-   "voxels": 8745
+   "file": "vertebrae_T12",
+   "name": "Vertebra T12",
+   "voxels": 13751
   },
   {
    "index": 47,
-   "file": "iliac_vena_right",
-   "name": "Right iliac vena",
-   "voxels": 8448
+   "file": "vertebrae_T11",
+   "name": "Vertebra T11",
+   "voxels": 13500
   },
   {
    "index": 48,
    "file": "iliac_artery_left",
    "name": "Left iliac artery",
-   "voxels": 6869
+   "voxels": 13024
   },
   {
    "index": 49,
-   "file": "esophagus",
-   "name": "Esophagus",
-   "voxels": 6088
+   "file": "iliac_artery_right",
+   "name": "Right iliac artery",
+   "voxels": 12453
   },
   {
    "index": 50,
-   "file": "iliac_artery_right",
-   "name": "Right iliac artery",
-   "voxels": 5905
+   "file": "vertebrae_T10",
+   "name": "Vertebra T10",
+   "voxels": 12325
   },
   {
    "index": 51,
    "file": "vertebrae_T9",
    "name": "Vertebra T9",
-   "voxels": 5457
+   "voxels": 11725
   },
   {
    "index": 52,
-   "file": "rib_left_10",
-   "name": "Rib left 10",
-   "voxels": 5311
+   "file": "prostate",
+   "name": "Prostate",
+   "voxels": 11425
   },
   {
    "index": 53,
-   "file": "rib_right_10",
-   "name": "Rib right 10",
-   "voxels": 5061
+   "file": "vertebrae_T8",
+   "name": "Vertebra T8",
+   "voxels": 10604
   },
   {
    "index": 54,
-   "file": "rib_left_9",
-   "name": "Rib left 9",
-   "voxels": 4601
+   "file": "superior_vena_cava",
+   "name": "Superior vena cava",
+   "voxels": 10284
   },
   {
    "index": 55,
-   "file": "rib_right_9",
-   "name": "Rib right 9",
-   "voxels": 3769
+   "file": "vertebrae_T7",
+   "name": "Vertebra T7",
+   "voxels": 9809
   },
   {
    "index": 56,
-   "file": "rib_left_11",
-   "name": "Rib left 11",
-   "voxels": 3508
+   "file": "iliac_vena_right",
+   "name": "Right iliac vena",
+   "voxels": 9354
   },
   {
    "index": 57,
-   "file": "rib_right_11",
-   "name": "Rib right 11",
-   "voxels": 3234
+   "file": "esophagus",
+   "name": "Esophagus",
+   "voxels": 9225
   },
   {
    "index": 58,
-   "file": "rib_left_8",
-   "name": "Rib left 8",
-   "voxels": 2307
+   "file": "vertebrae_T6",
+   "name": "Vertebra T6",
+   "voxels": 9080
   },
   {
    "index": 59,
-   "file": "rib_right_8",
-   "name": "Rib right 8",
-   "voxels": 2256
+   "file": "rib_left_7",
+   "name": "Rib left 7",
+   "voxels": 8874
   },
   {
    "index": 60,
-   "file": "adrenal_gland_left",
-   "name": "Left adrenal gland",
-   "voxels": 2254
+   "file": "rib_right_7",
+   "name": "Rib right 7",
+   "voxels": 8721
   },
   {
    "index": 61,
-   "file": "rib_left_7",
-   "name": "Rib left 7",
-   "voxels": 2058
+   "file": "vertebrae_T5",
+   "name": "Vertebra T5",
+   "voxels": 8556
   },
   {
    "index": 62,
-   "file": "adrenal_gland_right",
-   "name": "Right adrenal gland",
-   "voxels": 1826
+   "file": "rib_left_6",
+   "name": "Rib left 6",
+   "voxels": 8040
   },
   {
    "index": 63,
-   "file": "rib_right_12",
-   "name": "Rib right 12",
-   "voxels": 1594
+   "file": "rib_left_8",
+   "name": "Rib left 8",
+   "voxels": 7980
   },
   {
    "index": 64,
-   "file": "rib_right_7",
-   "name": "Rib right 7",
-   "voxels": 1492
+   "file": "vertebrae_T4",
+   "name": "Vertebra T4",
+   "voxels": 7969
   },
   {
    "index": 65,
-   "file": "rib_left_12",
-   "name": "Rib left 12",
-   "voxels": 1240
+   "file": "rib_right_8",
+   "name": "Rib right 8",
+   "voxels": 7943
   },
   {
    "index": 66,
-   "file": "gallbladder",
-   "name": "Gallbladder",
-   "voxels": 320
+   "file": "rib_right_6",
+   "name": "Rib right 6",
+   "voxels": 7894
   },
   {
    "index": 67,
-   "file": "vertebrae_T8",
-   "name": "Vertebra T8",
-   "voxels": 227
+   "file": "pulmonary_vein",
+   "name": "Pulmonary vein",
+   "voxels": 7882
   },
   {
    "index": 68,
-   "file": "sternum",
-   "name": "Sternum",
-   "voxels": 190
+   "file": "rib_right_9",
+   "name": "Rib right 9",
+   "voxels": 7584
   },
   {
    "index": 69,
-   "file": "pulmonary_vein",
-   "name": "Pulmonary vein",
-   "voxels": 22
+   "file": "trachea",
+   "name": "Trachea",
+   "voxels": 7523
   },
   {
    "index": 70,
+   "file": "rib_left_9",
+   "name": "Rib left 9",
+   "voxels": 7264
+  },
+  {
+   "index": 71,
+   "file": "rib_right_10",
+   "name": "Rib right 10",
+   "voxels": 6737
+  },
+  {
+   "index": 72,
+   "file": "rib_left_10",
+   "name": "Rib left 10",
+   "voxels": 6720
+  },
+  {
+   "index": 73,
+   "file": "rib_right_5",
+   "name": "Rib right 5",
+   "voxels": 6653
+  },
+  {
+   "index": 74,
+   "file": "portal_vein_and_splenic_vein",
+   "name": "Portal vein and splenic vein",
+   "voxels": 6619
+  },
+  {
+   "index": 75,
    "file": "rib_left_5",
    "name": "Rib left 5",
-   "voxels": 3
+   "voxels": 6486
+  },
+  {
+   "index": 76,
+   "file": "rib_right_4",
+   "name": "Rib right 4",
+   "voxels": 6200
+  },
+  {
+   "index": 77,
+   "file": "rib_left_4",
+   "name": "Rib left 4",
+   "voxels": 5835
+  },
+  {
+   "index": 78,
+   "file": "rib_left_11",
+   "name": "Rib left 11",
+   "voxels": 5104
+  },
+  {
+   "index": 79,
+   "file": "rib_right_11",
+   "name": "Rib right 11",
+   "voxels": 5053
+  },
+  {
+   "index": 80,
+   "file": "vertebrae_T3",
+   "name": "Vertebra T3",
+   "voxels": 4731
+  },
+  {
+   "index": 81,
+   "file": "brachiocephalic_vein_left",
+   "name": "Left brachiocephalic vein",
+   "voxels": 4324
+  },
+  {
+   "index": 82,
+   "file": "rib_left_3",
+   "name": "Rib left 3",
+   "voxels": 4281
+  },
+  {
+   "index": 83,
+   "file": "rib_right_3",
+   "name": "Rib right 3",
+   "voxels": 4103
+  },
+  {
+   "index": 84,
+   "file": "rib_right_12",
+   "name": "Rib right 12",
+   "voxels": 3095
+  },
+  {
+   "index": 85,
+   "file": "rib_left_12",
+   "name": "Rib left 12",
+   "voxels": 2678
+  },
+  {
+   "index": 86,
+   "file": "atrial_appendage_left",
+   "name": "Left atrial appendage",
+   "voxels": 2638
+  },
+  {
+   "index": 87,
+   "file": "rib_right_2",
+   "name": "Rib right 2",
+   "voxels": 2328
+  },
+  {
+   "index": 88,
+   "file": "brachiocephalic_trunk",
+   "name": "Brachiocephalic trunk",
+   "voxels": 2128
+  },
+  {
+   "index": 89,
+   "file": "adrenal_gland_left",
+   "name": "Left adrenal gland",
+   "voxels": 1838
+  },
+  {
+   "index": 90,
+   "file": "adrenal_gland_right",
+   "name": "Right adrenal gland",
+   "voxels": 1804
+  },
+  {
+   "index": 91,
+   "file": "brachiocephalic_vein_right",
+   "name": "Right brachiocephalic vein",
+   "voxels": 1600
+  },
+  {
+   "index": 92,
+   "file": "rib_left_2",
+   "name": "Rib left 2",
+   "voxels": 820
+  },
+  {
+   "index": 93,
+   "file": "rib_right_1",
+   "name": "Rib right 1",
+   "voxels": 700
+  },
+  {
+   "index": 94,
+   "file": "subclavian_artery_right",
+   "name": "Right subclavian artery",
+   "voxels": 673
+  },
+  {
+   "index": 95,
+   "file": "subclavian_artery_left",
+   "name": "Left subclavian artery",
+   "voxels": 586
+  },
+  {
+   "index": 96,
+   "file": "common_carotid_artery_left",
+   "name": "Left common carotid artery",
+   "voxels": 521
+  },
+  {
+   "index": 97,
+   "file": "skull",
+   "name": "Skull",
+   "voxels": 308
+  },
+  {
+   "index": 98,
+   "file": "rib_left_1",
+   "name": "Rib left 1",
+   "voxels": 237
+  },
+  {
+   "index": 99,
+   "file": "vertebrae_T2",
+   "name": "Vertebra T2",
+   "voxels": 37
+  },
+  {
+   "index": 100,
+   "file": "clavicula_right",
+   "name": "Right clavicula",
+   "voxels": 31
+  },
+  {
+   "index": 101,
+   "file": "common_carotid_artery_right",
+   "name": "Right common carotid artery",
+   "voxels": 28
+  },
+  {
+   "index": 102,
+   "file": "clavicula_left",
+   "name": "Left clavicula",
+   "voxels": 7
   }
  ],
  "source": {
   "dataset": "TotalSegmentator",
-  "subject": "s0250",
+  "subject": "s0287",
   "doi": "10.5281/zenodo.10047292",
   "url": "https://zenodo.org/records/10047292",
   "licence": "CC BY 4.0",
   "attribution": "Wasserthal et al., TotalSegmentator, University Hospital Basel"
  },
  "bytes": {
-  "volume": 10642293,
-  "labels": 209830
+  "volume": 11199346,
+  "labels": 195610
  }
 }

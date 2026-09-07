@@ -49,10 +49,17 @@ The radiograph is **computed from the meshes**: attenuation summed along each ra
 
 CT and MRI are **real studies**, each one anonymised subject shown with the segmentations a radiologist refined, so the structure named under the pointer was drawn by a person. The CT reads in true Hounsfield units, which is why the window presets behave as they do on a console. Volumes are fetched only when their modality is first opened.
 
-| | Source | Subject | Structures | Sampling | Licence |
-|---|---|---|---|---|---|
-| CT | [TotalSegmentator](https://doi.org/10.5281/zenodo.10047292) | s0250 | 70 present of 117 | 225×226×218 at 2.0 mm | CC BY 4.0 |
-| MRI | [TotalSegmentator MRI](https://doi.org/10.5281/zenodo.11367005) | s0175 | 53 present of 56 | 320×360×240 at 1.28×3.0×1.28 mm | **CC BY-NC-SA 2.0** |
+| | Source | Subject | Coverage | Structures | Sampling | Licence |
+|---|---|---|---|---|---|---|
+| CT | [TotalSegmentator](https://doi.org/10.5281/zenodo.10047292) | s0287 | neck to lower leg, 125 cm | 102 of 117 | 184×501×148 at 2.5 mm | CC BY 4.0 |
+| MRI · T1 | [TotalSegmentator MRI](https://doi.org/10.5281/zenodo.11367005) | s0175 | head to thigh, 108 cm | 53 of 56 | 320×360×240 at 1.28×3.0×1.28 mm | **CC BY-NC-SA 2.0** |
+| MRI · STIR | [TotalSegmentator MRI](https://doi.org/10.5281/zenodo.11367005) | s0190 | chest to pelvis, 50 cm | 34 of 56 | 384×384×39 at 1.3×1.3×6.0 mm | **CC BY-NC-SA 2.0** |
+
+**No single clinical study covers head to toe.** CT and MRI are acquired per body region, and even a protocol called whole body stops at the thighs. These are the widest acquisitions in either collection: the CT reaches from the neck to the lower legs, the T1 from the crown to mid-thigh. Neither includes both the head and the feet, and that is a property of how the studies were acquired rather than of this viewer.
+
+An MR sequence is not a display setting. One acquisition carries one weighting, so T1 and STIR here are two separate studies of two different patients, each labelled with the weighting **measured from its own tissue signals** rather than read from metadata this collection records in mixed units. On T1 urine is dark against liver; on STIR fat is nulled and fluid is bright.
+
+These are clinical studies, so they carry incidental findings. The STIR study has a visible lesion in the left axilla. They show real anatomy, not idealised anatomy.
 
 They are a **different body from the 3D model**. Rotating the atlas and scrolling the CT show two different people, linked by the name of a structure rather than by shared geometry. The studies carry what real studies carry: contrast, noise, motion, and whatever anatomy that patient happened to have. Around half the voxels in a section are unlabelled, because a segmentation names organs rather than every plane of fat and connective tissue.
 
@@ -79,10 +86,10 @@ Import this repository into Vercel as a Vite project. The included `vercel.json`
 Original application code is released under the [MIT License](LICENSE). The bundled data has its own terms, which travel with it:
 
 - **BodyParts3D 4.0** anatomy meshes — CC BY 4.0.
-- **TotalSegmentator** CT — CC BY 4.0, © Wasserthal et al., University Hospital Basel.
-- **TotalSegmentator MRI** — **CC BY-NC-SA 2.0**, © Akinci D’Antonoli et al., University Hospital Basel.
+- **TotalSegmentator** CT (subject s0287) — CC BY 4.0, © Wasserthal et al., University Hospital Basel.
+- **TotalSegmentator MRI** (subjects s0175 and s0190) — **CC BY-NC-SA 2.0**, © Akinci D’Antonoli et al., University Hospital Basel.
 
-> **The MRI licence is non-commercial and share-alike.** While that study is bundled, this build as a whole may not be used commercially, and derivatives must carry the same terms. The code remains MIT; the restriction comes from the data. Removing `public/imaging/mr` and the MRI modality lifts it.
+> **The MRI licence is non-commercial and share-alike.** While that study is bundled, this build as a whole may not be used commercially, and derivatives must carry the same terms. The code remains MIT; the restriction comes from the data. Removing `public/imaging/mr-t1`, `public/imaging/mr-stir` and the MRI modality lifts it.
 
 Preserve the attributions when redistributing. Third-party dependencies retain their respective licenses.
 

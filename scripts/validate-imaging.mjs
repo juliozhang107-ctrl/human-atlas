@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import zlib from 'node:zlib';
 import {readFileSync} from 'node:fs';
 import {PLANES,plane} from '../app/slice.ts';
-import {CT_WINDOWS,MODALITIES,ctWindow,modality,windowed} from '../app/modalities.ts';
+import {CT_WINDOWS,MODALITIES,MR_STUDIES,ctWindow,modality,mrStudy,windowed} from '../app/modalities.ts';
 import {extractSection,planeAxis,sliceCount} from '../app/volume.ts';
 
 const load=id=>{
@@ -38,13 +38,13 @@ assert.equal(modality('radiograph').cross,false,'a radiograph is a projection, n
 const atlas=JSON.parse(readFileSync(new URL('../public/models/atlas.json',import.meta.url)));
 const concepts=new Set(atlas.concepts.map(c=>c.name.toLowerCase()));
 
-for(const id of ['ct','mr']){
+for(const id of ['ct',...MR_STUDIES.map(s=>s.path)]){
  const study=load(id);
  const {manifest,values,labels}=study;
  const [dx,dy,dz]=manifest.dims;
 
  // ── Manifest integrity ─────────────────────────────────────────────────────────────────────────
- assert.equal(manifest.modality,id,`${id}: manifest names a different modality`);
+ assert.equal(manifest.modality,id==='ct'?'ct':'mr',`${id}: manifest names a different modality`);
  assert.ok(manifest.dims.every(d=>d>32),`${id}: implausible dimensions`);
  assert.ok(manifest.spacing.every(s=>s>0&&s<10),`${id}: implausible voxel spacing`);
  assert.ok(manifest.structures.length>20,`${id}: too few structures to be useful`);
@@ -94,7 +94,10 @@ for(const id of ['ct','mr']){
   assert.equal(manifest.intensity.unit,'HU');
   // Hounsfield units are absolute, so a mislabelled or misaligned mask shows up as tissue whose
   // density is wrong for its name. These bounds are wide enough for any normal study.
-  const checks=[['liver',20,90],['spleen',20,130],['urinary bladder',-20,40],['aorta',20,220],
+  // Bounds are wide enough for any phase of contrast: an angiogram puts the aorta near 300 HU
+  // where a portal venous study puts it near 110, and both are correct. They are still tight
+  // enough that a mask landing in bone or in fat would fail.
+  const checks=[['liver',20,140],['spleen',20,180],['urinary bladder',-30,60],['aorta',20,500],
                 ['vertebrae l3',120,900],['autochthon left',0,110]];
   for(const [name,low,high] of checks){
    const mean=hu(name);
@@ -103,9 +106,20 @@ for(const id of ['ct','mr']){
   }
   const air=[...values].slice(0,5000).map(v=>v*1+manifest.intensity.inter);
   assert.ok(Math.min(...air)<-800,'ct: the field should contain air near -1000 HU');
+  assert.ok(manifest.dims[1]*manifest.spacing[1]/10>100,`ct: expected wide craniocaudal coverage, got ${(manifest.dims[1]*manifest.spacing[1]/10).toFixed(0)} cm`);
  }else{
   assert.equal(manifest.intensity.dtype,'uint8');
   assert.ok(values.every(v=>v<=255));
+  // The weighting is measured, and each declared study must be the weighting it claims: on T1 urine
+  // is dark against liver, on an inversion recovery fluid is bright and muscle is dark.
+  const declaredStudy=MR_STUDIES.find(s=>s.path===id);
+  assert.ok(declaredStudy,`${id}: no study declares this path`);
+  assert.equal(manifest.weighting,declaredStudy.label,`${id}: manifest weighting disagrees with the study list`);
+  const fluid=hu('urinary bladder'),liver=hu('liver'),muscle=hu('autochthon left')??hu('autochthon right');
+  if(manifest.weighting==='T1'&&fluid&&liver)
+   assert.ok(fluid/liver<0.9,`${id}: declared T1 but fluid/liver is ${(fluid/liver).toFixed(2)}`);
+  if(manifest.weighting==='STIR'&&liver&&muscle)
+   assert.ok(muscle<liver,`${id}: declared STIR but muscle is not dark against liver`);
  }
  const bridged=manifest.structures.filter(s=>concepts.has(s.name.toLowerCase())).length;
  console.log(`${manifest.source.dataset} ${manifest.subject}: ${manifest.dims.join('×')} at `
@@ -121,4 +135,6 @@ for(const w of CT_WINDOWS)assert.ok(w.width>0&&w.name.trim(),`${w.id}: needs a w
 assert.equal(ctWindow('lung').level,-600);
 assert.throws(()=>ctWindow('pancreas'),/Unknown window/);
 assert.throws(()=>plane('oblique'),/Unknown plane/);
-console.log('Manifests, label coverage, section geometry, sampling and CT densities all check out.');
+for(const study of MR_STUDIES)assert.equal(mrStudy(study.id).path,study.path);
+assert.throws(()=>mrStudy('dwi'),/Unknown study/);
+console.log('Manifests, label coverage, section geometry, sampling, CT densities and MR weightings all check out.');
