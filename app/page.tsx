@@ -1,7 +1,7 @@
 import {flushSync} from 'react-dom';
 import {registerAtlasTools} from './agent-tools';
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {Activity,ArrowUpRight,ChevronRight,Focus,Info,Layers3,Pause,RotateCcw,RotateCw,Scan,Search,X} from 'lucide-react';
+import {Activity,ArrowUpRight,ChevronRight,Focus,Info,Layers3,Pause,RotateCcw,RotateCw,Scan,Search,Captions,CaptionsOff,X} from 'lucide-react';
 import {Button} from '@/components/ui/button';
 import {Badge} from '@/components/ui/badge';
 import {Slider} from '@/components/ui/slider';
@@ -84,6 +84,8 @@ export default function Home(){
    </>:<>
     <div className="projection-row">{PLANES.map(p=><Button variant="ghost" key={p.id} className={state.plane===p.id?'active':''} aria-pressed={state.plane===p.id} title={p.description} onClick={()=>choosePlane(p.id)}>{PLANE_ABBR[p.id]}</Button>)}</div>
     <p className="projection-note">{activePlane.description}</p>
+    <Button variant="ghost" className={`label-toggle ${state.labels?'active':''}`} aria-pressed={state.labels} onClick={()=>setState(s=>({...s,labels:!s.labels}))}>
+     {state.labels?<><Captions size={15}/>Names shown on the image</>:<><CaptionsOff size={15}/>Names hidden · hover to reveal</>}</Button>
     {study?<>
      <div className="window-row"><div className="explode-label"><label id="slice-label">Slice</label><output>{state.slice+1} <span>of {slices}</span></output></div>
       <Slider aria-labelledby="slice-label" min={0} max={Math.max(0,slices-1)} step={1} value={[Math.min(state.slice,slices-1)]} onValueChange={v=>setState(s=>({...s,slice:Array.isArray(v)?v[0]:v}))}/>
@@ -93,11 +95,6 @@ export default function Home(){
      <div className="preset-group"><div className="preset-label" id="study-presets">{state.mode==='mr'?'Sequence':'Region'}</div><div className="preset-row" role="group" aria-labelledby="study-presets">{studiesFor(state.mode).map(q=><Button variant="ghost" key={q.id} className={state.study===q.id?'active':''} aria-pressed={state.study===q.id} title={`${q.description} Covers ${q.coverage}.`} onClick={()=>chooseStudy(q.id)}>{q.label}</Button>)}</div></div>
      <p className="projection-note">{studyFor(state.mode,state.study).description} Covers {studyFor(state.mode,state.study).coverage}.</p>
      <p className="projection-note">{state.mode==='mr'?'One acquisition carries one weighting, so each sequence is a separate study of a different patient.':'No single clinical study covers a whole body, so the body arrives in two studies of two patients that overlap at the shoulders.'} {state.mode==='mr'?'The weighting was measured from each study’s own tissue signals.':''}</p>
-     <div className="preset-group"><div className="preset-label" id="label-toggle">Names on the image</div>
-      <div className="preset-row" role="group" aria-labelledby="label-toggle">
-       <Button variant="ghost" className={state.labels?'active':''} aria-pressed={state.labels} onClick={()=>setState(s=>({...s,labels:true}))}>Shown</Button>
-       <Button variant="ghost" className={!state.labels?'active':''} aria-pressed={!state.labels} onClick={()=>setState(s=>({...s,labels:false}))}>Hidden</Button>
-      </div></div>
      {contents.length>0&&<div className="preset-group"><div className="preset-label">In this slice <span className="small-number">{contents.length}</span></div>
       <div className="slice-contents">{contents.map(item=><button key={item.index} className={`slice-row ${chosen?.name.toLowerCase()===item.name.toLowerCase()?'active':''}`} onClick={()=>nameStructure(item.name)}>
        <span className="slice-name">{item.name}</span>{item.latin&&<span className="slice-latin">{item.latin}</span>}</button>)}</div></div>}

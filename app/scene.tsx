@@ -190,6 +190,10 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
   el.appendChild(sliceCanvas);
   const sliceContext=sliceCanvas.getContext('2d')!;
   const sliceBuffer=document.createElement('canvas'),sliceBufferContext=sliceBuffer.getContext('2d')!;
+  // A second buffer holds only the structure under the pointer, tinted, so hovering can show the
+  // shape of what is being named without rebuilding the image underneath it.
+  const hoverBuffer=document.createElement('canvas'),hoverBufferContext=hoverBuffer.getContext('2d')!;
+  let hoverIndex=0;
   const studies=new Map<string,Volume>();
   let study:Volume|null=null,loading='',section:Section|null=null,anchors:Anchor[]=[];
   let sliceKey='',drawKey='',sliceActive=false,sliceCrop={x:0,y:0,w:0,h:0},sliceDraw={x:0,y:0,w:0,h:0},markedIndex=0;
@@ -279,10 +283,35 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    const scale=Math.min(availableWidth/trueWidth,availableHeight/trueHeight)*.96;
    const w=trueWidth*scale,h=trueHeight*scale;
    sliceDraw={x:area.left*ratioX+(availableWidth-w)/2,y:area.top*ratioY+(availableHeight-h)/2,w,h};
+   paint();
+  };
+
+  /** Composite what is on screen: the image, then the structure under the pointer, then the names.
+   *  Kept separate from the geometry so hovering can repaint without recutting the slice. */
+  const paint=()=>{
+   if(!section)return;
    sliceContext.fillStyle='#05070a';sliceContext.fillRect(0,0,sliceCanvas.width,sliceCanvas.height);
    sliceContext.imageSmoothingEnabled=true;sliceContext.imageSmoothingQuality='high';
-   sliceContext.drawImage(sliceBuffer,0,0,section.width,section.height,sliceDraw.x,sliceDraw.y,w,h);
+   sliceContext.drawImage(sliceBuffer,0,0,section.width,section.height,sliceDraw.x,sliceDraw.y,sliceDraw.w,sliceDraw.h);
+   if(hoverIndex)sliceContext.drawImage(hoverBuffer,0,0,section.width,section.height,sliceDraw.x,sliceDraw.y,sliceDraw.w,sliceDraw.h);
    if(latest.current.labels)drawLabels();
+  };
+
+  /** Paint the hovered structure into its own buffer. Nothing is drawn when the pointer is over
+   *  tissue the study does not label, which is most of the fat and fascia between organs. */
+  const markHovered=(index:number)=>{
+   if(index===hoverIndex||!section)return false;
+   hoverIndex=index;
+   hoverBuffer.width=section.width;hoverBuffer.height=section.height;
+   if(index){
+    const overlay=hoverBufferContext.createImageData(section.width,section.height);
+    for(let i=0,o=0;i<section.labels.length;i++,o+=4){
+     if(section.labels[i]!==index)continue;
+     overlay.data[o]=112;overlay.data[o+1]=232;overlay.data[o+2]=212;overlay.data[o+3]=86;
+    }
+    hoverBufferContext.putImageData(overlay,0,0);
+   }
+   return true;
   };
 
   /** Write the names onto the image. Larger structures are placed first and anything that would
@@ -343,6 +372,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
   const sliceHover=(e:PointerEvent)=>{
    const found=structureAt(e.clientX,e.clientY);
    hover.hidden=!found;sliceCanvas.style.cursor=found?'pointer':'default';
+   if(markHovered(found?found.index:0))paint();
    if(!found)return;
    const rect=el.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;
    hover.textContent=found.name;
@@ -350,7 +380,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    hover.style.top=`${Math.max(8,Math.min(y+18,el.clientHeight-55))}px`;
   };
   const sliceTap=(e:PointerEvent)=>{const found=structureAt(e.clientX,e.clientY);if(found)structure.current(found.name);};
-  const sliceLeave=()=>{hover.hidden=true;};
+  const sliceLeave=()=>{hover.hidden=true;if(markHovered(0))paint();};
   /** The wheel walks the stack, as it does on a reading workstation. */
   const sliceWheel=(e:PointerEvent|WheelEvent)=>{
    const s=latest.current;

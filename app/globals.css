@@ -133,3 +133,6 @@ h1 .edition{font-family:inherit;font-weight:500;font-size:10px;letter-spacing:.0
 .slice-name{font-size:12px;line-height:1.35;color:#33414f}
 .slice-latin{font-size:10px;line-height:1.3;color:#8a949f;font-style:italic}
 .preset-label .small-number{margin-left:6px;font-size:11px;color:#8a949f}
+.label-toggle{display:flex;align-items:center;justify-content:flex-start;gap:9px;width:100%;font-size:12px;padding:10px 12px;border:1px solid #18253618;border-radius:5px;color:#65717e;min-height:42px}
+.label-toggle.active{background:#263b48;color:#fff;border-color:#263b48}
+.label-toggle.active:hover{background:#31485a;color:#fff}

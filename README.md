@@ -74,7 +74,9 @@ image itself for the larger structures, largest first, with anything that would 
 readout instead; the panel lists everything the slice holds, in full, however small. Each name is
 anchored to the point nearest the structure's centre of area that actually lies inside it, so a
 label on a horseshoe-shaped colon points at the colon rather than into the bowel it wraps around.
-See `tools/anatomy_names.py`.
+One control turns the written names off, leaving the image clean; hovering then tints whatever lies
+under the pointer and names just that one, which is the way to read a section without a wall of text
+over it. See `tools/anatomy_names.py`.
 
 **The published labels are cleaned on the way in.** A segmentation model run over a region it was not expecting leaves false positives, and this collection's own labels put nine millimetres of skull among the toes of a study whose highest slice is lung. Two filters remove them: connected components far smaller than the structure they belong to, and structures that sit somewhere they anatomically cannot, such as a skull below a lung. Anatomy legitimately cut off by the edge of the field, like a clavicle at the top of a scan that stops at the neck, is kept.
 
