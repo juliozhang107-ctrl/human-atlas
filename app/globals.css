@@ -86,3 +86,26 @@ h1 .edition{font-family:inherit;font-weight:500;font-size:10px;letter-spacing:.0
 @media(max-width:767px){body:has(.detail-sheet) .view-controls{visibility:hidden}}
 
 @media(max-height:600px) and (orientation:landscape){body:has(.detail-sheet) .bottom-dock{left:12px;right:324px;width:auto;transform:none;max-width:none;margin:0}}
+
+/* Radiograph view: projection presets, windowing, and the structures a beam crossed. */
+.top-actions .active{background:#263b48;color:#fff;border-color:#263b48}
+.top-actions .active:hover{background:#31485a;color:#fff}
+.radiograph-panel{position:absolute;right:95px;top:105px;bottom:178px;width:310px;border-radius:6px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+.projection-row{display:flex;gap:5px}
+.projection-row button{flex:1;font-size:12px;padding:8px 0;border:1px solid #18253618;border-radius:4px;color:#65717e;min-height:38px}
+.projection-row .active{background:#263b48;color:#fff;border-color:#263b48}
+.projection-note{font-size:11px;line-height:1.6;color:#78838f;margin:0}
+.window-row [data-slot=slider]{padding:6px 0}
+.window-row .explode-label{margin-bottom:6px;font-size:12px}
+.window-row output{font-size:13px;font-variant-numeric:tabular-nums;color:#263b48}
+.beam-summary{display:flex;gap:16px;padding:12px 0;border-block:1px solid #18253612;font-size:10px;color:#87929d;letter-spacing:.04em}
+.beam-summary strong{display:block;font-size:14px;color:#475665;font-weight:400;margin-top:5px;font-variant-numeric:tabular-nums}
+.beam-list{display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain;min-height:0;flex:1;scrollbar-width:thin;scrollbar-color:#b9c3cc transparent}
+.beam-row{display:flex;flex-direction:column;gap:3px;text-align:left;padding:9px 2px;border-bottom:1px solid #18253610;width:100%;min-height:44px}
+.beam-name{font-size:12px;line-height:1.4;color:#33414f}
+.beam-meta{font-size:10px;color:#8a949f;font-variant-numeric:tabular-nums;display:flex;align-items:center;gap:6px}
+.beam-meta i{width:2px;height:2px;border-radius:50%;background:#c3cad1;flex-shrink:0}
+.beam-hint{font-size:12px;line-height:1.6;color:#78838f;margin:0}
+@media(max-width:1000px){.radiograph-panel{right:80px;width:280px}}
+@media(max-width:767px){.radiograph-panel{left:12px;right:12px;top:auto;bottom:calc(139px + env(safe-area-inset-bottom));width:auto;max-height:38dvh;padding:14px 16px;gap:11px;background:#fffffff5;z-index:30}.radiograph-panel .projection-note{display:none}.window-row .explode-label{margin-bottom:2px}.beam-summary{padding:9px 0}}
+@media(max-height:600px) and (orientation:landscape){.radiograph-panel{top:80px;bottom:112px;right:15px;width:270px}}
