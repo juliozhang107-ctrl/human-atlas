@@ -85,11 +85,15 @@ export function windowed(value:number,width:number,level:number){
 }
 
 export type ModalityId = 'radiograph'|'ct'|'mr'|'us';
-export interface Modality {id:ModalityId;name:string;abbr:string;cross:boolean;description:string}
+/** `interactive` marks the modalities the browser offers. Ultrasound stays in the renderer and its
+ *  physics stays tested, but it is not offered in the app: a sector traced through surface meshes
+ *  teaches shadowing and enhancement honestly and little else, and real ultrasound is dominated by
+ *  speckle and tissue microstructure that this geometry cannot carry. */
+export interface Modality {id:ModalityId;name:string;abbr:string;cross:boolean;interactive:boolean;description:string}
 export const MODALITIES: Modality[] = [
- {id:'radiograph',name:'Radiography',abbr:'XR',cross:false,description:'A projection: attenuation summed along every ray from the tube to the detector.'},
- {id:'ct',        name:'Computed tomography',abbr:'CT',cross:true,description:'A cross-section of the same attenuation, expressed in Hounsfield units and windowed.'},
- {id:'mr',        name:'Magnetic resonance',abbr:'MR',cross:true,description:'A cross-section of spin echo signal from proton density and the T1 and T2 of each tissue.'},
- {id:'us',        name:'Ultrasound',abbr:'US',cross:true,description:'A sector scan: echoes from impedance mismatches, attenuated with depth, with shadowing behind bone and gas.'},
+ {id:'radiograph',name:'Radiography',abbr:'XR',cross:false,interactive:true,description:'A projection: attenuation summed along every ray from the tube to the detector.'},
+ {id:'ct',        name:'Computed tomography',abbr:'CT',cross:true,interactive:true,description:'A cross-section of the same attenuation, expressed in Hounsfield units and windowed.'},
+ {id:'mr',        name:'Magnetic resonance',abbr:'MR',cross:true,interactive:true,description:'A cross-section of spin echo signal from proton density and the T1 and T2 of each tissue.'},
+ {id:'us',        name:'Ultrasound',abbr:'US',cross:true,interactive:false,description:'A sector scan: echoes from impedance mismatches, attenuated with depth, with shadowing behind bone and gas.'},
 ];
 export function modality(id:ModalityId){const m=MODALITIES.find(x=>x.id===id);if(!m)throw new Error(`Unknown modality: ${id}. Expected one of ${MODALITIES.map(x=>x.id).join(', ')}.`);return m;}

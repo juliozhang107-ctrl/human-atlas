@@ -124,6 +124,9 @@ assert.ok(ACOUSTIC.bone.alpha>10*ACOUSTIC.soft.alpha,'bone must attenuate enough
 // ── Modalities and the atlas itself ────────────────────────────────────────────────────────────
 assert.equal(MODALITIES.filter(m=>m.cross).length,3,'CT, MR and ultrasound are the cross-sectional modalities');
 assert.equal(modality('radiograph').cross,false,'a radiograph is a projection, not a section');
+// Ultrasound is rendered by the command line tool but not offered in the app.
+assert.deepEqual(MODALITIES.filter(m=>m.interactive).map(m=>m.id),['radiograph','ct','mr'],'the app offers radiography, CT and MR');
+assert.equal(modality('us').interactive,false,'ultrasound stays out of the app');
 assert.throws(()=>modality('pet'),/Unknown modality/);
 const {atlas,geometry}=loadAtlas();
 for(const part of atlas.parts){
