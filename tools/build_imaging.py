@@ -7,6 +7,7 @@ handles anisotropic spacing itself, which avoids blurring the data by resampling
 import gzip, json, os, sys, time
 sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np
+from scipy import ndimage
 import nifti
 
 def human(name):
@@ -18,6 +19,43 @@ def human(name):
     text = ' '.join(parts).replace('vertebrae', 'vertebra').replace('costa', 'rib')
     text = text[0].upper() + text[1:]
     return f'{side.capitalize()} {text[0].lower()}{text[1:]}' if side else text
+
+STRAY_SHARE = .05
+
+# A structure cut off by the edge of the field is normal: a study that stops at the neck holds part
+# of a clavicle and part of a first rib, and those belong. What does not belong is a structure in a
+# place it cannot be. This collection's labels put a fragment of skull at the foot end of a study
+# whose highest slice is lung. Ordering catches that without touching anything legitimate.
+MUST_LIE_ABOVE = {
+ 'skull':      ['lung_upper_lobe_left', 'lung_upper_lobe_right', 'heart', 'liver'],
+ 'brain':      ['lung_upper_lobe_left', 'lung_upper_lobe_right', 'heart', 'liver'],
+ 'clavicula_left':  ['liver', 'urinary_bladder'], 'clavicula_right': ['liver', 'urinary_bladder'],
+ 'femur_left': ['urinary_bladder'],               'femur_right':     ['urinary_bladder'],
+}
+def impossible(name, centroids):
+    """True when a structure sits below something it must lie above."""
+    below = MUST_LIE_ABOVE.get(name)
+    if not below or name not in centroids: return None
+    for other in below:
+        if other in centroids and centroids[name] < centroids[other]:
+            return other
+    return None
+
+def largest_parts(mask, share=STRAY_SHARE):
+    """Drop connected components far smaller than the structure they claim to belong to.
+
+    A segmentation model run over a body region it was not expecting leaves false positives: this
+    collection's own labels put a fragment of skull among the toes of a study that stops at the neck.
+    Structures that genuinely come in pieces, such as a set of rib cartilages, keep every piece that
+    is a reasonable share of the whole; only the specks go."""
+    if not mask.any(): return mask, 0
+    parts, count = ndimage.label(mask)
+    if count <= 1: return mask, 0
+    sizes = np.bincount(parts.ravel())
+    sizes[0] = 0
+    keep = sizes >= max(1, sizes.max() * share)
+    cleaned = keep[parts]
+    return cleaned, int(mask.sum() - cleaned.sum())
 
 def resample(volume, source_spacing, target_spacing, nearest=False):
     """Separable resampling along each axis. Intensity is interpolated, which also filters the
@@ -77,12 +115,24 @@ def build(subject_dir, out_dir, modality, subject, source, target_spacing=None, 
 
     labels = np.zeros(values.shape, dtype=np.uint8)
     names = []
-    for index, (name, count) in enumerate(present, 1):
+    dropped, rejected, centroids = 0, [], {}
+    for name, count in present:
         mask = nifti.read(os.path.join(subject_dir, 'segmentations', name))
         oriented, _ = nifti.to_atlas(mask['data'], mask['affine'])
-        labels[oriented[crop] > 0] = index          # largest first, so smaller structures overwrite
+        kept, removed = largest_parts(oriented[crop] > 0)
+        dropped += removed
+        stem = name.replace('.nii.gz', '')
+        centroids[stem] = float(np.nonzero(kept)[1].mean())
+        conflict = impossible(stem, centroids)
+        if conflict:
+            rejected.append(f'{human(name)} (below {conflict})')
+            continue
+        index = len(names) + 1
+        labels[kept] = index                        # largest first, so smaller structures overwrite
         names.append({'index': index, 'file': name.replace('.nii.gz', ''),
-                      'name': human(name), 'voxels': count})
+                      'name': human(name), 'voxels': int(kept.sum())})
+    if dropped: print(f'  dropped {dropped} stray voxels in components under {int(STRAY_SHARE*100)}% of their structure')
+    if rejected: print(f'  rejected {len(rejected)} anatomically impossible labels: {", ".join(rejected)}')
 
     if target_spacing:
         before = values.shape
@@ -148,6 +198,8 @@ if __name__ == '__main__':
     # The CT keeps the sampling the collection distributes, 1.5 mm, rather than being reduced
     # further: that is as fine as this source goes.
     build('data/raw/ct/s0287', 'public/imaging/ct', 'ct', 's0287', SOURCES['ct'])
+    build('data/raw/ct/s0643', 'public/imaging/ct-head', 'ct', 's0643',
+          dict(SOURCES['ct'], subject='s0643'))
     build('data/raw/mri/s0175', 'public/imaging/mr-t1', 'mr', 's0175',
           dict(SOURCES['mri'], subject='s0175'), weighting='T1')
     build('data/raw/mri/s0173', 'public/imaging/mr-t2', 'mr', 's0173',

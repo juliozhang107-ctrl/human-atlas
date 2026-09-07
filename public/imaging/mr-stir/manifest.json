@@ -94,31 +94,31 @@
    "index": 10,
    "file": "iliopsoas_left",
    "name": "Left iliopsoas",
-   "voxels": 15919
+   "voxels": 15909
   },
   {
    "index": 11,
    "file": "sacrum",
    "name": "Sacrum",
-   "voxels": 15377
+   "voxels": 15369
   },
   {
    "index": 12,
    "file": "hip_left",
    "name": "Left hip",
-   "voxels": 14858
+   "voxels": 14856
   },
   {
    "index": 13,
    "file": "hip_right",
    "name": "Right hip",
-   "voxels": 14082
+   "voxels": 14081
   },
   {
    "index": 14,
    "file": "colon",
    "name": "Colon",
-   "voxels": 14081
+   "voxels": 13817
   },
   {
    "index": 15,
@@ -208,7 +208,7 @@
    "index": 29,
    "file": "pancreas",
    "name": "Pancreas",
-   "voxels": 393
+   "voxels": 391
   },
   {
    "index": 30,
@@ -251,6 +251,6 @@
  },
  "bytes": {
   "volume": 3037728,
-  "labels": 58973
+  "labels": 58813
  }
 }

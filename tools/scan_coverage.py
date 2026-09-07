@@ -5,7 +5,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from remote_zip import open_remote
 
 url, member, out = sys.argv[1], sys.argv[2], sys.argv[3]
-zf, backing = open_remote(url, buffer_size=1 << 17)
+zf, backing = open_remote(url, buffer_size=1 << 22)
 rows = list(csv.DictReader(io.StringIO(zf.read('meta.csv').decode('utf-8-sig')), delimiter=';'))
 key = list(rows[0])[0]
 results, started = [], time.time()

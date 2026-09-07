@@ -58,7 +58,7 @@
    "index": 4,
    "file": "colon",
    "name": "Colon",
-   "voxels": 81228
+   "voxels": 81007
   },
   {
    "index": 5,
@@ -76,13 +76,13 @@
    "index": 7,
    "file": "small_bowel",
    "name": "Small bowel",
-   "voxels": 55025
+   "voxels": 52456
   },
   {
    "index": 8,
    "file": "autochthon_right",
    "name": "Right autochthon",
-   "voxels": 49950
+   "voxels": 49876
   },
   {
    "index": 9,
@@ -112,7 +112,7 @@
    "index": 13,
    "file": "iliopsoas_left",
    "name": "Left iliopsoas",
-   "voxels": 16931
+   "voxels": 16865
   },
   {
    "index": 14,
@@ -148,7 +148,7 @@
    "index": 19,
    "file": "pancreas",
    "name": "Pancreas",
-   "voxels": 5317
+   "voxels": 5310
   },
   {
    "index": 20,
@@ -166,7 +166,7 @@
    "index": 22,
    "file": "duodenum",
    "name": "Duodenum",
-   "voxels": 2634
+   "voxels": 2586
   },
   {
    "index": 23,
@@ -184,31 +184,31 @@
    "index": 25,
    "file": "esophagus",
    "name": "Esophagus",
-   "voxels": 1580
+   "voxels": 1575
   },
   {
    "index": 26,
    "file": "hip_left",
    "name": "Left hip",
-   "voxels": 1568
+   "voxels": 1567
   },
   {
    "index": 27,
    "file": "inferior_vena_cava",
    "name": "Inferior vena cava",
-   "voxels": 1066
+   "voxels": 1058
   },
   {
    "index": 28,
    "file": "portal_vein_and_splenic_vein",
    "name": "Portal vein and splenic vein",
-   "voxels": 793
+   "voxels": 791
   },
   {
    "index": 29,
    "file": "aorta",
    "name": "Aorta",
-   "voxels": 638
+   "voxels": 636
   },
   {
    "index": 30,
@@ -256,7 +256,7 @@
    "index": 37,
    "file": "iliac_vena_right",
    "name": "Right iliac vena",
-   "voxels": 173
+   "voxels": 170
   },
   {
    "index": 38,
@@ -281,6 +281,6 @@
  },
  "bytes": {
   "volume": 3981531,
-  "labels": 72603
+  "labels": 71800
  }
 }

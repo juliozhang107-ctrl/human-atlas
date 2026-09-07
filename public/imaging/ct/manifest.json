@@ -51,25 +51,25 @@
    "index": 3,
    "file": "lung_lower_lobe_right",
    "name": "Right lung lower lobe",
-   "voxels": 340963
+   "voxels": 340921
   },
   {
    "index": 4,
    "file": "lung_lower_lobe_left",
    "name": "Left lung lower lobe",
-   "voxels": 335407
+   "voxels": 335402
   },
   {
    "index": 5,
    "file": "lung_upper_lobe_right",
    "name": "Right lung upper lobe",
-   "voxels": 305491
+   "voxels": 305488
   },
   {
    "index": 6,
    "file": "small_bowel",
    "name": "Small bowel",
-   "voxels": 294445
+   "voxels": 294191
   },
   {
    "index": 7,
@@ -129,13 +129,13 @@
    "index": 16,
    "file": "autochthon_right",
    "name": "Right autochthon",
-   "voxels": 139519
+   "voxels": 138816
   },
   {
    "index": 17,
    "file": "hip_left",
    "name": "Left hip",
-   "voxels": 119596
+   "voxels": 119593
   },
   {
    "index": 18,
@@ -159,7 +159,7 @@
    "index": 21,
    "file": "gluteus_medius_left",
    "name": "Left gluteus medius",
-   "voxels": 77879
+   "voxels": 77127
   },
   {
    "index": 22,
@@ -183,7 +183,7 @@
    "index": 25,
    "file": "costal_cartilages",
    "name": "Ribl cartilages",
-   "voxels": 52930
+   "voxels": 50425
   },
   {
    "index": 26,
@@ -243,7 +243,7 @@
    "index": 35,
    "file": "vertebrae_L4",
    "name": "Vertebra L4",
-   "voxels": 20154
+   "voxels": 20152
   },
   {
    "index": 36,
@@ -369,7 +369,7 @@
    "index": 56,
    "file": "iliac_vena_right",
    "name": "Right iliac vena",
-   "voxels": 9354
+   "voxels": 9352
   },
   {
    "index": 57,
@@ -429,7 +429,7 @@
    "index": 66,
    "file": "rib_right_6",
    "name": "Rib right 6",
-   "voxels": 7894
+   "voxels": 7888
   },
   {
    "index": 67,
@@ -459,7 +459,7 @@
    "index": 71,
    "file": "rib_right_10",
    "name": "Rib right 10",
-   "voxels": 6737
+   "voxels": 6681
   },
   {
    "index": 72,
@@ -471,13 +471,13 @@
    "index": 73,
    "file": "rib_right_5",
    "name": "Rib right 5",
-   "voxels": 6653
+   "voxels": 6526
   },
   {
    "index": 74,
    "file": "portal_vein_and_splenic_vein",
    "name": "Portal vein and splenic vein",
-   "voxels": 6619
+   "voxels": 6481
   },
   {
    "index": 75,
@@ -489,7 +489,7 @@
    "index": 76,
    "file": "rib_right_4",
    "name": "Rib right 4",
-   "voxels": 6200
+   "voxels": 6197
   },
   {
    "index": 77,
@@ -525,13 +525,13 @@
    "index": 82,
    "file": "rib_left_3",
    "name": "Rib left 3",
-   "voxels": 4281
+   "voxels": 4280
   },
   {
    "index": 83,
    "file": "rib_right_3",
    "name": "Rib right 3",
-   "voxels": 4103
+   "voxels": 4101
   },
   {
    "index": 84,
@@ -567,7 +567,7 @@
    "index": 89,
    "file": "adrenal_gland_left",
    "name": "Left adrenal gland",
-   "voxels": 1838
+   "voxels": 1816
   },
   {
    "index": 90,
@@ -613,36 +613,30 @@
   },
   {
    "index": 97,
-   "file": "skull",
-   "name": "Skull",
-   "voxels": 308
-  },
-  {
-   "index": 98,
    "file": "rib_left_1",
    "name": "Rib left 1",
    "voxels": 237
   },
   {
-   "index": 99,
+   "index": 98,
    "file": "vertebrae_T2",
    "name": "Vertebra T2",
    "voxels": 37
   },
   {
-   "index": 100,
+   "index": 99,
    "file": "clavicula_right",
    "name": "Right clavicula",
    "voxels": 31
   },
   {
-   "index": 101,
+   "index": 100,
    "file": "common_carotid_artery_right",
    "name": "Right common carotid artery",
    "voxels": 28
   },
   {
-   "index": 102,
+   "index": 101,
    "file": "clavicula_left",
    "name": "Left clavicula",
    "voxels": 7
@@ -658,6 +652,6 @@
  },
  "bytes": {
   "volume": 51514466,
-  "labels": 600265
+  "labels": 598248
  }
 }

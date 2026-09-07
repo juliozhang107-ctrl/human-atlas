@@ -8,7 +8,7 @@ import {decodeModelResponse} from './model-download';
 import {PointerTap} from './pointer-tap';
 import {SYSTEMS,type Atlas,type SceneState} from './anatomy';
 import {contributionFor,integrateBeam,bodySpan,isEnvelope,FILL_MU,type BeamReading,type Crossing,type Hit} from './radiograph';
-import {ctWindow,mrStudy} from './modalities';
+import {ctWindow,study as studyFor} from './modalities';
 import {loadVolume,extractSection,sliceCount,type Section,type Volume,type VolumeManifest} from './volume';
 /** Two millimetres a notch, matching the position slider. */
 export const SLICE_STEP=.002;
@@ -195,8 +195,8 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
   let sliceKey='',drawKey='',sliceActive=false,sliceCrop={x:0,y:0,w:0,h:0},sliceDraw={x:0,y:0,w:0,h:0};
 
   const wanted=(mode:string)=>mode==='ct'||mode==='mr';
-  /** Which study a state refers to: the single CT, or the chosen magnetic resonance acquisition. */
-  const studyPath=(s:SceneState)=>s.mode==='ct'?'ct':mrStudy(s.study).path;
+  /** Which study a state refers to, since both modalities now offer more than one. */
+  const studyPath=(s:SceneState)=>studyFor(s.mode,s.study).path;
   const ensureStudy=(mode:string)=>{
    const held=studies.get(mode);
    if(held){if(study!==held){study=held;sliceKey='';volume.current(held.manifest);}return true;}

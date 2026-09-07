@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import zlib from 'node:zlib';
 import {readFileSync} from 'node:fs';
 import {PLANES,plane} from '../app/slice.ts';
-import {CT_WINDOWS,MODALITIES,MR_STUDIES,ctWindow,modality,mrStudy,windowed} from '../app/modalities.ts';
+import {CT_WINDOWS,MODALITIES,STUDIES,ctWindow,modality,study as studyFor,studiesFor,windowed} from '../app/modalities.ts';
 import {extractSection,planeAxis,sliceCount} from '../app/volume.ts';
 
 const load=id=>{
@@ -38,13 +38,15 @@ assert.equal(modality('radiograph').cross,false,'a radiograph is a projection, n
 const atlas=JSON.parse(readFileSync(new URL('../public/models/atlas.json',import.meta.url)));
 const concepts=new Set(atlas.concepts.map(c=>c.name.toLowerCase()));
 
-for(const id of ['ct',...MR_STUDIES.map(s=>s.path)]){
+for(const id of STUDIES.map(s=>s.path)){
  const study=load(id);
  const {manifest,values,labels}=study;
  const [dx,dy,dz]=manifest.dims;
 
  // ── Manifest integrity ─────────────────────────────────────────────────────────────────────────
- assert.equal(manifest.modality,id==='ct'?'ct':'mr',`${id}: manifest names a different modality`);
+ const declared=STUDIES.find(s=>s.path===id);
+ assert.ok(declared,`${id}: no study declares this path`);
+ assert.equal(manifest.modality,declared.modality,`${id}: manifest names a different modality`);
  // A clinical study can be thin in one direction: a T2 abdomen is often thirty-odd slices at six
  // millimetres. What matters is that each axis covers a real distance, not that it has many voxels.
  assert.ok(manifest.dims.every(d=>d>16),`${id}: implausible dimensions ${manifest.dims}`);
@@ -58,9 +60,9 @@ for(const id of ['ct',...MR_STUDIES.map(s=>s.path)]){
  // Every label in the volume must name a structure, and every named structure must appear.
  const present=new Set(labels);present.delete(0);
  for(const index of present)assert.ok(study.named.has(index),`${id}: label ${index} names nothing`);
- const declared=new Set(manifest.structures.map(s=>s.index));
+ const indices=new Set(manifest.structures.map(s=>s.index));
  for(const s of manifest.structures)assert.ok(present.has(s.index),`${id}: ${s.name} is declared but absent from the volume`);
- assert.equal(declared.size,manifest.structures.length,`${id}: duplicate structure indices`);
+ assert.equal(indices.size,manifest.structures.length,`${id}: duplicate structure indices`);
  const labelled=[...labels].filter(Boolean).length;
  assert.ok(labelled>values.length*.02,`${id}: barely any voxels are labelled`);
 
@@ -94,7 +96,7 @@ for(const id of ['ct',...MR_STUDIES.map(s=>s.path)]){
   for(let i=0;i<labels.length;i++)if(labels[i]===structure.index){sum+=values[i]*manifest.intensity.slope+manifest.intensity.inter;n++;}
   return n?sum/n:null;
  };
- if(id==='ct'){
+ if(declared.modality==='ct'){
   assert.equal(manifest.intensity.unit,'HU');
   // Hounsfield units are absolute, so a mislabelled or misaligned mask shows up as tissue whose
   // density is wrong for its name. These bounds are wide enough for any normal study.
@@ -110,15 +112,13 @@ for(const id of ['ct',...MR_STUDIES.map(s=>s.path)]){
   }
   const air=[...values].slice(0,5000).map(v=>v*1+manifest.intensity.inter);
   assert.ok(Math.min(...air)<-800,'ct: the field should contain air near -1000 HU');
-  assert.ok(manifest.dims[1]*manifest.spacing[1]/10>100,`ct: expected wide craniocaudal coverage, got ${(manifest.dims[1]*manifest.spacing[1]/10).toFixed(0)} cm`);
+  if(declared.id==='body')assert.ok(manifest.dims[1]*manifest.spacing[1]/10>100,`ct: the body study should span the trunk and legs, got ${(manifest.dims[1]*manifest.spacing[1]/10).toFixed(0)} cm`);
  }else{
   assert.equal(manifest.intensity.dtype,'uint8');
   assert.ok(values.every(v=>v<=255));
   // The weighting is measured, and each declared study must be the weighting it claims: on T1 urine
   // is dark against liver, on an inversion recovery fluid is bright and muscle is dark.
-  const declaredStudy=MR_STUDIES.find(s=>s.path===id);
-  assert.ok(declaredStudy,`${id}: no study declares this path`);
-  assert.equal(manifest.weighting,declaredStudy.label,`${id}: manifest weighting disagrees with the study list`);
+  assert.equal(manifest.weighting,declared.label,`${id}: manifest weighting disagrees with the study list`);
   const fluid=hu('urinary bladder'),liver=hu('liver'),muscle=hu('autochthon left')??hu('autochthon right');
   if(manifest.weighting==='T1'&&fluid&&liver)
    assert.ok(fluid/liver<0.9,`${id}: declared T1 but fluid/liver is ${(fluid/liver).toFixed(2)}`);
@@ -132,6 +132,18 @@ for(const id of ['ct',...MR_STUDIES.map(s=>s.path)]){
   +`${manifest.source.licence}.`);
 }
 
+// Structures must sit in an anatomically possible order along the superior axis.
+{
+ const base=new URL('../public/imaging/ct-head/',import.meta.url);
+ const head=JSON.parse(readFileSync(new URL('manifest.json',base)));
+ const names=head.structures.map(s=>s.name.toLowerCase());
+ for(const expected of ['brain','skull'])
+  assert.ok(names.includes(expected),`ct-head: the head study must contain the ${expected}`);
+ const body=JSON.parse(readFileSync(new URL('../public/imaging/ct/manifest.json',import.meta.url)));
+ assert.ok(!body.structures.some(s=>s.name.toLowerCase()==='skull'),
+  'ct: a study that stops at the neck must not claim a skull');
+}
+
 // ── Windowing ──────────────────────────────────────────────────────────────────────────────────
 assert.equal(windowed(40,400,40),.5,'the window centre must sit mid grey');
 assert.equal(windowed(-1000,400,40),0);assert.equal(windowed(3000,400,40),1);
@@ -139,6 +151,10 @@ for(const w of CT_WINDOWS)assert.ok(w.width>0&&w.name.trim(),`${w.id}: needs a w
 assert.equal(ctWindow('lung').level,-600);
 assert.throws(()=>ctWindow('pancreas'),/Unknown window/);
 assert.throws(()=>plane('oblique'),/Unknown plane/);
-for(const study of MR_STUDIES)assert.equal(mrStudy(study.id).path,study.path);
-assert.throws(()=>mrStudy('dwi'),/Unknown study/);
+for(const s of STUDIES)assert.equal(studyFor(s.modality,s.id).path,s.path);
+assert.equal(studiesFor('ct').length,2,'the body arrives in two CT studies');
+assert.equal(studiesFor('mr').length,3,'three magnetic resonance sequences are offered');
+// Anatomy that cannot be where a label puts it: the collection's own labels once placed a fragment
+// of skull among the toes of a study whose highest slice is lung.
+
 console.log('Manifests, label coverage, section geometry, sampling, CT densities and MR weightings all check out.');

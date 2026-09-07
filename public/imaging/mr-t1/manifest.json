@@ -52,13 +52,13 @@
    "index": 3,
    "file": "lung_left",
    "name": "Left lung",
-   "voxels": 210878
+   "voxels": 209470
   },
   {
    "index": 4,
    "file": "liver",
    "name": "Liver",
-   "voxels": 182979
+   "voxels": 182978
   },
   {
    "index": 5,
@@ -70,7 +70,7 @@
    "index": 6,
    "file": "quadriceps_femoris_left",
    "name": "Left quadriceps femoris",
-   "voxels": 113404
+   "voxels": 113403
   },
   {
    "index": 7,
@@ -88,7 +88,7 @@
    "index": 9,
    "file": "quadriceps_femoris_right",
    "name": "Right quadriceps femoris",
-   "voxels": 85851
+   "voxels": 85844
   },
   {
    "index": 10,
@@ -142,7 +142,7 @@
    "index": 18,
    "file": "femur_right",
    "name": "Right femur",
-   "voxels": 38196
+   "voxels": 38194
   },
   {
    "index": 19,
@@ -160,19 +160,19 @@
    "index": 21,
    "file": "iliopsoas_right",
    "name": "Right iliopsoas",
-   "voxels": 36905
+   "voxels": 36029
   },
   {
    "index": 22,
    "file": "iliopsoas_left",
    "name": "Left iliopsoas",
-   "voxels": 33950
+   "voxels": 33193
   },
   {
    "index": 23,
    "file": "hip_left",
    "name": "Left hip",
-   "voxels": 33864
+   "voxels": 33863
   },
   {
    "index": 24,
@@ -184,7 +184,7 @@
    "index": 25,
    "file": "hip_right",
    "name": "Right hip",
-   "voxels": 31870
+   "voxels": 31820
   },
   {
    "index": 26,
@@ -214,19 +214,19 @@
    "index": 30,
    "file": "sacrum",
    "name": "Sacrum",
-   "voxels": 22351
+   "voxels": 22324
   },
   {
    "index": 31,
    "file": "stomach",
    "name": "Stomach",
-   "voxels": 22193
+   "voxels": 21617
   },
   {
    "index": 32,
    "file": "intervertebral_discs",
    "name": "Intervertebral discs",
-   "voxels": 18540
+   "voxels": 18505
   },
   {
    "index": 33,
@@ -244,7 +244,7 @@
    "index": 35,
    "file": "thigh_posterior_compartment_right",
    "name": "Right thigh posterior compartment",
-   "voxels": 10782
+   "voxels": 10779
   },
   {
    "index": 36,
@@ -298,7 +298,7 @@
    "index": 44,
    "file": "pancreas",
    "name": "Pancreas",
-   "voxels": 4285
+   "voxels": 4282
   },
   {
    "index": 45,
@@ -322,7 +322,7 @@
    "index": 48,
    "file": "iliac_artery_left",
    "name": "Left iliac artery",
-   "voxels": 1361
+   "voxels": 1322
   },
   {
    "index": 49,
@@ -365,6 +365,6 @@
  },
  "bytes": {
   "volume": 8465876,
-  "labels": 259973
+  "labels": 258492
  }
 }

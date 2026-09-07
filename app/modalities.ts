@@ -20,20 +20,36 @@ export function windowed(value:number,width:number,level:number){
  return Math.min(1,Math.max(0,(value-(level-width/2))/Math.max(1e-6,width)));
 }
 
-/** Magnetic resonance has no absolute scale, and one acquisition carries one weighting: a T2 cannot
- *  be derived from a T1 the way a bone window can be derived from a soft-tissue one. So a sequence
- *  here means a different study, and each is labelled with the weighting measured from its own
- *  tissue signals rather than read from metadata this collection records in mixed units. */
-export interface Study {id:string;path:string;label:string;subject:string;coverage:string;description:string}
-export const MR_STUDIES: Study[] = [
- {id:'t1',  path:'mr-t1',  label:'T1',  subject:'s0175', coverage:'head to thigh, 108 cm',
+/** The studies on offer, by modality.
+ *
+ *  No single clinical study covers a whole body: CT and MRI are acquired per region, and even a
+ *  protocol called whole body stops at the thighs. So the body arrives in two studies of two
+ *  patients, one running from the neck to the feet and one covering the head and neck, which
+ *  overlap at the shoulders.
+ *
+ *  A magnetic resonance sequence is a study too, not a display setting. One acquisition carries one
+ *  weighting: a T2 cannot be derived from a T1 the way a bone window is derived from a soft-tissue
+ *  one. Each is labelled with the weighting measured from its own tissue signals rather than read
+ *  from metadata this collection records in mixed units. */
+export interface Study {modality:'ct'|'mr';id:string;path:string;label:string;subject:string;coverage:string;description:string}
+export const STUDIES: Study[] = [
+ {modality:'ct',id:'body',path:'ct',      label:'Body', subject:'s0287', coverage:'neck to feet, 125 cm',
+  description:'A contrast angiogram of the trunk and legs. The widest study in the collection that also covers the trunk.'},
+ {modality:'ct',id:'head',path:'ct-head', label:'Head', subject:'s0643', coverage:'head to upper chest, 39 cm',
+  description:'A head and neck angiogram, carrying the brain, skull and cervical spine the body study stops short of.'},
+ {modality:'mr',id:'t1',  path:'mr-t1',  label:'T1',  subject:'s0175', coverage:'head to thigh, 108 cm',
   description:'Fat and marrow bright, urine dark against liver. The study to read anatomy from.'},
- {id:'t2',  path:'mr-t2',  label:'T2',  subject:'s0173', coverage:'abdomen, 40 cm',
+ {modality:'mr',id:'t2',  path:'mr-t2',  label:'T2',  subject:'s0173', coverage:'abdomen, 40 cm',
   description:'Fluid and spleen bright, muscle dark, fat still bright. Where most pathology shows.'},
- {id:'stir',path:'mr-stir',label:'STIR',subject:'s0190', coverage:'chest to pelvis, 50 cm',
+ {modality:'mr',id:'stir',path:'mr-stir',label:'STIR',subject:'s0190', coverage:'chest to pelvis, 50 cm',
   description:'Inversion recovery with fat nulled, so only fluid stays bright. For oedema and marrow.'},
 ];
-export function mrStudy(id:string){const study=MR_STUDIES.find(s=>s.id===id);if(!study)throw new Error(`Unknown study: ${id}. Expected one of ${MR_STUDIES.map(s=>s.id).join(', ')}.`);return study;}
+export function studiesFor(modality:string){return STUDIES.filter(s=>s.modality===modality);}
+export function study(modality:string,id:string){
+ const found=STUDIES.find(s=>s.modality===modality&&s.id===id)??studiesFor(modality)[0];
+ if(!found)throw new Error(`No study for ${modality}. Expected one of ${STUDIES.map(s=>`${s.modality}/${s.id}`).join(', ')}.`);
+ return found;
+}
 
 export type ModalityId = 'radiograph'|'ct'|'mr'|'us';
 /** `interactive` marks the modalities the browser offers. Ultrasound stays in the renderer and its

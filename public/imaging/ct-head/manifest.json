@@ -1,0 +1,381 @@
+{
+ "modality": "ct",
+ "subject": "s0643",
+ "weighting": null,
+ "dims": [
+  178,
+  263,
+  178
+ ],
+ "spacing": [
+  1.5,
+  1.5,
+  1.5
+ ],
+ "axes": "x patient left, y superior, z anterior",
+ "crop": [
+  [
+   0,
+   178
+  ],
+  [
+   0,
+   263
+  ],
+  [
+   0,
+   178
+  ]
+ ],
+ "intensity": {
+  "dtype": "uint16",
+  "encoding": "split-bytes",
+  "slope": 1,
+  "inter": -1024,
+  "unit": "HU"
+ },
+ "structures": [
+  {
+   "index": 1,
+   "file": "brain",
+   "name": "Brain",
+   "voxels": 397098
+  },
+  {
+   "index": 2,
+   "file": "skull",
+   "name": "Skull",
+   "voxels": 255483
+  },
+  {
+   "index": 3,
+   "file": "lung_upper_lobe_left",
+   "name": "Left lung upper lobe",
+   "voxels": 165044
+  },
+  {
+   "index": 4,
+   "file": "lung_upper_lobe_right",
+   "name": "Right lung upper lobe",
+   "voxels": 140665
+  },
+  {
+   "index": 5,
+   "file": "lung_lower_lobe_left",
+   "name": "Left lung lower lobe",
+   "voxels": 41717
+  },
+  {
+   "index": 6,
+   "file": "autochthon_right",
+   "name": "Right autochthon",
+   "voxels": 33746
+  },
+  {
+   "index": 7,
+   "file": "autochthon_left",
+   "name": "Left autochthon",
+   "voxels": 33720
+  },
+  {
+   "index": 8,
+   "file": "aorta",
+   "name": "Aorta",
+   "voxels": 29562
+  },
+  {
+   "index": 9,
+   "file": "scapula_left",
+   "name": "Left scapula",
+   "voxels": 19066
+  },
+  {
+   "index": 10,
+   "file": "heart",
+   "name": "Heart",
+   "voxels": 15613
+  },
+  {
+   "index": 11,
+   "file": "sternum",
+   "name": "Sternum",
+   "voxels": 15193
+  },
+  {
+   "index": 12,
+   "file": "scapula_right",
+   "name": "Right scapula",
+   "voxels": 14761
+  },
+  {
+   "index": 13,
+   "file": "spinal_cord",
+   "name": "Spinal cord",
+   "voxels": 14355
+  },
+  {
+   "index": 14,
+   "file": "trachea",
+   "name": "Trachea",
+   "voxels": 13929
+  },
+  {
+   "index": 15,
+   "file": "clavicula_left",
+   "name": "Left clavicula",
+   "voxels": 11177
+  },
+  {
+   "index": 16,
+   "file": "clavicula_right",
+   "name": "Right clavicula",
+   "voxels": 10957
+  },
+  {
+   "index": 17,
+   "file": "vertebrae_T4",
+   "name": "Vertebra T4",
+   "voxels": 9404
+  },
+  {
+   "index": 18,
+   "file": "vertebrae_T1",
+   "name": "Vertebra T1",
+   "voxels": 8987
+  },
+  {
+   "index": 19,
+   "file": "vertebrae_T3",
+   "name": "Vertebra T3",
+   "voxels": 8939
+  },
+  {
+   "index": 20,
+   "file": "vertebrae_T2",
+   "name": "Vertebra T2",
+   "voxels": 8923
+  },
+  {
+   "index": 21,
+   "file": "vertebrae_T5",
+   "name": "Vertebra T5",
+   "voxels": 8128
+  },
+  {
+   "index": 22,
+   "file": "superior_vena_cava",
+   "name": "Superior vena cava",
+   "voxels": 8108
+  },
+  {
+   "index": 23,
+   "file": "vertebrae_C7",
+   "name": "Vertebra C7",
+   "voxels": 7531
+  },
+  {
+   "index": 24,
+   "file": "vertebrae_C2",
+   "name": "Vertebra C2",
+   "voxels": 6794
+  },
+  {
+   "index": 25,
+   "file": "vertebrae_C6",
+   "name": "Vertebra C6",
+   "voxels": 6316
+  },
+  {
+   "index": 26,
+   "file": "vertebrae_C1",
+   "name": "Vertebra C1",
+   "voxels": 5707
+  },
+  {
+   "index": 27,
+   "file": "vertebrae_C5",
+   "name": "Vertebra C5",
+   "voxels": 5209
+  },
+  {
+   "index": 28,
+   "file": "esophagus",
+   "name": "Esophagus",
+   "voxels": 5162
+  },
+  {
+   "index": 29,
+   "file": "thyroid_gland",
+   "name": "Thyroid gland",
+   "voxels": 4995
+  },
+  {
+   "index": 30,
+   "file": "rib_left_4",
+   "name": "Rib left 4",
+   "voxels": 4934
+  },
+  {
+   "index": 31,
+   "file": "rib_left_3",
+   "name": "Rib left 3",
+   "voxels": 4848
+  },
+  {
+   "index": 32,
+   "file": "rib_right_3",
+   "name": "Rib right 3",
+   "voxels": 4763
+  },
+  {
+   "index": 33,
+   "file": "vertebrae_C4",
+   "name": "Vertebra C4",
+   "voxels": 4650
+  },
+  {
+   "index": 34,
+   "file": "brachiocephalic_vein_left",
+   "name": "Left brachiocephalic vein",
+   "voxels": 4615
+  },
+  {
+   "index": 35,
+   "file": "vertebrae_C3",
+   "name": "Vertebra C3",
+   "voxels": 4441
+  },
+  {
+   "index": 36,
+   "file": "rib_left_2",
+   "name": "Rib left 2",
+   "voxels": 4369
+  },
+  {
+   "index": 37,
+   "file": "rib_right_2",
+   "name": "Rib right 2",
+   "voxels": 3962
+  },
+  {
+   "index": 38,
+   "file": "rib_right_4",
+   "name": "Rib right 4",
+   "voxels": 3703
+  },
+  {
+   "index": 39,
+   "file": "lung_lower_lobe_right",
+   "name": "Right lung lower lobe",
+   "voxels": 3700
+  },
+  {
+   "index": 40,
+   "file": "rib_right_1",
+   "name": "Rib right 1",
+   "voxels": 3658
+  },
+  {
+   "index": 41,
+   "file": "subclavian_artery_right",
+   "name": "Right subclavian artery",
+   "voxels": 3357
+  },
+  {
+   "index": 42,
+   "file": "rib_left_1",
+   "name": "Rib left 1",
+   "voxels": 2885
+  },
+  {
+   "index": 43,
+   "file": "subclavian_artery_left",
+   "name": "Left subclavian artery",
+   "voxels": 2867
+  },
+  {
+   "index": 44,
+   "file": "rib_left_5",
+   "name": "Rib left 5",
+   "voxels": 2594
+  },
+  {
+   "index": 45,
+   "file": "common_carotid_artery_left",
+   "name": "Left common carotid artery",
+   "voxels": 2302
+  },
+  {
+   "index": 46,
+   "file": "brachiocephalic_trunk",
+   "name": "Brachiocephalic trunk",
+   "voxels": 2261
+  },
+  {
+   "index": 47,
+   "file": "common_carotid_artery_right",
+   "name": "Right common carotid artery",
+   "voxels": 1695
+  },
+  {
+   "index": 48,
+   "file": "brachiocephalic_vein_right",
+   "name": "Right brachiocephalic vein",
+   "voxels": 1316
+  },
+  {
+   "index": 49,
+   "file": "rib_right_5",
+   "name": "Rib right 5",
+   "voxels": 1106
+  },
+  {
+   "index": 50,
+   "file": "costal_cartilages",
+   "name": "Ribl cartilages",
+   "voxels": 800
+  },
+  {
+   "index": 51,
+   "file": "humerus_right",
+   "name": "Right humerus",
+   "voxels": 356
+  },
+  {
+   "index": 52,
+   "file": "rib_left_6",
+   "name": "Rib left 6",
+   "voxels": 172
+  },
+  {
+   "index": 53,
+   "file": "vertebrae_T6",
+   "name": "Vertebra T6",
+   "voxels": 165
+  },
+  {
+   "index": 54,
+   "file": "pulmonary_vein",
+   "name": "Pulmonary vein",
+   "voxels": 136
+  },
+  {
+   "index": 55,
+   "file": "atrial_appendage_left",
+   "name": "Left atrial appendage",
+   "voxels": 128
+  }
+ ],
+ "source": {
+  "dataset": "TotalSegmentator",
+  "subject": "s0643",
+  "doi": "10.5281/zenodo.10047292",
+  "url": "https://zenodo.org/records/10047292",
+  "licence": "CC BY 4.0",
+  "attribution": "Wasserthal et al., TotalSegmentator, University Hospital Basel"
+ },
+ "bytes": {
+  "volume": 9416150,
+  "labels": 150668
+ }
+}
