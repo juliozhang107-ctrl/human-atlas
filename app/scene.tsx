@@ -217,10 +217,21 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    // stored range is the window; there is nothing absolute to window against.
    const window=s.mode==='ct'?ctWindow(s.ctWindow):{width:256,level:128};
    section=extractSection(study,s.plane,s.slice,window.width,window.level);
+   // A structure chosen anywhere in the interface is tinted where this study has a label of the same
+   // name, which is what connects searching the atlas to finding the thing on a real image. The
+   // underlying grey is kept rather than replaced, so the tissue can still be read through the tint.
+   const wanted=s.highlight.toLowerCase();
+   const marked=wanted?study.manifest.structures.find(x=>x.name.toLowerCase()===wanted)?.index??0:0;
    sliceBuffer.width=section.width;sliceBuffer.height=section.height;
    const image=sliceBufferContext.createImageData(section.width,section.height);
    for(let i=0,o=0;i<section.grey.length;i++,o+=4){
-    image.data[o]=image.data[o+1]=image.data[o+2]=section.grey[i];image.data[o+3]=255;
+    const grey=section.grey[i];
+    if(marked&&section.labels[i]===marked){
+     image.data[o]=Math.min(255,grey*.45+28);
+     image.data[o+1]=Math.min(255,grey*.78+92);
+     image.data[o+2]=Math.min(255,grey*.72+82);
+    }else image.data[o]=image.data[o+1]=image.data[o+2]=grey;
+    image.data[o+3]=255;
    }
    sliceBufferContext.putImageData(image,0,0);
   };
@@ -325,7 +336,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    if(cross!==sliceActive){sliceActive=cross;sliceCanvas.hidden=!cross;renderer.domElement.style.visibility=cross?'hidden':'visible';hover.hidden=true;}
    if(cross){
     if(!ensureStudy(studyPath(s)))return;
-    const build=[studyPath(s),s.plane,s.slice,s.ctWindow].join('|');
+    const build=[studyPath(s),s.plane,s.slice,s.ctWindow,s.highlight].join('|');
     if(build!==sliceKey){sliceKey=build;buildSlice(s);drawKey='';}
     // The free area is remeasured each frame, so opening the inspector or the layer panel refits
     // the image instead of leaving it underneath.

@@ -25,9 +25,10 @@ export type ViewMode = 'anatomy'|'radiograph'|'ct'|'mr'|'us';
 /** `level` and `window` window the radiograph, in attenuation units. `slice` is an index into the
  *  loaded study along the current plane's axis. CT windows come from a named preset in Hounsfield
  *  units. `study` names which magnetic resonance acquisition to show, since a sequence there means
- *  a different study rather than a different way of displaying one. */
+ *  a different study rather than a different way of displaying one. `highlight` names the structure
+ *  currently selected, so a section can tint it where the study has a label of the same name. */
 export interface SceneState {inspectorOpen?:boolean;explode:number;visible:SystemId[];selected:string[];isolate:boolean;view:View;rotate:boolean;reset:number;
- mode:ViewMode;level:number;window:number;plane:PlaneId;slice:number;ctWindow:string;study:string}
+ mode:ViewMode;level:number;window:number;plane:PlaneId;slice:number;ctWindow:string;study:string;highlight:string}
 export const DEFAULT_VISIBLE:SystemId[] = ['cardiac','sensory','skeletal','muscular','arterial','venous','nervous','respiratory','digestive','urinary','lymphatic','endocrine','reproductive','connective'];
 export const EXPLANATIONS:Record<string,string> = {
  'heart':'A muscular pump in the chest. Its right side sends blood to the lungs; its left side sends blood through the systemic circulation.',
