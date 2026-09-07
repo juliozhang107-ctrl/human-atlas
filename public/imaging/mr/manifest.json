@@ -1,0 +1,369 @@
+{
+ "modality": "mr",
+ "subject": "s0175",
+ "dims": [
+  320,
+  360,
+  240
+ ],
+ "spacing": [
+  1.2813,
+  3.0,
+  1.2813
+ ],
+ "axes": "x patient left, y superior, z anterior",
+ "crop": [
+  [
+   0,
+   320
+  ],
+  [
+   0,
+   360
+  ],
+  [
+   0,
+   240
+  ]
+ ],
+ "intensity": {
+  "dtype": "uint8",
+  "encoding": "plain",
+  "slope": 1,
+  "inter": 0,
+  "unit": "stored 0-255",
+  "ceiling": 514.0
+ },
+ "structures": [
+  {
+   "index": 1,
+   "file": "lung_right",
+   "name": "Right lung",
+   "voxels": 326961
+  },
+  {
+   "index": 2,
+   "file": "brain",
+   "name": "Brain",
+   "voxels": 278752
+  },
+  {
+   "index": 3,
+   "file": "lung_left",
+   "name": "Left lung",
+   "voxels": 210878
+  },
+  {
+   "index": 4,
+   "file": "liver",
+   "name": "Liver",
+   "voxels": 182979
+  },
+  {
+   "index": 5,
+   "file": "heart",
+   "name": "Heart",
+   "voxels": 128959
+  },
+  {
+   "index": 6,
+   "file": "quadriceps_femoris_left",
+   "name": "Left quadriceps femoris",
+   "voxels": 113404
+  },
+  {
+   "index": 7,
+   "file": "thigh_medial_compartment_left",
+   "name": "Left thigh medial compartment",
+   "voxels": 93674
+  },
+  {
+   "index": 8,
+   "file": "thigh_medial_compartment_right",
+   "name": "Right thigh medial compartment",
+   "voxels": 90763
+  },
+  {
+   "index": 9,
+   "file": "quadriceps_femoris_right",
+   "name": "Right quadriceps femoris",
+   "voxels": 85851
+  },
+  {
+   "index": 10,
+   "file": "colon",
+   "name": "Colon",
+   "voxels": 76612
+  },
+  {
+   "index": 11,
+   "file": "gluteus_maximus_left",
+   "name": "Left gluteus maximus",
+   "voxels": 64559
+  },
+  {
+   "index": 12,
+   "file": "gluteus_maximus_right",
+   "name": "Right gluteus maximus",
+   "voxels": 60857
+  },
+  {
+   "index": 13,
+   "file": "small_bowel",
+   "name": "Small bowel",
+   "voxels": 56007
+  },
+  {
+   "index": 14,
+   "file": "spleen",
+   "name": "Spleen",
+   "voxels": 55203
+  },
+  {
+   "index": 15,
+   "file": "autochthon_left",
+   "name": "Left autochthon",
+   "voxels": 50907
+  },
+  {
+   "index": 16,
+   "file": "autochthon_right",
+   "name": "Right autochthon",
+   "voxels": 48281
+  },
+  {
+   "index": 17,
+   "file": "vertebrae",
+   "name": "Vertebra",
+   "voxels": 39738
+  },
+  {
+   "index": 18,
+   "file": "femur_right",
+   "name": "Right femur",
+   "voxels": 38196
+  },
+  {
+   "index": 19,
+   "file": "femur_left",
+   "name": "Left femur",
+   "voxels": 38099
+  },
+  {
+   "index": 20,
+   "file": "urinary_bladder",
+   "name": "Urinary bladder",
+   "voxels": 37264
+  },
+  {
+   "index": 21,
+   "file": "iliopsoas_right",
+   "name": "Right iliopsoas",
+   "voxels": 36905
+  },
+  {
+   "index": 22,
+   "file": "iliopsoas_left",
+   "name": "Left iliopsoas",
+   "voxels": 33950
+  },
+  {
+   "index": 23,
+   "file": "hip_left",
+   "name": "Left hip",
+   "voxels": 33864
+  },
+  {
+   "index": 24,
+   "file": "aorta",
+   "name": "Aorta",
+   "voxels": 32201
+  },
+  {
+   "index": 25,
+   "file": "hip_right",
+   "name": "Right hip",
+   "voxels": 31870
+  },
+  {
+   "index": 26,
+   "file": "gluteus_medius_left",
+   "name": "Left gluteus medius",
+   "voxels": 29343
+  },
+  {
+   "index": 27,
+   "file": "gluteus_medius_right",
+   "name": "Right gluteus medius",
+   "voxels": 25792
+  },
+  {
+   "index": 28,
+   "file": "kidney_left",
+   "name": "Left kidney",
+   "voxels": 23121
+  },
+  {
+   "index": 29,
+   "file": "kidney_right",
+   "name": "Right kidney",
+   "voxels": 22551
+  },
+  {
+   "index": 30,
+   "file": "sacrum",
+   "name": "Sacrum",
+   "voxels": 22351
+  },
+  {
+   "index": 31,
+   "file": "stomach",
+   "name": "Stomach",
+   "voxels": 22193
+  },
+  {
+   "index": 32,
+   "file": "intervertebral_discs",
+   "name": "Intervertebral discs",
+   "voxels": 18540
+  },
+  {
+   "index": 33,
+   "file": "humerus_right",
+   "name": "Right humerus",
+   "voxels": 17772
+  },
+  {
+   "index": 34,
+   "file": "thigh_posterior_compartment_left",
+   "name": "Left thigh posterior compartment",
+   "voxels": 14154
+  },
+  {
+   "index": 35,
+   "file": "thigh_posterior_compartment_right",
+   "name": "Right thigh posterior compartment",
+   "voxels": 10782
+  },
+  {
+   "index": 36,
+   "file": "humerus_left",
+   "name": "Left humerus",
+   "voxels": 9364
+  },
+  {
+   "index": 37,
+   "file": "gluteus_minimus_right",
+   "name": "Right gluteus minimus",
+   "voxels": 8144
+  },
+  {
+   "index": 38,
+   "file": "gluteus_minimus_left",
+   "name": "Left gluteus minimus",
+   "voxels": 8006
+  },
+  {
+   "index": 39,
+   "file": "spinal_cord",
+   "name": "Spinal cord",
+   "voxels": 7126
+  },
+  {
+   "index": 40,
+   "file": "inferior_vena_cava",
+   "name": "Inferior vena cava",
+   "voxels": 6891
+  },
+  {
+   "index": 41,
+   "file": "sartorius_left",
+   "name": "Left sartorius",
+   "voxels": 5446
+  },
+  {
+   "index": 42,
+   "file": "esophagus",
+   "name": "Esophagus",
+   "voxels": 4508
+  },
+  {
+   "index": 43,
+   "file": "sartorius_right",
+   "name": "Right sartorius",
+   "voxels": 4445
+  },
+  {
+   "index": 44,
+   "file": "pancreas",
+   "name": "Pancreas",
+   "voxels": 4285
+  },
+  {
+   "index": 45,
+   "file": "iliac_vena_right",
+   "name": "Right iliac vena",
+   "voxels": 2942
+  },
+  {
+   "index": 46,
+   "file": "iliac_vena_left",
+   "name": "Left iliac vena",
+   "voxels": 2695
+  },
+  {
+   "index": 47,
+   "file": "iliac_artery_right",
+   "name": "Right iliac artery",
+   "voxels": 1405
+  },
+  {
+   "index": 48,
+   "file": "iliac_artery_left",
+   "name": "Left iliac artery",
+   "voxels": 1361
+  },
+  {
+   "index": 49,
+   "file": "portal_vein_and_splenic_vein",
+   "name": "Portal vein and splenic vein",
+   "voxels": 1246
+  },
+  {
+   "index": 50,
+   "file": "duodenum",
+   "name": "Duodenum",
+   "voxels": 1149
+  },
+  {
+   "index": 51,
+   "file": "adrenal_gland_right",
+   "name": "Right adrenal gland",
+   "voxels": 12
+  },
+  {
+   "index": 52,
+   "file": "adrenal_gland_left",
+   "name": "Left adrenal gland",
+   "voxels": 10
+  },
+  {
+   "index": 53,
+   "file": "prostate",
+   "name": "Prostate",
+   "voxels": 1
+  }
+ ],
+ "source": {
+  "dataset": "TotalSegmentator MRI",
+  "subject": "s0175",
+  "doi": "10.5281/zenodo.11367005",
+  "url": "https://zenodo.org/records/11367005",
+  "licence": "CC BY-NC-SA 2.0",
+  "attribution": "Akinci D\u2019Antonoli et al., TotalSegmentator MRI, University Hospital Basel"
+ },
+ "bytes": {
+  "volume": 8465876,
+  "labels": 259973
+ }
+}

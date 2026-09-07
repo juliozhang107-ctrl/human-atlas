@@ -7,16 +7,15 @@ import {createExplosionLayout} from './explosion-layout';
 import {decodeModelResponse} from './model-download';
 import {PointerTap} from './pointer-tap';
 import {SYSTEMS,type Atlas,type SceneState} from './anatomy';
-import {contributionFor,integrateBeam,bodySpan,isEnvelope,sectionTissue,hounsfield,FILL_MU,type BeamReading,type Crossing,type Hit} from './radiograph';
-import {plane,frameFor,crossSection,fillSegments,fillEnclosed,byDescendingVolume,type Frame,type Plane} from './slice';
-import {RELAXATION,ACOUSTIC,sequence,ctWindow,mrSignal} from './modalities';
-import {windowSection,ultrasoundSector,probeFor,scatterFromAttenuation} from './imaging';
+import {contributionFor,integrateBeam,bodySpan,isEnvelope,FILL_MU,type BeamReading,type Crossing,type Hit} from './radiograph';
+import {ctWindow} from './modalities';
+import {loadVolume,extractSection,sliceCount,type Section,type Volume,type VolumeManifest} from './volume';
 /** Two millimetres a notch, matching the position slider. */
 export const SLICE_STEP=.002;
-interface Props {atlas:Atlas;state:SceneState;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void;onBeam:(reading:BeamReading|null)=>void;onSlice:(position:number)=>void}
-export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,onBeam,onSlice}:Props){
- const host=useRef<HTMLDivElement>(null),latest=useRef(state),select=useRef(onSelect),beam=useRef(onBeam),step=useRef(onSlice);
- latest.current=state;select.current=onSelect;beam.current=onBeam;step.current=onSlice;
+interface Props {atlas:Atlas;state:SceneState;onSelect:(id:string)=>void;onProgress:(n:number)=>void;onError:(s:string)=>void;onBeam:(reading:BeamReading|null)=>void;onSlice:(index:number)=>void;onStructure:(name:string)=>void;onVolume:(manifest:VolumeManifest|null)=>void}
+export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,onBeam,onSlice,onStructure,onVolume}:Props){
+ const host=useRef<HTMLDivElement>(null),latest=useRef(state),select=useRef(onSelect),beam=useRef(onBeam),step=useRef(onSlice),structure=useRef(onStructure),volume=useRef(onVolume);
+ latest.current=state;select.current=onSelect;beam.current=onBeam;step.current=onSlice;structure.current=onStructure;volume.current=onVolume;
  useEffect(()=>{
   const el=host.current!;let disposed=false,frame=0,dirty=true,ready=false,lastView='',lastReset=-1,lastIsolate='',layoutKey='',amount=0;
   let lastState:SceneState|null=null;
@@ -182,79 +181,49 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
   };
   renderer.domElement.addEventListener('pointerdown',down);renderer.domElement.addEventListener('pointermove',move);renderer.domElement.addEventListener('pointerup',up);renderer.domElement.addEventListener('pointercancel',cancel);
   // ── Cross-sections ────────────────────────────────────────────────────────────────────────────
-  // Sections are cut on the processor rather than the graphics card. Intersecting a mesh with a
-  // plane is exact, where sampling one on the card would need depth peeling to decide which of
-  // several overlapping structures owns a pixel. That exact answer is what lets the reader tap a
-  // section and be told what they are looking at, so it is worth the milliseconds.
+  // Sections come from a real study rather than from these meshes: an intensity volume and a label
+  // volume of the same shape, where every voxel carries the index of the structure that owns it.
+  // Slicing is then an indexing operation, and the label under the pointer names the anatomy
+  // exactly, because a radiologist drew it rather than a model inferring it.
   const sliceCanvas=document.createElement('canvas');sliceCanvas.className='section-view';sliceCanvas.hidden=true;
-  sliceCanvas.setAttribute('aria-label','Cross-sectional image. Scroll to move through the stack, and tap a structure to name it.');el.appendChild(sliceCanvas);
+  sliceCanvas.setAttribute('aria-label','Cross-sectional image from a real study. Scroll to move through the stack, and tap a structure to name it.');
+  el.appendChild(sliceCanvas);
   const sliceContext=sliceCanvas.getContext('2d')!;
   const sliceBuffer=document.createElement('canvas'),sliceBufferContext=sliceBuffer.getContext('2d')!;
-  let sliceLabels:Int32Array|null=null,sliceFrame:Frame|null=null,sliceKey='',drawKey='',sliceActive=false;
-  let sliceCrop={x:0,y:0,w:0,h:0},sliceDraw={x:0,y:0,w:0,h:0};
-  const impedance=new Float64Array(atlas.parts.length),absorption=new Float64Array(atlas.parts.length),scattering=new Float64Array(atlas.parts.length);
-  const density=new Float64Array(atlas.parts.length),relaxation=atlas.parts.map(p=>RELAXATION[sectionTissue(p)]);
-  atlas.parts.forEach((p,i)=>{
-   const a=ACOUSTIC[sectionTissue(p)];
-   impedance[i]=a.z;absorption[i]=a.alpha;scattering[i]=scatterFromAttenuation(a.alpha);
-   density[i]=hounsfield(sectionTissue(p));
-  });
-  const sliceExtent=(p:Plane)=>{
-   let u0=Infinity,u1=-Infinity,v0=Infinity,v1=-Infinity;
-   for(const part of atlas.parts)for(let corner=0;corner<8;corner++){
-    const x=part.bounds[corner&1?1:0][0],y=part.bounds[corner&2?1:0][1],z=part.bounds[corner&4?1:0][2];
-    const u=x*p.right[0]+y*p.right[1]+z*p.right[2],v=x*p.up[0]+y*p.up[1]+z*p.up[2];
-    if(u<u0)u0=u;if(u>u1)u1=u;if(v<v0)v0=v;if(v>v1)v1=v;
-   }
-   return [u0-.02,u1+.02,v0-.02,v1+.02] as const;
+  const studies=new Map<string,Volume>();
+  let study:Volume|null=null,loading='',section:Section|null=null;
+  let sliceKey='',drawKey='',sliceActive=false,sliceCrop={x:0,y:0,w:0,h:0},sliceDraw={x:0,y:0,w:0,h:0};
+
+  const wanted=(mode:string)=>mode==='ct'||mode==='mr';
+  const ensureStudy=(mode:string)=>{
+   const held=studies.get(mode);
+   if(held){if(study!==held){study=held;sliceKey='';volume.current(held.manifest);}return true;}
+   if(loading===mode)return false;
+   loading=mode;study=null;section=null;volume.current(null);
+   loadVolume(`/imaging/${mode}`,abort.signal).then(loaded=>{
+    if(disposed)return;
+    studies.set(mode,loaded);
+    if(latest.current.mode===mode){study=loaded;sliceKey='';volume.current(loaded.manifest);dirty=true;}
+   }).catch(e=>{if(!disposed&&e.name!=='AbortError')onError(e instanceof Error?e.message:'The imaging study could not be loaded.');})
+    .finally(()=>{if(loading===mode)loading='';});
+   return false;
   };
-  const meshGeometry=(index:number)=>{
-   const g=pickers[index]!.geometry;
-   return {positions:g.getAttribute('position').array as Float32Array,indices:g.index!.array as Uint32Array};
-  };
+
   const buildSlice=(s:SceneState)=>{
-   const p=plane(s.plane),[u0,u1,v0,v1]=sliceExtent(p);
-   const resolution=Math.min(720,Math.max(320,Math.round(el.clientWidth*.85)));
-   const frame=frameFor(u0,u1,v0,v1,resolution);
-   const labels=new Int32Array(frame.width*frame.height).fill(-1);
-   const straddling=atlas.parts.map((part,index)=>({...part,index}))
-    .filter(part=>pickers[part.index]&&s.slice>=part.bounds[0][p.axis]&&s.slice<=part.bounds[1][p.axis]);
-   // The body first, flooded inward from the skin outline, then every structure over it.
-   const envelope=straddling.find(isEnvelope);
-   if(envelope){
-    const {positions,indices}=meshGeometry(envelope.index),outline:number[]=[];
-    crossSection(positions,indices,p,s.slice,frame,outline);
-    if(outline.length){fillSegments(outline,frame,labels,envelope.index);fillEnclosed(labels,frame,envelope.index);}
+   if(!study)return;
+   const window=s.mode==='ct'?ctWindow(s.ctWindow):{width:s.mrWindow,level:s.mrLevel};
+   section=extractSection(study,s.plane,s.slice,window.width,window.level);
+   sliceBuffer.width=section.width;sliceBuffer.height=section.height;
+   const image=sliceBufferContext.createImageData(section.width,section.height);
+   for(let i=0,o=0;i<section.grey.length;i++,o+=4){
+    image.data[o]=image.data[o+1]=image.data[o+2]=section.grey[i];image.data[o+3]=255;
    }
-   for(const part of byDescendingVolume(straddling)){
-    if(isEnvelope(part))continue;
-    const {positions,indices}=meshGeometry(part.index),segments:number[]=[];
-    crossSection(positions,indices,p,s.slice,frame,segments);
-    if(segments.length)fillSegments(segments,frame,labels,part.index);
-   }
-   const grey=new Uint8Array(frame.width*frame.height);
-   if(s.mode==='ct'){
-    const w=ctWindow(s.ctWindow);
-    windowSection(labels,density,hounsfield('air'),w.width,w.level,grey);
-   }else if(s.mode==='mr'){
-    const seq=sequence(s.sequence),signal=new Float64Array(atlas.parts.length);
-    let peak=1e-9;
-    for(let i=0;i<signal.length;i++){signal[i]=mrSignal(relaxation[i],seq);if(signal[i]>peak)peak=signal[i];}
-    windowSection(labels,signal,0,peak,peak/2,grey);
-   }else{
-    ultrasoundSector(labels,frame,probeFor(p.id,u0,u1,v0,v1),
-     label=>impedance[label],label=>absorption[label],label=>scattering[label],grey);
-   }
-   sliceBuffer.width=frame.width;sliceBuffer.height=frame.height;
-   const image=sliceBufferContext.createImageData(frame.width,frame.height);
-   for(let i=0,o=0;i<grey.length;i++,o+=4){image.data[o]=image.data[o+1]=image.data[o+2]=grey[i];image.data[o+3]=255;}
    sliceBufferContext.putImageData(image,0,0);
-   sliceLabels=labels;sliceFrame=frame;
   };
-  /** The space left over once the panels are accounted for. A section is a flat image with nothing
-   *  to orbit, so rather than filling the viewport and sliding underneath the panels it is fitted
-   *  into what they leave free. Measuring the panels rather than hard coding their widths keeps this
-   *  correct across the breakpoints, where the imaging panel becomes a bottom sheet. */
+
+  /** The space the panels leave free. A section is a flat image with nothing to orbit, so rather
+   *  than filling the viewport and sliding underneath the panels it is fitted into what is left.
+   *  Measuring the panels keeps this right across the breakpoints and when the inspector opens. */
   const sectionArea=()=>{
    const host=el.getBoundingClientRect(),gap=14;
    let left=8,right=el.clientWidth-8,top=92,bottom=el.clientHeight-8;
@@ -276,104 +245,89 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    }
    const dock=box('.bottom-dock');
    if(dock)bottom=Math.min(bottom,dock.top-gap);
-   // Never let the panels squeeze the image out of existence.
    if(right-left<200){left=8;right=el.clientWidth-8;}
    if(bottom-top<200){top=8;bottom=el.clientHeight-8;}
    return {left,right,top,bottom};
   };
-  const drawSlice=(s:SceneState,area:{left:number;right:number;top:number;bottom:number})=>{
-   if(!sliceFrame)return;
-   const p=plane(s.plane),f=sliceFrame;
-   let x0=0,y0=0,x1=f.width,y1=f.height;
-   if(s.field==='trunk'){
-    // This atlas stands with its arms down, so a trunk section is coned in to exclude the forearms.
-    const half=p.id==='sagittal'?.26:p.id==='axial'?.20:.23,centre=f.u0+f.width/2/f.scale;
-    x0=Math.max(0,Math.round((centre-half-f.u0)*f.scale));x1=Math.min(f.width,Math.round((centre+half-f.u0)*f.scale));
-    if(p.id!=='axial'){
-     y0=Math.max(0,Math.round(f.height-(1.6-f.v0)*f.scale));
-     y1=Math.min(f.height,Math.round(f.height-(.74-f.v0)*f.scale));
-    }
-   }
-   sliceCrop={x:x0,y:y0,w:Math.max(1,x1-x0),h:Math.max(1,y1-y0)};
-   const ratio=Math.min(devicePixelRatio,2);
-   sliceCanvas.width=Math.max(1,Math.round(el.clientWidth*ratio));sliceCanvas.height=Math.max(1,Math.round(el.clientHeight*ratio));
-   sliceCanvas.style.width=`${el.clientWidth}px`;sliceCanvas.style.height=`${el.clientHeight}px`;
-   sliceContext.fillStyle='#05070a';sliceContext.fillRect(0,0,sliceCanvas.width,sliceCanvas.height);
+
+  const drawSlice=(area:{left:number;right:number;top:number;bottom:number})=>{
+   if(!section)return;
+   sliceCrop={x:0,y:0,w:section.width,h:section.height};
    const ratioX=sliceCanvas.width/Math.max(1,el.clientWidth),ratioY=sliceCanvas.height/Math.max(1,el.clientHeight);
    const availableWidth=(area.right-area.left)*ratioX,availableHeight=(area.bottom-area.top)*ratioY;
-   const scale=Math.min(availableWidth/sliceCrop.w,availableHeight/sliceCrop.h)*.96;
-   const w=sliceCrop.w*scale,h=sliceCrop.h*scale;
+   // Voxels are not cubic, so the image is drawn at the aspect its spacing implies rather than
+   // one screen pixel per voxel, which would squash a coronal image of an anisotropic study.
+   const trueWidth=section.width*section.pixelWidth,trueHeight=section.height*section.pixelHeight;
+   const scale=Math.min(availableWidth/trueWidth,availableHeight/trueHeight)*.96;
+   const w=trueWidth*scale,h=trueHeight*scale;
    sliceDraw={x:area.left*ratioX+(availableWidth-w)/2,y:area.top*ratioY+(availableHeight-h)/2,w,h};
-   sliceContext.drawImage(sliceBuffer,sliceCrop.x,sliceCrop.y,sliceCrop.w,sliceCrop.h,sliceDraw.x,sliceDraw.y,w,h);
+   sliceContext.fillStyle='#05070a';sliceContext.fillRect(0,0,sliceCanvas.width,sliceCanvas.height);
+   sliceContext.imageSmoothingEnabled=true;sliceContext.imageSmoothingQuality='high';
+   sliceContext.drawImage(sliceBuffer,0,0,section.width,section.height,sliceDraw.x,sliceDraw.y,w,h);
   };
-  /** Which structure lies under a point on the section, or -1 outside the image. */
-  const sliceLabelAt=(clientX:number,clientY:number)=>{
-   if(!sliceLabels||!sliceFrame)return -1;
+
+  const resizeSlice=()=>{
+   const ratio=Math.min(devicePixelRatio,2);
+   sliceCanvas.width=Math.max(1,Math.round(el.clientWidth*ratio));
+   sliceCanvas.height=Math.max(1,Math.round(el.clientHeight*ratio));
+   sliceCanvas.style.width=`${el.clientWidth}px`;sliceCanvas.style.height=`${el.clientHeight}px`;
+  };
+
+  /** Which structure lies under a point on the section, or nothing outside the image. */
+  const structureAt=(clientX:number,clientY:number)=>{
+   if(!section||!study)return null;
    const rect=sliceCanvas.getBoundingClientRect();
-   if(!rect.width||!rect.height)return -1;
+   if(!rect.width||!rect.height)return null;
    const ratio=sliceCanvas.width/rect.width;
-   const x=sliceCrop.x+((clientX-rect.left)*ratio-sliceDraw.x)/sliceDraw.w*sliceCrop.w;
-   const y=sliceCrop.y+((clientY-rect.top)*ratio-sliceDraw.y)/sliceDraw.h*sliceCrop.h;
-   if(x<0||y<0||x>=sliceFrame.width||y>=sliceFrame.height)return -1;
-   return sliceLabels[Math.floor(y)*sliceFrame.width+Math.floor(x)];
+   const x=((clientX-rect.left)*ratio-sliceDraw.x)/sliceDraw.w*section.width;
+   const y=((clientY-rect.top)*ratio-sliceDraw.y)/sliceDraw.h*section.height;
+   if(x<0||y<0||x>=section.width||y>=section.height)return null;
+   const label=section.labels[Math.floor(y)*section.width+Math.floor(x)];
+   return label?study.named.get(label)??null:null;
   };
-  const sectional=(s:SceneState)=>s.mode==='ct'||s.mode==='mr'||s.mode==='us';
   const sliceHover=(e:PointerEvent)=>{
-   const label=sliceLabelAt(e.clientX,e.clientY);
-   hover.hidden=label<0;sliceCanvas.style.cursor=label<0?'default':'pointer';
-   if(label<0)return;
+   const found=structureAt(e.clientX,e.clientY);
+   hover.hidden=!found;sliceCanvas.style.cursor=found?'pointer':'default';
+   if(!found)return;
    const rect=el.getBoundingClientRect(),x=e.clientX-rect.left,y=e.clientY-rect.top;
-   // The fill is not a structure. Naming it after the skin mesh it came from would tell a reader
-   // that they are looking at anatomy the atlas models, when they are looking at the space it does
-   // not model.
-   hover.textContent=isEnvelope(atlas.parts[label])?'Unmodelled interstitial tissue':atlas.parts[label].name;
+   hover.textContent=found.name;
    hover.style.left=`${Math.max(8,Math.min(x+14,el.clientWidth-260))}px`;
    hover.style.top=`${Math.max(8,Math.min(y+18,el.clientHeight-55))}px`;
   };
-  const sliceTap=(e:PointerEvent)=>{const label=sliceLabelAt(e.clientX,e.clientY);if(label>=0&&!isEnvelope(atlas.parts[label]))select.current(atlas.parts[label].id);};
+  const sliceTap=(e:PointerEvent)=>{const found=structureAt(e.clientX,e.clientY);if(found)structure.current(found.name);};
   const sliceLeave=()=>{hover.hidden=true;};
-  // How far the plane can travel, cached per plane so a wheel event does not walk the atlas.
-  const travelled=new Map<string,[number,number]>();
-  const travelFor=(p:Plane)=>{
-   const cached=travelled.get(p.id);
-   if(cached)return cached;
-   let low=Infinity,high=-Infinity;
-   for(const part of atlas.parts){low=Math.min(low,part.bounds[0][p.axis]);high=Math.max(high,part.bounds[1][p.axis]);}
-   const span:[number,number]=[low,high];travelled.set(p.id,span);return span;
-  };
-  /** The wheel walks the stack, as it does on a reading workstation: away from the reader moves
-   *  superiorly on an axial section, and anteriorly or toward the patient's left on the others. */
-  const sliceWheel=(e:WheelEvent)=>{
+  /** The wheel walks the stack, as it does on a reading workstation. */
+  const sliceWheel=(e:PointerEvent|WheelEvent)=>{
    const s=latest.current;
-   if(!sectional(s))return;
+   if(!wanted(s.mode)||!study)return;
+   const wheel=e as WheelEvent;
    e.preventDefault();
-   const p=plane(s.plane),[low,high]=travelFor(p);
-   const direction=e.deltaY>0?-1:e.deltaY<0?1:0;
+   const direction=wheel.deltaY>0?-1:wheel.deltaY<0?1:0;
    if(!direction)return;
-   const next=Math.min(high,Math.max(low,s.slice+direction*SLICE_STEP));
+   const next=Math.min(sliceCount(study,s.plane)-1,Math.max(0,s.slice+direction));
    if(next!==s.slice)step.current(next);
   };
   sliceCanvas.addEventListener('pointermove',sliceHover);
   sliceCanvas.addEventListener('pointerup',sliceTap);
   sliceCanvas.addEventListener('pointerleave',sliceLeave);
-  sliceCanvas.addEventListener('wheel',sliceWheel,{passive:false});
+  sliceCanvas.addEventListener('wheel',sliceWheel as EventListener,{passive:false});
 
   const clock=new T.Clock();let lastExtent=-1;
   const animate=()=>{
    if(disposed)return;frame=requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.05),s=latest.current;
    // A section replaces the three-dimensional view entirely, and is rebuilt only when something it
    // depends on changes rather than every frame.
-   const cross=sectional(s);
+   const cross=wanted(s.mode);
    if(cross!==sliceActive){sliceActive=cross;sliceCanvas.hidden=!cross;renderer.domElement.style.visibility=cross?'hidden':'visible';hover.hidden=true;}
    if(cross){
-    if(!ready)return;
-    const build=[s.mode,s.plane,s.slice.toFixed(4),s.ctWindow,s.sequence,el.clientWidth].join('|');
+    if(!ensureStudy(s.mode))return;
+    const build=[s.mode,s.plane,s.slice,s.ctWindow,s.mrLevel,s.mrWindow].join('|');
     if(build!==sliceKey){sliceKey=build;buildSlice(s);drawKey='';}
     // The free area is remeasured each frame, so opening the inspector or the layer panel refits
     // the image instead of leaving it underneath.
     const area=sectionArea();
-    const draw=[build,s.field,el.clientWidth,el.clientHeight,Math.round(area.left),Math.round(area.right),Math.round(area.top),Math.round(area.bottom)].join('|');
-    if(draw!==drawKey){drawKey=draw;drawSlice(s,area);}
+    const draw=[build,el.clientWidth,el.clientHeight,Math.round(area.left),Math.round(area.right),Math.round(area.top),Math.round(area.bottom)].join('|');
+    if(draw!==drawKey){drawKey=draw;resizeSlice();drawSlice(area);}
     return;
    }
    sliceKey='';
@@ -430,7 +384,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
 
   };animate();
   const contextLost=(e:Event)=>{e.preventDefault();onError('The 3D session was paused by your device. Reload to continue.');};renderer.domElement.addEventListener('webglcontextlost',contextLost);
-  return()=>{disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());scene.traverse(o=>{if(o instanceof T.Mesh&&!geometries.includes(o.geometry)){o.geometry.dispose();const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});env.dispose();partTexture.dispose();selectionTexture.dispose();attenuationTexture.dispose();pickMaterial.dispose();beamTarget.dispose();beamMaterial.dispose();bodyTarget.dispose();bodyMaterial.dispose();prime.geometry.dispose();(prime.material as T.Material).dispose();filmMaterial.dispose();film.geometry.dispose();markerGeometry.dispose();markerMaterial.dispose();sliceCanvas.removeEventListener('pointermove',sliceHover);sliceCanvas.removeEventListener('pointerup',sliceTap);sliceCanvas.removeEventListener('pointerleave',sliceLeave);sliceCanvas.removeEventListener('wheel',sliceWheel);sliceCanvas.remove();hover.remove();renderer.dispose();renderer.domElement.remove();};
+  return()=>{disposed=true;abort.abort();cancelAnimationFrame(frame);observer.disconnect();controls.dispose();geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());scene.traverse(o=>{if(o instanceof T.Mesh&&!geometries.includes(o.geometry)){o.geometry.dispose();const ms=Array.isArray(o.material)?o.material:[o.material];ms.forEach(m=>m.dispose());}});env.dispose();partTexture.dispose();selectionTexture.dispose();attenuationTexture.dispose();pickMaterial.dispose();beamTarget.dispose();beamMaterial.dispose();bodyTarget.dispose();bodyMaterial.dispose();prime.geometry.dispose();(prime.material as T.Material).dispose();filmMaterial.dispose();film.geometry.dispose();markerGeometry.dispose();markerMaterial.dispose();sliceCanvas.removeEventListener('pointermove',sliceHover);sliceCanvas.removeEventListener('pointerup',sliceTap);sliceCanvas.removeEventListener('pointerleave',sliceLeave);sliceCanvas.removeEventListener('wheel',sliceWheel as EventListener);sliceCanvas.remove();hover.remove();renderer.dispose();renderer.domElement.remove();};
  },[atlas]);
  return <div className="scene" ref={host}/>;
 }

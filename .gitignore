@@ -44,3 +44,6 @@ next-env.d.ts
 /mr-*.png
 /us-*.png
 /s[0-9]-*.png
+/data/
+/tools/__pycache__/
+/tools/__pycache__/

@@ -1,4 +1,4 @@
-import type {Part,SystemId} from './anatomy';
+import type {SystemId} from './anatomy';
 
 /** Linear attenuation coefficients in cm^-1 at a 70 keV effective beam energy, taken as the NIST
  *  mass attenuation coefficient for the tissue multiplied by its density. Whole-bone meshes enclose
@@ -69,14 +69,6 @@ export function tissueFor(part:{name:string;system:SystemId}):TissueId{
 }
 export function muFor(part:{name:string;system:SystemId}){return TISSUES[tissueFor(part)].mu;}
 
-/** In a projection the envelope carries the soft-tissue fill of the whole body. In a cross-section
- *  it means something narrower: once every modelled structure has been drawn, what is still labelled
- *  envelope is the subcutaneous and interstitial space, which is mostly fat. Reading it as fat is
- *  what gives a section its dark rim under the skin and its contrast between muscle and the planes
- *  around it. */
-export function sectionTissue(part:{name:string;system:SystemId}):TissueId{
- return isEnvelope(part)?FILL_TISSUE:tissueFor(part);
-}
 
 /** Attenuation a structure adds to the beam, in cm^-1. With the body filled, a structure adds only
  *  what it has over the fill it displaces, so gas-filled airways subtract and bone adds strongly.
@@ -141,13 +133,6 @@ export function integrateBeam(hits:Hit[],contribution:(index:number)=>number){
  return {total,crossings};
 }
 
-/** Hounsfield units are defined from the same linear attenuation coefficients the beam pass uses,
- *  so the radiograph and the CT numbers cannot drift apart. One caveat follows from the geometry:
- *  each bone is a single mesh with no separate cortex, trabecular bone or marrow, so bone reads at
- *  a cortical value throughout rather than the lower average of a real vertebral body. */
-export const MU_WATER=TISSUES.fluid.mu;
-export function hounsfield(tissue:TissueId){return Math.round(1000*(TISSUES[tissue].mu-MU_WATER)/MU_WATER);}
-
 /** Beer–Lambert transmission through the accumulated attenuation. */
 export function transmission(total:number){return Math.exp(-total);}
 
@@ -159,9 +144,3 @@ export function displayValue(total:number,level=DEFAULT_WINDOW.level,width=DEFAU
  return Math.min(1,Math.max(0,(total-low)/Math.max(1e-6,width)));
 }
 
-/** Grouped for the reference readout in the interface. */
-export function tissueSummary(parts:Part[]){
- const counts=new Map<TissueId,number>();
- for(const part of parts){const tissue=tissueFor(part);counts.set(tissue,(counts.get(tissue)??0)+1);}
- return [...counts].sort((a,b)=>TISSUES[b[0]].mu-TISSUES[a[0]].mu).map(([tissue,count])=>({tissue,count,...TISSUES[tissue]}));
-}

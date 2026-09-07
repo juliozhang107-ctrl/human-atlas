@@ -30,10 +30,12 @@ Open http://localhost:3016. To build the static site, run `npm run build`; the o
 npm run check
 node scripts/validate-atlas.mjs
 node scripts/validate-interactions.mjs
+node scripts/validate-radiograph.mjs
+node scripts/validate-imaging.mjs
 npm run build
 ```
 
-Validation covers mesh buffers, names and concept membership, nonoverlapping exploded layouts at desktop and mobile aspect ratios, search and inspection contracts, and tap-versus-drag handling. Browser interaction checks have exercised selection, system controls, search, isolation, rotation, and 390×844, 320×568, and 844×390 layouts. Phone controls stay clear of the exploded inventory, and isolated structures fit the space above or beside the detail panel. Physical-device performance and real multitouch hardware have not been tested.
+Validation covers mesh buffers, names and concept membership, nonoverlapping exploded layouts at desktop and mobile aspect ratios, search and inspection contracts, and tap-versus-drag handling. It also covers the radiograph's attenuation model and beam integration, and the imaging studies: manifest integrity, that every label names a declared structure, section geometry and sampling in each plane, and that each labelled organ's mean Hounsfield value is right for its name, which is what would catch a mask drifting out of register with its image. Browser interaction checks have exercised selection, system controls, search, isolation, rotation, and 390×844, 320×568, and 844×390 layouts. Phone controls stay clear of the exploded inventory, and isolated structures fit the space above or beside the detail panel. Physical-device performance and real multitouch hardware have not been tested.
 
 ## Anatomy data
 
@@ -41,7 +43,22 @@ The current viewer uses **BodyParts3D 4.0**, an adult male reference anatomy, li
 
 Geometry is simplified for browser performance while retaining every source mesh. The packaged model contains 2,288,268 triangles and downloads approximately 33 MB of compressed geometry. Full credits, source links, and adaptation details are in [ATTRIBUTION.md](public/ATTRIBUTION.md).
 
-This is an educational explorer, not a diagnostic or surgical tool.
+## Imaging data
+
+The radiograph is **computed from the meshes**: attenuation summed along each ray at a 70 keV effective beam energy. It is a model of a projection, not an acquired film.
+
+CT and MRI are **real studies**, each one anonymised subject shown with the segmentations a radiologist refined, so the structure named under the pointer was drawn by a person. The CT reads in true Hounsfield units, which is why the window presets behave as they do on a console. Volumes are fetched only when their modality is first opened.
+
+| | Source | Subject | Structures | Sampling | Licence |
+|---|---|---|---|---|---|
+| CT | [TotalSegmentator](https://doi.org/10.5281/zenodo.10047292) | s0250 | 70 present of 117 | 225×226×218 at 2.0 mm | CC BY 4.0 |
+| MRI | [TotalSegmentator MRI](https://doi.org/10.5281/zenodo.11367005) | s0175 | 53 present of 56 | 320×360×240 at 1.28×3.0×1.28 mm | **CC BY-NC-SA 2.0** |
+
+They are a **different body from the 3D model**. Rotating the atlas and scrolling the CT show two different people, linked by the name of a structure rather than by shared geometry. The studies carry what real studies carry: contrast, noise, motion, and whatever anatomy that patient happened to have. Around half the voxels in a section are unlabelled, because a segmentation names organs rather than every plane of fat and connective tissue.
+
+To rebuild them, run `python3 tools/fetch_subject.py <archive url> <subject> <destination>` and then `python3 tools/build_imaging.py`. The fetcher reads the remote archives over HTTP range requests, so pulling one subject transfers tens of megabytes rather than the 23.6 GB the CT archive weighs.
+
+This is an educational explorer, not a diagnostic or surgical tool, and these studies are not a substitute for reading real ones.
 
 ## How it works
 
@@ -59,6 +76,14 @@ Import this repository into Vercel as a Vite project. The included `vercel.json`
 
 ## License
 
-Original application code is released under the [MIT License](LICENSE). **The anatomy data has its own CC BY 4.0 license**; preserve the attribution when redistributing it. Third-party dependencies retain their respective licenses.
+Original application code is released under the [MIT License](LICENSE). The bundled data has its own terms, which travel with it:
+
+- **BodyParts3D 4.0** anatomy meshes — CC BY 4.0.
+- **TotalSegmentator** CT — CC BY 4.0, © Wasserthal et al., University Hospital Basel.
+- **TotalSegmentator MRI** — **CC BY-NC-SA 2.0**, © Akinci D’Antonoli et al., University Hospital Basel.
+
+> **The MRI licence is non-commercial and share-alike.** While that study is bundled, this build as a whole may not be used commercially, and derivatives must carry the same terms. The code remains MIT; the restriction comes from the data. Removing `public/imaging/mr` and the MRI modality lifts it.
+
+Preserve the attributions when redistributing. Third-party dependencies retain their respective licenses.
 
 Issues and pull requests are welcome. Please include reproduction steps and browser/device details for interaction problems.
