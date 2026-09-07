@@ -251,7 +251,37 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    sliceBufferContext.putImageData(image,0,0);
    sliceLabels=labels;sliceFrame=frame;
   };
-  const drawSlice=(s:SceneState)=>{
+  /** The space left over once the panels are accounted for. A section is a flat image with nothing
+   *  to orbit, so rather than filling the viewport and sliding underneath the panels it is fitted
+   *  into what they leave free. Measuring the panels rather than hard coding their widths keeps this
+   *  correct across the breakpoints, where the imaging panel becomes a bottom sheet. */
+  const sectionArea=()=>{
+   const host=el.getBoundingClientRect(),gap=14;
+   let left=8,right=el.clientWidth-8,top=92,bottom=el.clientHeight-8;
+   const box=(selector:string)=>{
+    const node=document.querySelector(selector);
+    if(!(node instanceof HTMLElement))return null;
+    const style=getComputedStyle(node);
+    if(style.display==='none'||style.visibility==='hidden')return null;
+    const r=node.getBoundingClientRect();
+    return r.width>4&&r.height>4?{left:r.left-host.left,right:r.right-host.left,top:r.top-host.top,bottom:r.bottom-host.top}:null;
+   };
+   const layers=box('.layers-panel');
+   if(layers&&layers.right<el.clientWidth*.5)left=Math.max(left,layers.right+gap);
+   for(const selector of ['.radiograph-panel','.detail-sheet']){
+    const panel=box(selector);
+    if(!panel)continue;
+    if(panel.left>el.clientWidth*.5)right=Math.min(right,panel.left-gap);
+    else if(panel.top>el.clientHeight*.4)bottom=Math.min(bottom,panel.top-gap);
+   }
+   const dock=box('.bottom-dock');
+   if(dock)bottom=Math.min(bottom,dock.top-gap);
+   // Never let the panels squeeze the image out of existence.
+   if(right-left<200){left=8;right=el.clientWidth-8;}
+   if(bottom-top<200){top=8;bottom=el.clientHeight-8;}
+   return {left,right,top,bottom};
+  };
+  const drawSlice=(s:SceneState,area:{left:number;right:number;top:number;bottom:number})=>{
    if(!sliceFrame)return;
    const p=plane(s.plane),f=sliceFrame;
    let x0=0,y0=0,x1=f.width,y1=f.height;
@@ -269,9 +299,11 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    sliceCanvas.width=Math.max(1,Math.round(el.clientWidth*ratio));sliceCanvas.height=Math.max(1,Math.round(el.clientHeight*ratio));
    sliceCanvas.style.width=`${el.clientWidth}px`;sliceCanvas.style.height=`${el.clientHeight}px`;
    sliceContext.fillStyle='#05070a';sliceContext.fillRect(0,0,sliceCanvas.width,sliceCanvas.height);
-   const scale=Math.min(sliceCanvas.width/sliceCrop.w,sliceCanvas.height/sliceCrop.h)*.9;
+   const ratioX=sliceCanvas.width/Math.max(1,el.clientWidth),ratioY=sliceCanvas.height/Math.max(1,el.clientHeight);
+   const availableWidth=(area.right-area.left)*ratioX,availableHeight=(area.bottom-area.top)*ratioY;
+   const scale=Math.min(availableWidth/sliceCrop.w,availableHeight/sliceCrop.h)*.96;
    const w=sliceCrop.w*scale,h=sliceCrop.h*scale;
-   sliceDraw={x:(sliceCanvas.width-w)/2,y:(sliceCanvas.height-h)/2,w,h};
+   sliceDraw={x:area.left*ratioX+(availableWidth-w)/2,y:area.top*ratioY+(availableHeight-h)/2,w,h};
    sliceContext.drawImage(sliceBuffer,sliceCrop.x,sliceCrop.y,sliceCrop.w,sliceCrop.h,sliceDraw.x,sliceDraw.y,w,h);
   };
   /** Which structure lies under a point on the section, or -1 outside the image. */
@@ -337,8 +369,11 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
     if(!ready)return;
     const build=[s.mode,s.plane,s.slice.toFixed(4),s.ctWindow,s.sequence,el.clientWidth].join('|');
     if(build!==sliceKey){sliceKey=build;buildSlice(s);drawKey='';}
-    const draw=[build,s.field,el.clientWidth,el.clientHeight].join('|');
-    if(draw!==drawKey){drawKey=draw;drawSlice(s);}
+    // The free area is remeasured each frame, so opening the inspector or the layer panel refits
+    // the image instead of leaving it underneath.
+    const area=sectionArea();
+    const draw=[build,s.field,el.clientWidth,el.clientHeight,Math.round(area.left),Math.round(area.right),Math.round(area.top),Math.round(area.bottom)].join('|');
+    if(draw!==drawKey){drawKey=draw;drawSlice(s,area);}
     return;
    }
    sliceKey='';

@@ -93,7 +93,7 @@ export interface Modality {id:ModalityId;name:string;abbr:string;cross:boolean;i
 export const MODALITIES: Modality[] = [
  {id:'radiograph',name:'Radiography',abbr:'XR',cross:false,interactive:true,description:'A projection: attenuation summed along every ray from the tube to the detector.'},
  {id:'ct',        name:'Computed tomography',abbr:'CT',cross:true,interactive:true,description:'A cross-section of the same attenuation, expressed in Hounsfield units and windowed.'},
- {id:'mr',        name:'Magnetic resonance',abbr:'MR',cross:true,interactive:true,description:'A cross-section of spin echo signal from proton density and the T1 and T2 of each tissue.'},
+ {id:'mr',        name:'Magnetic resonance imaging',abbr:'MRI',cross:true,interactive:true,description:'A cross-section of spin echo signal from proton density and the T1 and T2 of each tissue.'},
  {id:'us',        name:'Ultrasound',abbr:'US',cross:true,interactive:false,description:'A sector scan: echoes from impedance mismatches, attenuated with depth, with shadowing behind bone and gas.'},
 ];
 export function modality(id:ModalityId){const m=MODALITIES.find(x=>x.id===id);if(!m)throw new Error(`Unknown modality: ${id}. Expected one of ${MODALITIES.map(x=>x.id).join(', ')}.`);return m;}
