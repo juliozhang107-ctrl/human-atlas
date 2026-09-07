@@ -53,9 +53,10 @@ CT and MRI are **real studies**, each one anonymised subject shown with the segm
 |---|---|---|---|---|---|---|
 | CT | Body | s0287 | neck to feet, 125 cm | 101 | 306×835×246 at 1.5 mm | 51 MB |
 | CT | Head | s0643 | head to upper chest, 39 cm | 55 | 178×263×178 at 1.5 mm | 10 MB |
-| MRI | T1 | s0175 | head to thigh, 108 cm | 53 | 320×360×240 at 1.28×3.0×1.28 mm | 9 MB |
-| MRI | T2 | s0173 | abdomen, 40 cm | 39 | 384×384×32 at 1.04×1.04×6.0 mm | 5 MB |
-| MRI | STIR | s0190 | chest to pelvis, 50 cm | 34 | 384×384×39 at 1.3×1.3×6.0 mm | 4 MB |
+| MRI | T1 | s0175 | head to thigh, 108 cm | 53 | 320×360×240 at 1.28×3.0×1.28 mm | 10 MB |
+| MRI | T1 FS | s0187 | abdomen and pelvis, 45 cm | 44 | 260×320×146 at 1.41×1.41×1.5 mm | 9 MB |
+| MRI | T2 | s0173 | abdomen, 40 cm | 39 | 384×384×32 at 1.04×1.04×6.0 mm | 4 MB |
+| MRI | STIR | s0190 | chest to pelvis, 50 cm | 34 | 384×384×39 at 1.3×1.3×6.0 mm | 3 MB |
 
 CT from [TotalSegmentator](https://doi.org/10.5281/zenodo.10047292), CC BY 4.0. MRI from [TotalSegmentator MRI](https://doi.org/10.5281/zenodo.11367005), **CC BY-NC-SA 2.0**.
 
@@ -77,6 +78,19 @@ label on a horseshoe-shaped colon points at the colon rather than into the bowel
 One control turns the written names off, leaving the image clean; hovering then tints whatever lies
 under the pointer and names just that one, which is the way to read a section without a wall of text
 over it. See `tools/anatomy_names.py`.
+
+**Each magnetic resonance study carries the window it should be read at.** There is no absolute
+scale to window against, and reading a study across its whole stored range leaves it dark, because
+the bright tail of fat, fluid and vessels takes up most of that range: the STIR sat at 27% grey
+that way. Centring the window on the median of the body puts tissue at mid grey. Centring on the
+midpoint of the range instead is worse than doing nothing, because the distribution is skewed.
+
+**Reformats are only as good as the acquisition.** A T2 or a STIR of the abdomen is conventionally
+acquired as thick two-dimensional slices, six millimetres here, so a sagittal or axial reformat of
+one is coarse however it is displayed and no windowing changes that. Only one study in the whole
+collection is near-isotropic, the fat-suppressed T1, and it is included for exactly that reason:
+it stays sharp reformatted into any plane. The collection holds no near-isotropic T2 or STIR of the
+trunk, and the only trunk STIR at all is the six-millimetre one here.
 
 **Whole-body magnetic resonance is levelled across its stations.** It is acquired in overlapping
 stations, each scaled on its own, so the joins show as horizontal bands: in the T1 the head station
@@ -121,7 +135,7 @@ Original application code is released under the [MIT License](LICENSE). The bund
 
 - **BodyParts3D 4.0** anatomy meshes — CC BY 4.0.
 - **TotalSegmentator** CT (subjects s0287 and s0643) — CC BY 4.0, © Wasserthal et al., University Hospital Basel.
-- **TotalSegmentator MRI** (subjects s0175, s0173 and s0190) — **CC BY-NC-SA 2.0**, © Akinci D’Antonoli et al., University Hospital Basel.
+- **TotalSegmentator MRI** (subjects s0175, s0187, s0173 and s0190) — **CC BY-NC-SA 2.0**, © Akinci D’Antonoli et al., University Hospital Basel.
 
 > **The MRI licence is non-commercial and share-alike.** While that study is bundled, this build as a whole may not be used commercially, and derivatives must carry the same terms. The code remains MIT; the restriction comes from the data. Removing the `public/imaging/mr-*` studies and the MRI modality lifts it.
 

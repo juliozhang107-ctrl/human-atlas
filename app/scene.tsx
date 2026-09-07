@@ -217,9 +217,10 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
 
   const buildSlice=(s:SceneState)=>{
    if(!study)return;
-   // A magnetic resonance study is stored normalised to its own upper percentile, so the whole
-   // stored range is the window; there is nothing absolute to window against.
-   const window=s.mode==='ct'?ctWindow(s.ctWindow):{width:256,level:128};
+   // Magnetic resonance has no absolute scale, so each study carries the window that puts its own
+   // tissue at mid grey. Reading it across the whole stored range instead leaves it dark, because
+   // the bright tail of fat, fluid and vessels takes up most of that range.
+   const window=s.mode==='ct'?ctWindow(s.ctWindow):study.manifest.window??{width:256,level:128};
    section=extractSection(study,s.plane,s.slice,window.width,window.level);
    // A structure chosen anywhere in the interface is tinted where this study has a label of the same
    // name, which is what connects searching the atlas to finding the thing on a real image. The

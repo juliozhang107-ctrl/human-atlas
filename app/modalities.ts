@@ -39,6 +39,8 @@ export const STUDIES: Study[] = [
   description:'A head and neck angiogram, carrying the brain, skull and cervical spine the body study stops short of.'},
  {modality:'mr',id:'t1',  path:'mr-t1',  label:'T1',  subject:'s0175', coverage:'head to thigh, 108 cm',
   description:'Fat and marrow bright, urine dark against liver. The study to read anatomy from.'},
+ {modality:'mr',id:'t1fs',path:'mr-t1fs',label:'T1 FS',subject:'s0187', coverage:'abdomen and pelvis, 45 cm',
+  description:'T1 with fat suppressed, and the only study acquired near-isotropically, so it stays sharp reformatted into any plane.'},
  {modality:'mr',id:'t2',  path:'mr-t2',  label:'T2',  subject:'s0173', coverage:'abdomen, 40 cm',
   description:'Fluid and spleen bright, muscle dark, fat still bright. Where most pathology shows.'},
  {modality:'mr',id:'stir',path:'mr-stir',label:'STIR',subject:'s0190', coverage:'chest to pelvis, 50 cm',

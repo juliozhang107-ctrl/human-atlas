@@ -135,6 +135,19 @@ for(const id of STUDIES.map(s=>s.path)){
   // The weighting is measured, and each declared study must be the weighting it claims: on T1 urine
   // is dark against liver, on an inversion recovery fluid is bright and muscle is dark.
   assert.equal(manifest.weighting,declared.label,`${id}: manifest weighting disagrees with the study list`);
+  // Magnetic resonance has no absolute scale, so each study must say how to read it, and that
+  // window must put its own tissue near mid grey rather than leaving the image dark.
+  assert.ok(manifest.window&&manifest.window.width>0,`${id}: no display window`);
+  // Body is defined the same way the builder defines it, as the upper thirty per cent of voxels,
+  // so the two cannot disagree about what tissue the window is supposed to centre on.
+  const all=[];
+  for(let i=0;i<values.length;i+=17)all.push(values[i]);
+  all.sort((a,b)=>a-b);
+  const bodyFloor=all[Math.floor(all.length*.7)];
+  const sample=all.filter(v=>v>bodyFloor);
+  const tissue=sample[sample.length>>1];
+  const grey=(tissue-(manifest.window.level-manifest.window.width/2))/manifest.window.width;
+  assert.ok(grey>.32&&grey<.68,`${id}: its window puts tissue at ${(grey*100).toFixed(0)}% grey, which reads too ${grey<.5?'dark':'bright'}`);
   // A stitched acquisition scales each station separately and shows the joins as brightness bands.
   // Measuring the body median slice by slice catches any that survive the flattening.
   // Banding is a step, not a gradient: a stitched study jumps in brightness between one slice and
@@ -202,7 +215,7 @@ assert.throws(()=>ctWindow('pancreas'),/Unknown window/);
 assert.throws(()=>plane('oblique'),/Unknown plane/);
 for(const s of STUDIES)assert.equal(studyFor(s.modality,s.id).path,s.path);
 assert.equal(studiesFor('ct').length,2,'the body arrives in two CT studies');
-assert.equal(studiesFor('mr').length,3,'three magnetic resonance sequences are offered');
+assert.equal(studiesFor('mr').length,4,'four magnetic resonance studies are offered');
 // Anatomy that cannot be where a label puts it: the collection's own labels once placed a fragment
 // of skull among the toes of a study whose highest slice is lung.
 

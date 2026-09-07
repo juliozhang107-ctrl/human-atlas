@@ -198,6 +198,7 @@ def build(subject_dir, out_dir, modality, subject, source, target_spacing=None, 
         print(f'  resampled {before} -> {values.shape} at {target_spacing[0]} mm')
 
     os.makedirs(out_dir, exist_ok=True)
+    window = None
     if modality == 'ct':
         # Hounsfield units are kept, so the window presets act on real numbers.
         stored = np.clip(values + 1024, 0, 65535).astype(np.uint16)
@@ -211,6 +212,14 @@ def build(subject_dir, out_dir, modality, subject, source, target_spacing=None, 
         # recorded for reference rather than applied.
         intensity_meta = {'dtype': 'uint8', 'encoding': 'plain', 'slope': 1, 'inter': 0,
                           'unit': 'stored 0-255', 'ceiling': round(ceiling, 2)}
+        # Magnetic resonance has no absolute scale, so each study carries the window it should be
+        # read at. Centring on the median of the body puts tissue at mid grey; a window centred on
+        # the midpoint of the range instead would leave it dark, because the distribution has a long
+        # bright tail of fat, fluid and vessels that drags the midpoint up.
+        tissue = stored[stored > np.percentile(stored, 70)]
+        middle = float(np.median(tissue))
+        upper = float(np.percentile(tissue, 90))
+        window = {'level': round(middle, 1), 'width': round(max(24., 2.2 * (upper - middle)), 1)}
 
     def write(name, array):
         # Sixteen-bit data is split into a plane of low bytes and a plane of high bytes before
@@ -231,7 +240,7 @@ def build(subject_dir, out_dir, modality, subject, source, target_spacing=None, 
                 'dims': list(values.shape), 'spacing': [round(s, 4) for s in spacing],
                 'axes': 'x patient left, y superior, z anterior',
                 'crop': [[int(lo), int(hi)] for lo, hi in box],
-                'intensity': intensity_meta, 'structures': names, 'source': source,
+                'intensity': intensity_meta, 'window': window, 'structures': names, 'source': source,
                 'bytes': {'volume': vol_gz, 'labels': lab_gz}}
     with open(os.path.join(out_dir, 'manifest.json'), 'w') as f: json.dump(manifest, f, indent=1)
     print(f'  volume {vol_raw/1e6:.0f} MB raw -> {vol_gz/1e6:.1f} MB gz; '
@@ -260,5 +269,9 @@ if __name__ == '__main__':
           dict(SOURCES['mri'], subject='s0175'), weighting='T1')
     build('data/raw/mri/s0173', 'public/imaging/mr-t2', 'mr', 's0173',
           dict(SOURCES['mri'], subject='s0173'), weighting='T2')
+    # The only near-isotropic study in the collection, so the only one whose sagittal and axial
+    # reformats are as sharp as the plane it was acquired in.
+    build('data/raw/mri/s0187', 'public/imaging/mr-t1fs', 'mr', 's0187',
+          dict(SOURCES['mri'], subject='s0187'), weighting='T1 FS')
     build('data/raw/mri/s0190', 'public/imaging/mr-stir', 'mr', 's0190',
           dict(SOURCES['mri'], subject='s0190'), weighting='STIR')

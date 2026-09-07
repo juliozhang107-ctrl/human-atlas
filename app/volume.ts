@@ -11,6 +11,9 @@ export interface Source {dataset:string;subject:string;doi:string;url:string;lic
 export interface VolumeManifest {
  modality:string;subject:string;dims:[number,number,number];spacing:[number,number,number];axes:string;
  intensity:{dtype:'uint8'|'uint16';encoding:'plain'|'split-bytes';slope:number;inter:number;unit:string;ceiling?:number};
+ /** How this study should be read. Magnetic resonance has no absolute scale, so each carries the
+  *  window that puts its own tissue at mid grey. Null for CT, which is windowed by preset. */
+ window:{level:number;width:number}|null;
  structures:Structure[];source:Source;
 }
 export interface Volume {manifest:VolumeManifest;values:Uint8Array|Uint16Array;labels:Uint8Array;named:Map<number,Structure>}

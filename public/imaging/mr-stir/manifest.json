@@ -35,6 +35,10 @@
   "unit": "stored 0-255",
   "ceiling": 213.0
  },
+ "window": {
+  "level": 68.0,
+  "width": 136.4
+ },
  "structures": [
   {
    "index": 1,
@@ -277,11 +281,11 @@
  ],
  "source": {
   "dataset": "TotalSegmentator MRI",
+  "subject": "s0190",
   "doi": "10.5281/zenodo.11367005",
   "url": "https://zenodo.org/records/11367005",
   "licence": "CC BY-NC-SA 2.0",
-  "attribution": "Akinci D\u2019Antonoli et al., TotalSegmentator MRI, University Hospital Basel",
-  "subject": "s0190"
+  "attribution": "Akinci D\u2019Antonoli et al., TotalSegmentator MRI, University Hospital Basel"
  },
  "bytes": {
   "volume": 3037728,
