@@ -197,7 +197,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
   let hoverIndex=0;
   const studies=new Map<string,Volume>();
   let study:Volume|null=null,loading='',section:Section|null=null,anchors:Anchor[]=[];
-  let sliceKey='',drawKey='',sliceActive=false,sliceCrop={x:0,y:0,w:0,h:0},sliceDraw={x:0,y:0,w:0,h:0},markedIndex=0;
+  let sliceKey='',drawKey='',sliceActive=false,sliceCrop={x:0,y:0,w:0,h:0},sliceDraw={x:0,y:0,w:0,h:0},sliceBounds={left:0,right:0,top:0,bottom:0},markedIndex=0;
 
   const wanted=(mode:string)=>mode==='ct'||mode==='mr';
   /** Which study a state refers to, since both modalities now offer more than one. */
@@ -279,10 +279,14 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    sliceCrop={x:0,y:0,w:section.width,h:section.height};
    const ratioX=sliceCanvas.width/Math.max(1,el.clientWidth),ratioY=sliceCanvas.height/Math.max(1,el.clientHeight);
    const availableWidth=(area.right-area.left)*ratioX,availableHeight=(area.bottom-area.top)*ratioY;
+   sliceBounds={left:area.left*ratioX,right:area.right*ratioX,top:area.top*ratioY,bottom:area.bottom*ratioY};
+   // Names sit in a column at each margin, so with them on the image gives up a fifth of the width
+   // on each side for the text to stand in clear space instead of over the anatomy.
+   const margin=latest.current.labels?availableWidth*.2:0;
    // Voxels are not cubic, so the image is drawn at the aspect its spacing implies rather than
    // one screen pixel per voxel, which would squash a coronal image of an anisotropic study.
    const trueWidth=section.width*section.pixelWidth,trueHeight=section.height*section.pixelHeight;
-   const scale=Math.min(availableWidth/trueWidth,availableHeight/trueHeight)*.96;
+   const scale=Math.min((availableWidth-margin*2)/trueWidth,availableHeight/trueHeight)*.96;
    const w=trueWidth*scale,h=trueHeight*scale;
    sliceDraw={x:area.left*ratioX+(availableWidth-w)/2,y:area.top*ratioY+(availableHeight-h)/2,w,h};
    paint();
@@ -319,36 +323,88 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
   /** Write the names onto the image. Larger structures are placed first and anything that would
    *  collide with a name already written is left to the readout instead, so a section stays legible
    *  rather than becoming a wall of text. Each name is tethered to the point it describes. */
+  /** Section colours by system, matching the 3D model, and mixed toward white for the text: a
+   *  saturated venous blue reads as a line at one pixel but not as eleven-point type on grey. */
+  const SECTION_COLOUR=new Map(SYSTEMS.map(system=>[system.id,system.color]));
+  const tint=(hex:string,towards:number)=>{
+   const n=parseInt(hex.slice(1),16),mix=(c:number)=>Math.round(c+(255-c)*towards);
+   return `rgb(${mix(n>>16&255)},${mix(n>>8&255)},${mix(n&255)})`;
+  };
+
+  /** Names on the section, laid out the way an anatomical atlas lays them out: the text stands in a
+   *  column at each margin with a leader drawn to the structure it names, and is coloured by system.
+   *
+   *  Text placed beside its own anchor collides on any busy slice, and the loser was dropped, so a
+   *  mid-abdominal image would name six of the twenty structures it crossed and silently omit the
+   *  rest. A column cannot collide: every name that clears the sliver threshold gets a line, pushed
+   *  off its neighbours and then corrected back off the bottom edge so a cluster spreads either way
+   *  instead of sliding downward. Only genuine overflow past the column's capacity is dropped, and
+   *  then the largest structures are kept, since those are what a reader orients by. */
   const drawLabels=()=>{
    if(!section||!study)return;
    const scale=sliceCanvas.width/Math.max(1,el.clientWidth);
-   const size=Math.max(10,Math.round(11*scale));
-   sliceContext.font=`${size}px Inter, ui-sans-serif, system-ui, sans-serif`;
+   const base=Math.max(10,Math.round(11*scale));
+   const face=(px:number)=>`${px}px Inter, ui-sans-serif, system-ui, sans-serif`;
+   sliceContext.font=face(base);
    sliceContext.textBaseline='middle';
-   sliceContext.lineJoin='round';
-   const placed:{left:number;right:number;top:number;bottom:number}[]=[];
+   sliceContext.lineJoin='round';sliceContext.lineCap='round';
    const minimum=section.width*section.height*.0016;
+
+   type Slot={name:string;colour:string;marked:boolean;ax:number;ay:number;area:number;y:number};
+   const middle=sliceDraw.x+sliceDraw.w/2;
+   const gathered:Slot[][]=[[],[]];
+   let widest=0;
    for(const anchor of anchors){
     if(anchor.area<minimum)continue;
     const named=study.named.get(anchor.index);
     if(!named)continue;
-    const x=sliceDraw.x+(anchor.x+.5)/section.width*sliceDraw.w;
-    const y=sliceDraw.y+(anchor.y+.5)/section.height*sliceDraw.h;
-    const width=sliceContext.measureText(named.name).width;
-    const gap=size*.6;
-    const right=x+gap+width<sliceCanvas.width-4;
-    const box={left:right?x+gap:x-gap-width,right:right?x+gap+width:x-gap,
-               top:y-size*.7,bottom:y+size*.7};
-    if(box.left<2||box.right>sliceCanvas.width-2)continue;
-    if(placed.some(p=>box.left<p.right+4&&box.right>p.left-4&&box.top<p.bottom+2&&box.bottom>p.top-2))continue;
-    placed.push(box);
-    sliceContext.beginPath();sliceContext.arc(x,y,Math.max(1.5,scale*1.6),0,Math.PI*2);
-    sliceContext.fillStyle='#6ad9c8';sliceContext.fill();
-    sliceContext.textAlign=right?'left':'right';
+    const ax=sliceDraw.x+(anchor.x+.5)/section.width*sliceDraw.w;
+    const ay=sliceDraw.y+(anchor.y+.5)/section.height*sliceDraw.h;
+    widest=Math.max(widest,sliceContext.measureText(named.name).width);
+    gathered[ax<middle?0:1].push({name:named.name,colour:SECTION_COLOUR.get(named.system)??'#9fb2bd',
+      marked:named.index===markedIndex,ax,ay,area:anchor.area,y:ay});
+   }
+
+   // The type fits the margin it is given rather than running inward: at a narrow window a name as
+   // long as "Right gluteus maximus" is wider than a fifth of the image, and left at full size it
+   // would be read over the anatomy it is naming. Floored, since unreadably small is worse still.
+   const allowance=Math.max(base*4,Math.min(sliceDraw.x-sliceBounds.left,sliceBounds.right-(sliceDraw.x+sliceDraw.w))-base);
+   const size=widest>allowance?Math.max(Math.round(base*.72),Math.floor(base*allowance/widest)):base;
+   if(size!==base)sliceContext.font=face(size);
+   const line=size*1.55,pad=size*.45,stub=size*.7,dot=Math.max(1.6,scale*1.7);
+   const columns:{x:number;dir:1|-1;slots:Slot[]}[]=[{x:sliceBounds.left+pad,dir:1,slots:gathered[0]},
+                                                     {x:sliceBounds.right-pad,dir:-1,slots:gathered[1]}];
+
+   const top=sliceBounds.top+pad+line/2,bottom=sliceBounds.bottom-pad-line/2;
+   const capacity=Math.max(0,Math.floor((bottom-top)/line)+1);
+   for(const column of columns){
+    if(column.slots.length>capacity)column.slots=column.slots.sort((a,b)=>b.area-a.area).slice(0,capacity);
+    column.slots.sort((a,b)=>a.ay-b.ay);
+    let y=top;
+    for(const slot of column.slots){slot.y=Math.max(slot.ay,y);y=slot.y+line;}
+    let limit=bottom;
+    for(let i=column.slots.length-1;i>=0;i--){const slot=column.slots[i];slot.y=Math.min(slot.y,limit);limit=slot.y-line;}
+    for(const slot of column.slots)slot.y=Math.max(slot.y,top);
+   }
+
+   for(const column of columns)for(const slot of column.slots){
+    const width=sliceContext.measureText(slot.name).width;
+    const textX=column.dir===1?column.x:column.x-width;
+    const edge=column.dir===1?textX+width:textX;   // the leader leaves the text on its inner side
+    sliceContext.strokeStyle=slot.marked?'rgba(255,255,255,.95)':`${slot.colour}b0`;
+    sliceContext.lineWidth=Math.max(1,scale*(slot.marked?1.6:1));
+    sliceContext.beginPath();
+    sliceContext.moveTo(edge,slot.y);
+    sliceContext.lineTo(edge+column.dir*stub,slot.y);
+    sliceContext.lineTo(slot.ax,slot.ay);
+    sliceContext.stroke();
+    sliceContext.beginPath();sliceContext.arc(slot.ax,slot.ay,dot,0,Math.PI*2);
+    sliceContext.fillStyle=slot.marked?'#ffffff':slot.colour;sliceContext.fill();
+    sliceContext.textAlign='left';
     sliceContext.lineWidth=Math.max(2,scale*2.6);sliceContext.strokeStyle='rgba(5,7,10,.92)';
-    sliceContext.strokeText(named.name,right?x+gap:x-gap,y);
-    sliceContext.fillStyle=named.index===markedIndex?'#8ff0dd':'#eaf2f6';
-    sliceContext.fillText(named.name,right?x+gap:x-gap,y);
+    sliceContext.strokeText(slot.name,textX,slot.y);
+    sliceContext.fillStyle=slot.marked?'#ffffff':tint(slot.colour,.42);
+    sliceContext.fillText(slot.name,textX,slot.y);
    }
   };
 

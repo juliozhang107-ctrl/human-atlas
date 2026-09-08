@@ -112,6 +112,41 @@ for _side, _english, _latin in (('left', 'Left', 'sinistra'), ('right', 'Right',
     for _n in range(1, 13):
         NAMES[f'rib_{_side}_{_n}'] = (f'{_english} {_ordinal(_n).lower()} rib', f'Costa {_n} {_latin}')
 
+# Which display system a class belongs to, so a label on a section can be coloured the way the 3D
+# model already colours its systems. Matched by longest prefix, which keeps `iliac_artery` apart from
+# `iliac_vena` and `iliopsoas`, and lets one `rib_` rule cover all twenty-four ribs. Anything
+# unmatched resolves to '' and is reported by scripts/validate-imaging.mjs rather than guessed at.
+SYSTEM_RULES = {
+ 'skeletal':     ('clavicula', 'femur', 'hip', 'humerus', 'rib_', 'sacrum', 'scapula', 'skull',
+                  'sternum', 'vertebrae'),
+ 'connective':   ('costal_cartilages', 'intervertebral_discs'),
+ 'muscular':     ('autochthon', 'gluteus_', 'iliopsoas', 'quadriceps_femoris', 'sartorius', 'thigh_'),
+ 'cardiac':      ('heart', 'atrial_appendage'),
+ 'arterial':     ('aorta', 'brachiocephalic_trunk', 'common_carotid_artery', 'subclavian_artery',
+                  'iliac_artery'),
+ 'venous':       ('brachiocephalic_vein', 'inferior_vena_cava', 'superior_vena_cava',
+                  'pulmonary_vein', 'portal_vein', 'iliac_vena'),
+ 'nervous':      ('brain', 'spinal_cord'),
+ 'respiratory':  ('trachea', 'lung_'),
+ 'digestive':    ('colon', 'duodenum', 'esophagus', 'gallbladder', 'liver', 'pancreas',
+                  'small_bowel', 'stomach'),
+ 'urinary':      ('kidney', 'urinary_bladder'),
+ 'lymphatic':    ('spleen',),
+ 'endocrine':    ('adrenal_gland', 'thyroid_gland'),
+ 'reproductive': ('prostate',),
+}
+
+_BY_PREFIX = sorted(((prefix, system) for system, prefixes in SYSTEM_RULES.items()
+                     for prefix in prefixes), key=lambda rule: -len(rule[0]))
+
+
+def system_for(source):
+    """The display system a segmentation class belongs to, or '' when it is not classified."""
+    for prefix, system in _BY_PREFIX:
+        if source.startswith(prefix): return system
+    return ''
+
+
 def describe(source):
     """The reported name and Terminologia Anatomica term for a segmentation class."""
     if source in NAMES: return NAMES[source]

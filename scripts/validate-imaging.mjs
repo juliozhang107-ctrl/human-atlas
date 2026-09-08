@@ -5,6 +5,9 @@ import {PLANES,plane} from '../app/slice.ts';
 import {CT_WINDOWS,MODALITIES,STUDIES,ctWindow,modality,study as studyFor,studiesFor,windowed} from '../app/modalities.ts';
 import {extractSection,anchorsFor,planeAxis,sliceCount} from '../app/volume.ts';
 
+const SYSTEMS=['skeletal','muscular','arterial','venous','nervous','digestive','respiratory','urinary',
+               'reproductive','lymphatic','endocrine','integumentary','connective','sensory','cardiac'];
+
 const load=id=>{
  const base=new URL(`../public/imaging/${id}/`,import.meta.url);
  const manifest=JSON.parse(readFileSync(new URL('manifest.json',base)));
@@ -71,6 +74,9 @@ for(const id of STUDIES.map(s=>s.path)){
   assert.ok(!/_/.test(s.name),`${id}: ${s.name} still reads like a file name`);
   assert.ok(s.name[0]===s.name[0].toUpperCase(),`${id}: ${s.name} should start with a capital`);
   assert.ok('latin' in s,`${id}: ${s.name} has no Terminologia Anatomica field`);
+  // The label on the image is coloured by system, so an unclassified structure would be drawn a
+  // neutral grey among coloured neighbours and read as a different kind of thing than it is.
+  assert.ok(SYSTEMS.includes(s.system),`${id}: ${s.name} has system ${JSON.stringify(s.system)}, which is not one the atlas colours`);
  }
  const named=manifest.structures.filter(s=>s.latin).length;
  assert.ok(named>manifest.structures.length*.9,`${id}: only ${named} of ${manifest.structures.length} carry a Latin term`);

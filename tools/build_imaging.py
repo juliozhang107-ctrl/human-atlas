@@ -9,7 +9,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 import numpy as np
 from scipy import ndimage
 import nifti
-from anatomy_names import describe
+from anatomy_names import describe, system_for
 
 def human(name):
     """The name a report would use for a segmentation class, from tools/anatomy_names.py."""
@@ -185,7 +185,7 @@ def build(subject_dir, out_dir, modality, subject, source, target_spacing=None, 
         labels[kept] = index                        # largest first, so smaller structures overwrite
         reported, latin = describe(stem)
         names.append({'index': index, 'file': stem, 'name': reported, 'latin': latin,
-                      'voxels': int(kept.sum())})
+                      'system': system_for(stem), 'voxels': int(kept.sum())})
     if dropped: print(f'  dropped {dropped} stray voxels in components under {int(STRAY_SHARE*100)}% of their structure')
     if rejected: print(f'  rejected {len(rejected)} anatomically impossible labels: {", ".join(rejected)}')
 

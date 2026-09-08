@@ -1,4 +1,5 @@
 import type {PlaneId} from './slice';
+import type {SystemId} from './anatomy';
 
 /** A real imaging study: an intensity volume and a label volume of the same shape, in which every
  *  voxel carries the index of the structure that owns it. Axes are the atlas's own, so index order
@@ -6,7 +7,7 @@ import type {PlaneId} from './slice';
  *
  *  Sixteen-bit volumes arrive as a plane of low bytes followed by a plane of high bytes, which
  *  compresses far better than interleaved pairs because the high plane is nearly constant. */
-export interface Structure {index:number;file:string;name:string;latin:string;voxels:number}
+export interface Structure {index:number;file:string;name:string;latin:string;system:SystemId;voxels:number}
 export interface Source {dataset:string;subject:string;doi:string;url:string;licence:string;attribution:string}
 export interface VolumeManifest {
  modality:string;subject:string;dims:[number,number,number];spacing:[number,number,number];axes:string;
