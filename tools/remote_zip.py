@@ -33,7 +33,8 @@ class HttpFile(io.RawIOBase):
         else:
             raise RuntimeError(f'range {span} failed')
         data = done.stdout
-        buffer[:len(data)] = data
+        view = memoryview(buffer).cast('B')
+        view[:len(data)] = data
         self.pos += len(data); self.fetched += len(data); self.requests += 1
         return len(data)
 

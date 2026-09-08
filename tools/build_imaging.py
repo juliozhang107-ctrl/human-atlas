@@ -277,11 +277,12 @@ if __name__ == '__main__':
     # The CT keeps the sampling the collection distributes, 1.5 mm, rather than being reduced
     # further: that is as fine as this source goes.
     build('data/raw/ct/s0287', 'public/imaging/ct', 'ct', 's0287', SOURCES['ct'])
-    # s0333 rather than s0643: the same head and neck angiogram at a quarter of the noise. Air
-    # outside the patient measures 14 Hounsfield units of noise against 59, which is the difference
-    # between a readable brain and a snowstorm.
-    build('data/raw/ct/s0333', 'public/imaging/ct-head', 'ct', 's0333',
-          dict(SOURCES['ct'], subject='s0333'))
+    # Head studies were fetched and measured rather than chosen by their descriptions. s0478 is the
+    # quietest and the sharpest of them: 9 Hounsfield units of noise in the air outside the patient
+    # against 59 for the first one tried, and the steepest bone edges once that noise is divided
+    # out, which is what separates a sharp scan from a grainy one pretending to be sharp.
+    build('data/raw/ct/s0478', 'public/imaging/ct-head', 'ct', 's0478',
+          dict(SOURCES['ct'], subject='s0478'))
     build('data/raw/mri/s0175', 'public/imaging/mr-t1', 'mr', 's0175',
           dict(SOURCES['mri'], subject='s0175'), weighting='T1')
     build('data/raw/mri/s0173', 'public/imaging/mr-t2', 'mr', 's0173',

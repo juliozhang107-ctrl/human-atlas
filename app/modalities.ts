@@ -35,7 +35,7 @@ export interface Study {modality:'ct'|'mr';id:string;path:string;label:string;su
 export const STUDIES: Study[] = [
  {modality:'ct',id:'body',path:'ct',      label:'Body', subject:'s0287', coverage:'neck to feet, 125 cm',
   description:'A contrast angiogram of the trunk and legs. The widest study in the collection that also covers the trunk.'},
- {modality:'ct',id:'head',path:'ct-head', label:'Head', subject:'s0333', coverage:'head to upper chest, 33 cm',
+ {modality:'ct',id:'head',path:'ct-head', label:'Head', subject:'s0478', coverage:'head to upper chest, 36 cm',
   description:'A head and neck angiogram, carrying the brain, skull and cervical spine the body study stops short of.'},
  {modality:'mr',id:'t1',  path:'mr-t1',  label:'T1',  subject:'s0175', coverage:'head to thigh, 108 cm',
   description:'Fat and marrow bright, urine dark against liver. The study to read anatomy from.'},

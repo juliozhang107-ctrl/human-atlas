@@ -52,13 +52,22 @@ CT and MRI are **real studies**, each one anonymised subject shown with the segm
 | | Study | Subject | Coverage | Structures | Sampling | Download |
 |---|---|---|---|---|---|---|
 | CT | Body | s0287 | neck to feet, 125 cm | 101 | 306×835×246 at 1.5 mm | 51 MB |
-| CT | Head | s0333 | head to upper chest, 33 cm | 53 | 219×217×217 at 1.5 mm | 10 MB |
+| CT | Head | s0478 | head to upper chest, 36 cm | 53 | 181×237×167 at 1.5 mm | 7 MB |
 | MRI | T1 | s0175 | head to thigh, 108 cm | 53 | 320×360×240 at 1.28×3.0×1.28 mm | 10 MB |
 | MRI | T1 FS | s0187 | abdomen and pelvis, 45 cm | 44 | 260×320×146 at 1.41×1.41×1.5 mm | 9 MB |
 
-Studies were chosen on measurements, not on their labels. The head CT is the quietest of the
-candidates fetched, 14 Hounsfield units of noise in the air outside the patient against 59 for the
-first one tried, which is the difference between a readable brain and a snowstorm.
+Studies were chosen on measurements, not on their descriptions. Head candidates were fetched and
+ranked on two numbers: noise, measured in the air outside the patient, and the steepness of the
+soft-tissue-to-bone edge divided by that noise, so a grainy scan cannot pass itself off as a sharp
+one. The one used measures 9 Hounsfield units of noise against 59 for the first one tried, with bone
+edges five times steeper.
+
+Resolution is capped at the 1.5 mm the collection distributes. Two higher-resolution head datasets
+were looked at and neither can be used: [CADS BrainCT-1mm](https://huggingface.co/datasets/mrmrx/CADS-dataset)
+is gated behind an access request, and [HaN-Seg](https://zenodo.org/records/7442914), 42 patients
+with 30 organs at risk, is CC BY-NC-ND, whose no-derivatives clause forbids the resampling and
+reformatting this viewer does. Full-resolution source images exist on TCIA but are published without
+segmentations, which would cost the naming this atlas is built around.
 | MRI | T2 | s0173 | abdomen, 40 cm | 39 | 384×384×32 at 1.04×1.04×6.0 mm | 4 MB |
 | MRI | STIR | s0190 | chest to pelvis, 50 cm | 34 | 384×384×39 at 1.3×1.3×6.0 mm | 3 MB |
 
@@ -138,7 +147,7 @@ Import this repository into Vercel as a Vite project. The included `vercel.json`
 Original application code is released under the [MIT License](LICENSE). The bundled data has its own terms, which travel with it:
 
 - **BodyParts3D 4.0** anatomy meshes — CC BY 4.0.
-- **TotalSegmentator** CT (subjects s0287 and s0333) — CC BY 4.0, © Wasserthal et al., University Hospital Basel.
+- **TotalSegmentator** CT (subjects s0287 and s0478) — CC BY 4.0, © Wasserthal et al., University Hospital Basel.
 - **TotalSegmentator MRI** (subjects s0175, s0187, s0173 and s0190) — **CC BY-NC-SA 2.0**, © Akinci D’Antonoli et al., University Hospital Basel.
 
 > **The MRI licence is non-commercial and share-alike.** While that study is bundled, this build as a whole may not be used commercially, and derivatives must carry the same terms. The code remains MIT; the restriction comes from the data. Removing the `public/imaging/mr-*` studies and the MRI modality lifts it.
