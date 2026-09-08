@@ -76,8 +76,6 @@ is gated behind an access request, and [HaN-Seg](https://zenodo.org/records/7442
 with 30 organs at risk, is CC BY-NC-ND, whose no-derivatives clause forbids the resampling and
 reformatting this viewer does. Full-resolution source images exist on TCIA but are published without
 segmentations, which would cost the naming this atlas is built around.
-| MRI | T2 | s0173 | abdomen, 40 cm | 39 | 384×384×32 at 1.04×1.04×6.0 mm | 4 MB |
-| MRI | STIR | s0190 | chest to pelvis, 50 cm | 34 | 384×384×39 at 1.3×1.3×6.0 mm | 3 MB |
 
 CT from [TotalSegmentator](https://doi.org/10.5281/zenodo.10047292), CC BY 4.0. MRI from [TotalSegmentator MRI](https://doi.org/10.5281/zenodo.11367005), **CC BY-NC-SA 2.0**.
 
@@ -85,7 +83,7 @@ CT from [TotalSegmentator](https://doi.org/10.5281/zenodo.10047292), CC BY 4.0. 
 
 The CT keeps the 1.5 mm sampling the collection distributes, which is as fine as this source goes: the original acquisitions are published only without their segmentations. That costs 51 MB on first opening the body study and around 190 MB of held memory. Building at 2 mm halves both: pass `target_spacing=(2.0, 2.0, 2.0)` in `tools/build_imaging.py`.
 
-An MR sequence is a study too, not a display setting. One acquisition carries one weighting, so T1, T2 and STIR are three separate studies of three patients. Each is labelled with the weighting **measured from its own tissue signals** rather than read from metadata this collection records in mixed units: urine against liver, spleen against liver, and subcutaneous fat against liver, the last being what separates a STIR from a T2 since muscle is dark on both. `tools/weighting.py` does the measuring, and documents its own limit: those ratios compare one region against another, so they hold only within a single station and cannot classify a stitched whole-body acquisition.
+An MR sequence is a study too, not a display setting. One acquisition carries one weighting, so the T1 and the fat-suppressed T1 are two separate studies of two patients. Each is labelled with the weighting **measured from its own tissue signals** rather than read from metadata this collection records in mixed units: urine against liver, spleen against liver, and subcutaneous fat against liver, the last being what separates a STIR from a T2 since muscle is dark on both. `tools/weighting.py` does the measuring, and documents its own limit: those ratios compare one region against another, so they hold only within a single station and cannot classify a stitched whole-body acquisition.
 
 **Structures are named as a report would name them.** The source classes are short identifiers
 meant for a model's output directory: `autochthon_left` is the deep intrinsic back muscle group, and
@@ -102,23 +100,23 @@ over it. See `tools/anatomy_names.py`.
 
 **Each magnetic resonance study carries the window it should be read at.** There is no absolute
 scale to window against, and reading a study across its whole stored range leaves it dark, because
-the bright tail of fat, fluid and vessels takes up most of that range: the STIR sat at 27% grey
-that way. Centring the window on the median of the body puts tissue at mid grey. Centring on the
+the bright tail of fat, fluid and vessels takes up most of that range. Centring the window on the median of the body puts tissue at mid grey. Centring on the
 midpoint of the range instead is worse than doing nothing, because the distribution is skewed.
 
-**Reformats are only as good as the acquisition.** A T2 or a STIR of the abdomen is conventionally
-acquired as thick two-dimensional slices, six millimetres here, so a sagittal or axial reformat of
-one is coarse however it is displayed and no windowing changes that. Only one study in the whole
-collection is near-isotropic, the fat-suppressed T1, and it is included for exactly that reason:
-it stays sharp reformatted into any plane. The collection holds no near-isotropic T2 or STIR of the
-trunk, and the only trunk STIR at all is the six-millimetre one here.
+**Reformats are only as good as the acquisition, which is why only two sequences are offered.** A
+T2 or a STIR of the trunk is conventionally acquired as thick two-dimensional slices, and the only
+ones this collection holds are six-millimetre stacks of 32 and 39 slices. A sagittal or axial
+reformat of those is coarse however it is displayed, and no windowing or levelling changes it, so
+both were dropped rather than shipped as something a resident could mistake for a bad viewer. What
+is left is sound in three planes: the fat-suppressed T1 is the one near-isotropic study in the whole
+collection, and the T1 is three millimetres through-plane while covering 108 cm.
 
 **Whole-body magnetic resonance is levelled across its stations.** It is acquired in overlapping
 stations, each scaled on its own, so the joins show as horizontal bands: in the T1 the head station
 ran about three times brighter than the trunk and a quarter of the head was clipped to white. The
 joins are found rather than assumed, as slices where the body median jumps while the amount of body
-barely changes, and each station is then scaled as a block. Three joins were found in the T1; the
-single-station T2 and STIR need none and are left untouched. Head-to-trunk brightness falls from
+barely changes, and each station is then scaled as a block. Three joins were found in the T1.
+Head-to-trunk brightness falls from
 2.93 to 1.59 and clipping in the head from 24% to 5%.
 
 Two things this deliberately does not do. It never touches CT, whose Hounsfield numbers are absolute
@@ -130,7 +128,7 @@ one station's field of view ends are what remains, and they come with the source
 
 **The published labels are cleaned on the way in.** A segmentation model run over a region it was not expecting leaves false positives, and this collection's own labels put nine millimetres of skull among the toes of a study whose highest slice is lung. Two filters remove them: connected components far smaller than the structure they belong to, and structures that sit somewhere they anatomically cannot, such as a skull below a lung. Anatomy legitimately cut off by the edge of the field, like a clavicle at the top of a scan that stops at the neck, is kept.
 
-These are clinical studies, so they carry incidental findings. The STIR has a visible lesion in the left axilla. They show real anatomy, not idealised anatomy.
+These are clinical studies, so they carry incidental findings. They show real anatomy, not idealised anatomy.
 
 To rebuild them, run `python3 tools/fetch_subject.py <archive url> <subject> <destination>` and then `python3 tools/build_imaging.py`. The fetcher reads the remote archives over HTTP range requests, so pulling one subject transfers tens of megabytes rather than the 23.6 GB the CT archive weighs.
 
@@ -157,7 +155,7 @@ which this fork preserves unchanged. Modifications made here are released on the
 
 - **BodyParts3D 4.0** anatomy meshes — CC BY 4.0.
 - **TotalSegmentator** CT (subjects s0287 and s0478) — CC BY 4.0, © Wasserthal et al., University Hospital Basel.
-- **TotalSegmentator MRI** (subjects s0175, s0187, s0173 and s0190) — **CC BY-NC-SA 2.0**, © Akinci D’Antonoli et al., University Hospital Basel.
+- **TotalSegmentator MRI** (subjects s0175 and s0187) — **CC BY-NC-SA 2.0**, © Akinci D’Antonoli et al., University Hospital Basel.
 
 > **The MRI licence is non-commercial and share-alike.** While those studies are bundled, this build
 > as a whole may not be used commercially, and anything built on it must carry the same terms. The

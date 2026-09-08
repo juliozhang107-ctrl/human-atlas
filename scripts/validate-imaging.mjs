@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import zlib from 'node:zlib';
-import {readFileSync} from 'node:fs';
+import {readFileSync,readdirSync} from 'node:fs';
 import {PLANES,plane} from '../app/slice.ts';
 import {CT_WINDOWS,MODALITIES,STUDIES,ctWindow,modality,study as studyFor,studiesFor,windowed} from '../app/modalities.ts';
 import {extractSection,anchorsFor,planeAxis,sliceCount} from '../app/volume.ts';
@@ -231,7 +231,21 @@ assert.throws(()=>ctWindow('pancreas'),/Unknown window/);
 assert.throws(()=>plane('oblique'),/Unknown plane/);
 for(const s of STUDIES)assert.equal(studyFor(s.modality,s.id).path,s.path);
 assert.equal(studiesFor('ct').length,2,'the body arrives in two CT studies');
-assert.equal(studiesFor('mr').length,4,'four magnetic resonance studies are offered');
+// Every study the interface offers must be on disk, and nothing may be on disk unoffered: a study
+// dropped from the list while its 10 MB of volume stayed behind would ship dead weight to every
+// visitor, and one listed without its data would break the moment a reader selected it.
+const onDisk=readdirSync(new URL('../public/imaging/',import.meta.url),{withFileTypes:true})
+ .filter(entry=>entry.isDirectory()).map(entry=>entry.name).sort();
+assert.deepEqual(onDisk,STUDIES.map(s=>s.path).sort(),
+ `the studies on disk and the studies offered must match: disk has ${onDisk.join(', ')}`);
+// A sequence is only worth offering if it survives being reformatted. The collection's T2 and STIR
+// of the trunk are six-millimetre stacks, coarse in any plane but the acquired one, and were
+// dropped for that reason; this keeps one from being added back without the same test.
+for(const study of studiesFor('mr')){
+ const spacing=JSON.parse(readFileSync(new URL(`../public/imaging/${study.path}/manifest.json`,import.meta.url))).spacing;
+ assert.ok(Math.max(...spacing)<=3.0,
+  `${study.label}: ${Math.max(...spacing)} mm through-plane is too coarse to reformat`);
+}
 // Anatomy that cannot be where a label puts it: the collection's own labels once placed a fragment
 // of skull among the toes of a study whose highest slice is lung.
 

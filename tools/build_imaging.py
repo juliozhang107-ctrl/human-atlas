@@ -285,11 +285,9 @@ if __name__ == '__main__':
           dict(SOURCES['ct'], subject='s0478'))
     build('data/raw/mri/s0175', 'public/imaging/mr-t1', 'mr', 's0175',
           dict(SOURCES['mri'], subject='s0175'), weighting='T1')
-    build('data/raw/mri/s0173', 'public/imaging/mr-t2', 'mr', 's0173',
-          dict(SOURCES['mri'], subject='s0173'), weighting='T2')
     # The only near-isotropic study in the collection, so the only one whose sagittal and axial
-    # reformats are as sharp as the plane it was acquired in.
+    # reformats are as sharp as the plane it was acquired in. The collection's T2 and STIR of the
+    # trunk are six-millimetre two-dimensional stacks, which no windowing can make readable in a
+    # reformatted plane, so they are not built.
     build('data/raw/mri/s0187', 'public/imaging/mr-t1fs', 'mr', 's0187',
           dict(SOURCES['mri'], subject='s0187'), weighting='T1 FS')
-    build('data/raw/mri/s0190', 'public/imaging/mr-stir', 'mr', 's0190',
-          dict(SOURCES['mri'], subject='s0190'), weighting='STIR')
