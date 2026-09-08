@@ -140,8 +140,9 @@ if(!Number.isFinite(level)||!Number.isFinite(window)){
 const grey=new Uint8Array(width*height);
 for(let i=0;i<pixels.length;i++)grey[i]=Math.round(displayValue(pixels[i],level,window)*255);
 
-// A laterality marker, as on a real film: the block letter L over the patient's left.
-if(view.id==='ap'||view.id==='pa'){
+// A laterality marker, as on a real film: the block letter L over the patient's left. Frontal
+// projections only, identified by the beam running along the anteroposterior axis.
+if(Math.abs(view.beam[2])>.99){
  const leftIsImageRight=view.right[0]>0,size=Math.max(8,Math.round(height*.026)),pad=Math.round(size*.9),thick=Math.max(2,Math.round(size*.22));
  const x0=leftIsImageRight?width-pad-size:pad,y0=pad;
  const box=(x,y,w,h)=>{for(let j=y;j<y+h&&j<height;j++)for(let i=x;i<x+w&&i<width;i++)if(i>=0&&j>=0)grey[j*width+i]=255;};

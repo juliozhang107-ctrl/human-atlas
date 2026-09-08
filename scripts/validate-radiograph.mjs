@@ -96,14 +96,21 @@ assert.ok(Math.abs(shuffled.total-slab.total)<1e-12,'integration must not depend
 assert.deepEqual(integrateBeam([],()=>1),{total:0,crossings:[]},'an empty beam attenuates nothing');
 
 // Projections must be orthonormal frames, or the detector image would be skewed.
-assert.equal(PROJECTIONS.length,4);
+assert.equal(PROJECTIONS.length,3);
 const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
 for(const p of PROJECTIONS){
  for(const [label,v] of [['beam',p.beam],['right',p.right],['up',p.up]])assert.ok(Math.abs(dot(v,v)-1)<1e-9,`${p.id}: ${label} is not a unit vector`);
  assert.ok(Math.abs(dot(p.beam,p.right))<1e-9&&Math.abs(dot(p.beam,p.up))<1e-9&&Math.abs(dot(p.right,p.up))<1e-9,`${p.id}: frame is not orthogonal`);
 }
 // Frontal films are read facing the patient, so the patient's right (-x) falls left of centre.
-for(const id of ['ap','pa'])assert.ok(projection(id).right[0]>0,`${id}: patient's right must fall on the left of the image`);
+assert.ok(projection('ap').right[0]>0,"ap: patient's right must fall on the left of the image");
+// No two beams may be parallel. A line integral does not care which end the tube is at, so two
+// projections whose beams differ only in sign render the same pixels: a PA offered beside the AP
+// was byte-identical to it while claiming less magnification of anterior structures, which needs
+// beam divergence this parallel-ray model does not have.
+for(let i=0;i<PROJECTIONS.length;i++)for(let j=i+1;j<PROJECTIONS.length;j++)
+ assert.ok(Math.abs(dot(PROJECTIONS[i].beam,PROJECTIONS[j].beam))<1-1e-9,
+  `${PROJECTIONS[i].id} and ${PROJECTIONS[j].id} have parallel beams and would render the same image`);
 assert.throws(()=>projection('axial'),/Unknown projection/,'unknown projections must be rejected by name');
 
 // Transmission and windowing.

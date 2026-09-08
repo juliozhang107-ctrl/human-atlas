@@ -86,15 +86,21 @@ export function bodySpan(hits:Hit[],envelopeIndex:number){
  return far>near?far-near:0;
 }
 
-export type ProjectionId = 'ap'|'pa'|'lateral'|'oblique';
+export type ProjectionId = 'ap'|'lateral'|'oblique';
 /** `beam` points from the tube toward the detector. `right` and `up` span the detector, oriented so
  *  that frontal films are read as if facing the patient: the patient's right side falls on the left
- *  of the image. Axes of the atlas are +x patient left, +y superior, +z anterior. */
+ *  of the image. Axes of the atlas are +x patient left, +y superior, +z anterior.
+ *
+ *  No two beams may be parallel, which is why there is no PA beside the AP. Attenuation summed along
+ *  a ray does not depend on which end the tube is at, so a PA sharing the AP's detector frame
+ *  rendered a byte-identical image while its caption promised less magnification of anterior
+ *  structures. Magnification comes from beam divergence and a finite source-to-detector distance,
+ *  and this model has neither: every ray here is parallel. Offering the button implied a difference
+ *  the physics could not produce. `scripts/validate-radiograph.mjs` now rejects parallel beams. */
 export interface Projection {id:ProjectionId;name:string;abbr:string;description:string;beam:[number,number,number];right:[number,number,number];up:[number,number,number]}
 const OBLIQUE=Math.SQRT1_2;
 export const PROJECTIONS: Projection[] = [
  {id:'ap',     name:'Anteroposterior', abbr:'AP',  description:'Tube in front of the patient, detector behind. The heart and anterior structures sit further from the detector and are magnified.', beam:[0,0,-1], right:[1,0,0],  up:[0,1,0]},
- {id:'pa',     name:'Posteroanterior', abbr:'PA',  description:'Tube behind the patient, detector in front. The standard erect chest projection, with less magnification of anterior structures.', beam:[0,0,1],  right:[1,0,0],  up:[0,1,0]},
  {id:'lateral',name:'Left lateral',    abbr:'LAT', description:'Tube at the patient’s right, detector against the left side. Displayed with the patient facing the left of the image.', beam:[-1,0,0], right:[0,0,-1], up:[0,1,0]},
  {id:'oblique',name:'Right anterior oblique',abbr:'RAO',description:'Tube rotated 45 degrees between the frontal and lateral positions, separating structures that overlap on a frontal film.', beam:[-OBLIQUE,0,-OBLIQUE], right:[OBLIQUE,0,-OBLIQUE], up:[0,1,0]},
 ];

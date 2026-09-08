@@ -17,7 +17,7 @@ import {planeAxis,type Structure,type VolumeManifest} from './volume';
 import {asset} from './assets';
 const PLANE_ABBR:Record<PlaneId,string>={axial:'AX',coronal:'COR',sagittal:'SAG'};
 /** Each radiographic projection is a camera preset; orbiting freely gives any other angle. */
-const PROJECTION_VIEW:Record<ProjectionId,View>={ap:'front',pa:'back',lateral:'side',oblique:'three-quarter'};
+const PROJECTION_VIEW:Record<ProjectionId,View>={ap:'front',lateral:'side',oblique:'three-quarter'};
 const initial:SceneState={explode:0,visible:DEFAULT_VISIBLE,selected:[],isolate:false,view:'three-quarter',rotate:false,reset:0,mode:'anatomy',level:DEFAULT_WINDOW.level,window:DEFAULT_WINDOW.width,plane:'axial',slice:0,ctWindow:'soft',study:'body',highlight:'',labels:true};
 export default function Home(){
  const detailTitle=useRef<HTMLHeadingElement>(null);
