@@ -35,7 +35,7 @@ assert.equal(planeAxis('coronal'),2,'coronal travels along the anterior axis');
 assert.equal(planeAxis('sagittal'),0,'sagittal travels along the left-right axis');
 assert.ok(plane('axial').right[0]>0&&plane('coronal').right[0]>0,'frontal planes put the patient’s right on the left of the image');
 assert.ok(plane('sagittal').right[2]<0,'sagittal is displayed with anterior to the left');
-assert.deepEqual(MODALITIES.filter(m=>m.interactive).map(m=>m.id),['radiograph','ct','mr']);
+assert.deepEqual(MODALITIES.filter(m=>m.interactive).map(m=>m.id),['radiograph','ct']);
 assert.equal(modality('radiograph').cross,false,'a radiograph is a projection, not a section');
 
 const atlas=JSON.parse(readFileSync(new URL('../public/models/atlas.json',import.meta.url)));
@@ -238,9 +238,9 @@ const onDisk=readdirSync(new URL('../public/imaging/',import.meta.url),{withFile
  .filter(entry=>entry.isDirectory()).map(entry=>entry.name).sort();
 assert.deepEqual(onDisk,STUDIES.map(s=>s.path).sort(),
  `the studies on disk and the studies offered must match: disk has ${onDisk.join(', ')}`);
-// A sequence is only worth offering if it survives being reformatted. The collection's T2 and STIR
-// of the trunk are six-millimetre stacks, coarse in any plane but the acquired one, and were
-// dropped for that reason; this keeps one from being added back without the same test.
+// Dormant while magnetic resonance is not offered, and kept for when it is: a sequence is only
+// worth offering if it survives being reformatted. The collection's T2 and STIR of the trunk are
+// six-millimetre stacks, coarse in any plane but the acquired one, which is why they went first.
 for(const study of studiesFor('mr')){
  const spacing=JSON.parse(readFileSync(new URL(`../public/imaging/${study.path}/manifest.json`,import.meta.url))).spacing;
  assert.ok(Math.max(...spacing)<=3.0,
@@ -249,4 +249,4 @@ for(const study of studiesFor('mr')){
 // Anatomy that cannot be where a label puts it: the collection's own labels once placed a fragment
 // of skull among the toes of a study whose highest slice is lung.
 
-console.log('Manifests, naming, label coverage, section geometry, anchors, sampling, CT densities and MR weightings all check out.');
+console.log('Manifests, naming, label coverage, section geometry, anchors, sampling and CT densities all check out.');

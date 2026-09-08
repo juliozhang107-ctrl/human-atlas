@@ -27,20 +27,15 @@ export function windowed(value:number,width:number,level:number){
  *  patients, one running from the neck to the feet and one covering the head and neck, which
  *  overlap at the shoulders.
  *
- *  A magnetic resonance sequence is a study too, not a display setting. One acquisition carries one
- *  weighting: a T2 cannot be derived from a T1 the way a bone window is derived from a soft-tissue
- *  one. Each is labelled with the weighting measured from its own tissue signals rather than read
- *  from metadata this collection records in mixed units. */
+ *  Magnetic resonance is not offered. Its preparation survives in `tools/` and the builder, but the
+ *  only openly segmented collection is CC BY-NC-SA, which would make this whole build
+ *  non-commercial and share-alike for the sake of two studies. */
 export interface Study {modality:'ct'|'mr';id:string;path:string;label:string;subject:string;coverage:string;description:string}
 export const STUDIES: Study[] = [
  {modality:'ct',id:'body',path:'ct',      label:'Body', subject:'s0287', coverage:'neck to feet, 125 cm',
   description:'A contrast angiogram of the trunk and legs. The widest study in the collection that also covers the trunk.'},
  {modality:'ct',id:'head',path:'ct-head', label:'Head', subject:'s0478', coverage:'head to upper chest, 36 cm',
   description:'A head and neck angiogram, carrying the brain, skull and cervical spine the body study stops short of.'},
- {modality:'mr',id:'t1',  path:'mr-t1',  label:'T1',  subject:'s0175', coverage:'head to thigh, 108 cm',
-  description:'Fat and marrow bright, urine dark against liver. The study to read anatomy from.'},
- {modality:'mr',id:'t1fs',path:'mr-t1fs',label:'T1 FS',subject:'s0187', coverage:'abdomen and pelvis, 45 cm',
-  description:'T1 with fat suppressed, and the only study acquired near-isotropically, so it stays sharp reformatted into any plane.'},
 ];
 export function studiesFor(modality:string){return STUDIES.filter(s=>s.modality===modality);}
 export function study(modality:string,id:string){
@@ -49,7 +44,7 @@ export function study(modality:string,id:string){
  return found;
 }
 
-export type ModalityId = 'radiograph'|'ct'|'mr'|'us';
+export type ModalityId = 'radiograph'|'ct'|'us';
 /** `interactive` marks the modalities the browser offers. Ultrasound stays in the renderer and its
  *  physics stays tested, but it is not offered in the app: a sector traced through surface meshes
  *  teaches shadowing and enhancement honestly and little else, and real ultrasound is dominated by
@@ -58,7 +53,6 @@ export interface Modality {id:ModalityId;name:string;abbr:string;cross:boolean;i
 export const MODALITIES: Modality[] = [
  {id:'radiograph',name:'Radiography',abbr:'XR',cross:false,interactive:true,description:'A projection: attenuation summed along every ray from the tube to the detector.'},
  {id:'ct',        name:'Computed tomography',abbr:'CT',cross:true,interactive:true,description:'A cross-section of the same attenuation, expressed in Hounsfield units and windowed.'},
- {id:'mr',        name:'Magnetic resonance imaging',abbr:'MRI',cross:true,interactive:true,description:'A cross-section of spin echo signal from proton density and the T1 and T2 of each tissue.'},
  {id:'us',        name:'Ultrasound',abbr:'US',cross:true,interactive:false,description:'A sector scan: echoes from impedance mismatches, attenuated with depth, with shadowing behind bone and gas.'},
 ];
 export function modality(id:ModalityId){const m=MODALITIES.find(x=>x.id===id);if(!m)throw new Error(`Unknown modality: ${id}. Expected one of ${MODALITIES.map(x=>x.id).join(', ')}.`);return m;}

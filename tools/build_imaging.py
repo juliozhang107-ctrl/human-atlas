@@ -283,11 +283,9 @@ if __name__ == '__main__':
     # out, which is what separates a sharp scan from a grainy one pretending to be sharp.
     build('data/raw/ct/s0478', 'public/imaging/ct-head', 'ct', 's0478',
           dict(SOURCES['ct'], subject='s0478'))
-    build('data/raw/mri/s0175', 'public/imaging/mr-t1', 'mr', 's0175',
-          dict(SOURCES['mri'], subject='s0175'), weighting='T1')
-    # The only near-isotropic study in the collection, so the only one whose sagittal and axial
-    # reformats are as sharp as the plane it was acquired in. The collection's T2 and STIR of the
-    # trunk are six-millimetre two-dimensional stacks, which no windowing can make readable in a
-    # reformatted plane, so they are not built.
-    build('data/raw/mri/s0187', 'public/imaging/mr-t1fs', 'mr', 's0187',
-          dict(SOURCES['mri'], subject='s0187'), weighting='T1 FS')
+    # Magnetic resonance is prepared by everything above but is not built: the only openly segmented
+    # collection is CC BY-NC-SA, and bundling it would put non-commercial and share-alike terms on
+    # the whole distribution for the sake of two studies. To restore it, add back s0175 as T1 and
+    # the near-isotropic s0187 as T1 FS, with their entries in app/modalities.ts. The collection's
+    # T2 (s0173) and STIR (s0190) of the trunk are six-millimetre two-dimensional stacks that no
+    # windowing makes readable in a reformatted plane, and are not worth restoring.

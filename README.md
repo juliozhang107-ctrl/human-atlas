@@ -8,9 +8,10 @@ An interactive 3D anatomy explorer built with React, Three.js, and shadcn/ui. Ta
 
 This is a fork of [ashemag/human-atlas](https://github.com/ashemag/human-atlas), whose 3D anatomy
 explorer is the foundation everything here stands on. The fork adds diagnostic imaging for radiology
-residents: a simulated radiograph computed from tissue attenuation, and real CT and MRI cross-sections
-in three planes with voxel-accurate structure naming. It is not intended to be merged back — see
-[License](#license) for why the bundled magnetic resonance makes that inadvisable.
+residents: a simulated radiograph computed from tissue attenuation, and real CT cross-sections in
+three planes with voxel-accurate structure naming. Everything bundled is CC BY 4.0 and the upstream
+MIT licence is preserved unchanged, so nothing here would impose new terms on the project it came
+from.
 
 ## Explore
 
@@ -55,14 +56,12 @@ Geometry is simplified for browser performance while retaining every source mesh
 
 The radiograph is **computed from the meshes**: attenuation summed along each ray at a 70 keV effective beam energy. It is a model of a projection, not an acquired film.
 
-CT and MRI are **real studies**, each one anonymised subject shown with the segmentations a radiologist refined, so the structure named under the pointer was drawn by a person. The CT reads in true Hounsfield units, which is why the window presets behave as they do on a console. Volumes are fetched only when their modality is first opened.
+The CT studies are **real**, each one anonymised subject shown with the segmentations a radiologist refined, so the structure named under the pointer was drawn by a person. They read in true Hounsfield units, which is why the window presets behave as they do on a console. Volumes are fetched only when their study is first opened.
 
 | | Study | Subject | Coverage | Structures | Sampling | Download |
 |---|---|---|---|---|---|---|
 | CT | Body | s0287 | neck to feet, 125 cm | 101 | 306×835×246 at 1.5 mm | 51 MB |
 | CT | Head | s0478 | head to upper chest, 36 cm | 53 | 181×237×167 at 1.5 mm | 7 MB |
-| MRI | T1 | s0175 | head to thigh, 108 cm | 53 | 320×360×240 at 1.28×3.0×1.28 mm | 10 MB |
-| MRI | T1 FS | s0187 | abdomen and pelvis, 45 cm | 44 | 260×320×146 at 1.41×1.41×1.5 mm | 9 MB |
 
 Studies were chosen on measurements, not on their descriptions. Head candidates were fetched and
 ranked on two numbers: noise, measured in the air outside the patient, and the steepness of the
@@ -77,13 +76,31 @@ with 30 organs at risk, is CC BY-NC-ND, whose no-derivatives clause forbids the 
 reformatting this viewer does. Full-resolution source images exist on TCIA but are published without
 segmentations, which would cost the naming this atlas is built around.
 
-CT from [TotalSegmentator](https://doi.org/10.5281/zenodo.10047292), CC BY 4.0. MRI from [TotalSegmentator MRI](https://doi.org/10.5281/zenodo.11367005), **CC BY-NC-SA 2.0**.
+CT from [TotalSegmentator](https://doi.org/10.5281/zenodo.10047292), CC BY 4.0.
 
-**No single clinical study covers a whole body.** CT and MRI are acquired per body region, and no study type in either collection combines the head with the trunk or the legs; even a protocol called whole body stops at the thighs. So the body arrives in two CT studies of two patients that overlap at the shoulders: one running from the neck to the feet, one carrying the head, brain and cervical spine. The only genuinely head-to-toe public imaging is the Visible Human Project, a cadaver with no segmentations, where naming a structure would stop working.
+**No single clinical study covers a whole body.** CT is acquired per body region, and no study type in the collection combines the head with the trunk or the legs; even a protocol called whole body stops at the thighs. So the body arrives in two CT studies of two patients that overlap at the shoulders: one running from the neck to the feet, one carrying the head, brain and cervical spine. The only genuinely head-to-toe public imaging is the Visible Human Project, a cadaver with no segmentations, where naming a structure would stop working.
 
 The CT keeps the 1.5 mm sampling the collection distributes, which is as fine as this source goes: the original acquisitions are published only without their segmentations. That costs 51 MB on first opening the body study and around 190 MB of held memory. Building at 2 mm halves both: pass `target_spacing=(2.0, 2.0, 2.0)` in `tools/build_imaging.py`.
 
-An MR sequence is a study too, not a display setting. One acquisition carries one weighting, so the T1 and the fat-suppressed T1 are two separate studies of two patients. Each is labelled with the weighting **measured from its own tissue signals** rather than read from metadata this collection records in mixed units: urine against liver, spleen against liver, and subcutaneous fat against liver, the last being what separates a STIR from a T2 since muscle is dark on both. `tools/weighting.py` does the measuring, and documents its own limit: those ratios compare one region against another, so they hold only within a single station and cannot classify a stitched whole-body acquisition.
+### Magnetic resonance is not bundled
+
+It was, and the pipeline still works: `tools/` prepares a study end to end, and `tools/weighting.py`
+labels one by the weighting **measured from its own tissue signals** rather than read from metadata
+the collection records in mixed units — urine against liver, spleen against liver, and subcutaneous
+fat against liver, the last being what separates a STIR from a T2 since muscle is dark on both. Two
+studies shipped for a while: s0175 as T1, and the near-isotropic s0187 as T1 FS.
+
+They are gone for one reason, and it is not technical. **TotalSegmentator MRI is CC BY-NC-SA 2.0**,
+and share-alike is viral: while those two studies were bundled, the whole build — geometry, CT, code
+and all — could not be used commercially and had to be passed on under the same terms. Everything
+else here is CC BY 4.0 or MIT. Two directories were imposing the strictest licence in the project on
+all the rest of it, so they went, and the restriction went with them.
+
+To restore it, add the two `build(...)` calls back in `tools/build_imaging.py` and their entries in
+`app/modalities.ts`; the validator's reformat bound is still there waiting. Know what you would take
+on. And do not restore the collection's T2 (s0173) or STIR (s0190) of the trunk: those are
+six-millimetre two-dimensional stacks of 32 and 39 slices, coarse in every plane but the acquired
+one, and no windowing changes that.
 
 **Structures are named as a report would name them.** The source classes are short identifiers
 meant for a model's output directory: `autochthon_left` is the deep intrinsic back muscle group, and
@@ -98,25 +115,24 @@ One control turns the written names off, leaving the image clean; hovering then 
 under the pointer and names just that one, which is the way to read a section without a wall of text
 over it. See `tools/anatomy_names.py`.
 
-**Each magnetic resonance study carries the window it should be read at.** There is no absolute
-scale to window against, and reading a study across its whole stored range leaves it dark, because
-the bright tail of fat, fluid and vessels takes up most of that range. Centring the window on the median of the body puts tissue at mid grey. Centring on the
-midpoint of the range instead is worse than doing nothing, because the distribution is skewed.
+**Each magnetic resonance study carries the window it should be read at**, one of the parts of the
+pipeline that outlives the studies it was written for. There is no absolute scale to window against,
+and reading a study across its whole stored range leaves it dark, because the bright tail of fat,
+fluid and vessels takes up most of that range. Centring the window on the median of the body puts
+tissue at mid grey; centring on the midpoint of the range instead is worse than doing nothing,
+because the distribution is skewed.
 
-**Reformats are only as good as the acquisition, which is why only two sequences are offered.** A
-T2 or a STIR of the trunk is conventionally acquired as thick two-dimensional slices, and the only
-ones this collection holds are six-millimetre stacks of 32 and 39 slices. A sagittal or axial
-reformat of those is coarse however it is displayed, and no windowing or levelling changes it, so
-both were dropped rather than shipped as something a resident could mistake for a bad viewer. What
-is left is sound in three planes: the fat-suppressed T1 is the one near-isotropic study in the whole
-collection, and the T1 is three millimetres through-plane while covering 108 cm.
+**Reformats are only as good as the acquisition.** A CT at 1.5 mm isotropic reformats into any
+plane without loss, which is why the axial, coronal and sagittal views are all equally sharp. That
+is not true of a typical magnetic resonance study, and it is the second reason the two the pipeline
+prepares were never the whole answer: only s0187 was near-isotropic.
 
-**Whole-body magnetic resonance is levelled across its stations.** It is acquired in overlapping
-stations, each scaled on its own, so the joins show as horizontal bands: in the T1 the head station
-ran about three times brighter than the trunk and a quarter of the head was clipped to white. The
-joins are found rather than assumed, as slices where the body median jumps while the amount of body
-barely changes, and each station is then scaled as a block. Three joins were found in the T1.
-Head-to-trunk brightness falls from
+**Whole-body magnetic resonance is levelled across its stations**, which the pipeline still does
+though nothing is built with it now. It is acquired in overlapping stations, each scaled on its own,
+so the joins show as horizontal bands: in the T1 the head station ran about three times brighter than
+the trunk and a quarter of the head was clipped to white. The joins are found rather than assumed, as
+slices where the body median jumps while the amount of body barely changes, and each station is then
+scaled as a block. Three joins were found in the T1, after which head-to-trunk brightness fell from
 2.93 to 1.59 and clipping in the head from 24% to 5%.
 
 Two things this deliberately does not do. It never touches CT, whose Hounsfield numbers are absolute
@@ -155,18 +171,15 @@ which this fork preserves unchanged. Modifications made here are released on the
 
 - **BodyParts3D 4.0** anatomy meshes — CC BY 4.0.
 - **TotalSegmentator** CT (subjects s0287 and s0478) — CC BY 4.0, © Wasserthal et al., University Hospital Basel.
-- **TotalSegmentator MRI** (subjects s0175 and s0187) — **CC BY-NC-SA 2.0**, © Akinci D’Antonoli et al., University Hospital Basel.
+**Everything bundled is CC BY 4.0**, so this build carries no non-commercial or share-alike
+restriction. Magnetic resonance is deliberately not bundled: the only openly segmented collection,
+[TotalSegmentator MRI](https://doi.org/10.5281/zenodo.11367005), is CC BY-NC-SA 2.0, whose
+share-alike term is viral over the whole distribution. See
+[Magnetic resonance is not bundled](#magnetic-resonance-is-not-bundled).
 
-> **The MRI licence is non-commercial and share-alike.** While those studies are bundled, this build
-> as a whole may not be used commercially, and anything built on it must carry the same terms. The
-> code remains MIT; the restriction comes from the data. Removing the `public/imaging/mr-*` studies
-> and the MRI modality lifts it.
-
-**The imaging data is modified**, as CC BY-NC-SA requires stating. Every study is cropped to the
-patient, re-encoded, and has spurious labels removed; the magnetic resonance studies are additionally
-levelled across their acquisition stations and carry a display window computed here. None of the
-changes alter what the images show, but they are changes, and `tools/build_imaging.py` is the record
-of exactly what was done.
+**The imaging data is modified**, as CC BY requires stating. Every study is cropped to the patient,
+re-encoded, and has spurious labels removed. None of the changes alter what the images show, but they
+are changes, and `tools/build_imaging.py` is the record of exactly what was done.
 
 ## Publishing
 

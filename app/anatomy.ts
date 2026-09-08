@@ -21,7 +21,7 @@ export interface Part {id:string;name:string;conceptId:string;system:SystemId;ch
 export interface Concept {id:string;name:string;elements:string[]}
 export interface Atlas {version:string;sex?:'male';source?:string;scope?:string;parts:Part[];concepts:Concept[];chunks:{url:string;bytes:number;gzip?:string;gzipBytes?:number}[];triangles:number}
 export type View = 'three-quarter'|'front'|'back'|'side';
-export type ViewMode = 'anatomy'|'radiograph'|'ct'|'mr'|'us';
+export type ViewMode = 'anatomy'|'radiograph'|'ct'|'us';
 /** `level` and `window` window the radiograph, in attenuation units. `slice` is an index into the
  *  loaded study along the current plane's axis. CT windows come from a named preset in Hounsfield
  *  units. `study` names which magnetic resonance acquisition to show, since a sequence there means

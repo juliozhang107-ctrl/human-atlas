@@ -199,7 +199,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
   let study:Volume|null=null,loading='',section:Section|null=null,anchors:Anchor[]=[];
   let sliceKey='',drawKey='',sliceActive=false,sliceCrop={x:0,y:0,w:0,h:0},sliceDraw={x:0,y:0,w:0,h:0},sliceBounds={left:0,right:0,top:0,bottom:0},markedIndex=0;
 
-  const wanted=(mode:string)=>mode==='ct'||mode==='mr';
+  const wanted=(mode:string)=>mode==='ct';
   /** Which study a state refers to, since both modalities now offer more than one. */
   const studyPath=(s:SceneState)=>studyFor(s.mode,s.study).path;
   const ensureStudy=(mode:string)=>{
