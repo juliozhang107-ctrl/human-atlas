@@ -2,7 +2,15 @@
 
 An interactive 3D anatomy explorer built with React, Three.js, and shadcn/ui. Take the BodyParts3D adult male reference apart into **2,234 individually selectable meshes**, explore **15 anatomical systems**, and search **3,432 named concepts**.
 
-**[Explore the live demo](https://human-atlas-seven.vercel.app)**
+**[Explore the live demo](https://human-atlas-seven.vercel.app)** · **[This radiology build](https://juliozhang107-ctrl.github.io/human-atlas/)**
+
+## Relation to the original
+
+This is a fork of [ashemag/human-atlas](https://github.com/ashemag/human-atlas), whose 3D anatomy
+explorer is the foundation everything here stands on. The fork adds diagnostic imaging for radiology
+residents: a simulated radiograph computed from tissue attenuation, and real CT and MRI cross-sections
+in three planes with voxel-accurate structure naming. It is not intended to be merged back — see
+[License](#license) for why the bundled magnetic resonance makes that inadvisable.
 
 ## Explore
 
@@ -144,7 +152,8 @@ Import this repository into Vercel as a Vite project. The included `vercel.json`
 
 ## License
 
-Original application code is released under the [MIT License](LICENSE). The bundled data has its own terms, which travel with it:
+The original application code is by **ashemag** and is released under the [MIT License](LICENSE),
+which this fork preserves unchanged. Modifications made here are released on the same terms. The bundled data has its own terms, which travel with it:
 
 - **BodyParts3D 4.0** anatomy meshes — CC BY 4.0.
 - **TotalSegmentator** CT (subjects s0287 and s0478) — CC BY 4.0, © Wasserthal et al., University Hospital Basel.
