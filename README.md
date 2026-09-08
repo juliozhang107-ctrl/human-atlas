@@ -52,9 +52,13 @@ CT and MRI are **real studies**, each one anonymised subject shown with the segm
 | | Study | Subject | Coverage | Structures | Sampling | Download |
 |---|---|---|---|---|---|---|
 | CT | Body | s0287 | neck to feet, 125 cm | 101 | 306×835×246 at 1.5 mm | 51 MB |
-| CT | Head | s0643 | head to upper chest, 39 cm | 55 | 178×263×178 at 1.5 mm | 10 MB |
+| CT | Head | s0333 | head to upper chest, 33 cm | 53 | 219×217×217 at 1.5 mm | 10 MB |
 | MRI | T1 | s0175 | head to thigh, 108 cm | 53 | 320×360×240 at 1.28×3.0×1.28 mm | 10 MB |
 | MRI | T1 FS | s0187 | abdomen and pelvis, 45 cm | 44 | 260×320×146 at 1.41×1.41×1.5 mm | 9 MB |
+
+Studies were chosen on measurements, not on their labels. The head CT is the quietest of the
+candidates fetched, 14 Hounsfield units of noise in the air outside the patient against 59 for the
+first one tried, which is the difference between a readable brain and a snowstorm.
 | MRI | T2 | s0173 | abdomen, 40 cm | 39 | 384×384×32 at 1.04×1.04×6.0 mm | 4 MB |
 | MRI | STIR | s0190 | chest to pelvis, 50 cm | 34 | 384×384×39 at 1.3×1.3×6.0 mm | 3 MB |
 
@@ -134,7 +138,7 @@ Import this repository into Vercel as a Vite project. The included `vercel.json`
 Original application code is released under the [MIT License](LICENSE). The bundled data has its own terms, which travel with it:
 
 - **BodyParts3D 4.0** anatomy meshes — CC BY 4.0.
-- **TotalSegmentator** CT (subjects s0287 and s0643) — CC BY 4.0, © Wasserthal et al., University Hospital Basel.
+- **TotalSegmentator** CT (subjects s0287 and s0333) — CC BY 4.0, © Wasserthal et al., University Hospital Basel.
 - **TotalSegmentator MRI** (subjects s0175, s0187, s0173 and s0190) — **CC BY-NC-SA 2.0**, © Akinci D’Antonoli et al., University Hospital Basel.
 
 > **The MRI licence is non-commercial and share-alike.** While that study is bundled, this build as a whole may not be used commercially, and derivatives must carry the same terms. The code remains MIT; the restriction comes from the data. Removing the `public/imaging/mr-*` studies and the MRI modality lifts it.
