@@ -9,6 +9,7 @@ import {PointerTap} from './pointer-tap';
 import {SYSTEMS,type Atlas,type SceneState} from './anatomy';
 import {contributionFor,integrateBeam,bodySpan,isEnvelope,FILL_MU,type BeamReading,type Crossing,type Hit} from './radiograph';
 import {ctWindow,study as studyFor} from './modalities';
+import {asset} from './assets';
 import {loadVolume,extractSection,anchorsFor,sliceCount,type Anchor,type Section,type Structure,type Volume,type VolumeManifest} from './volume';
 /** Two millimetres a notch, matching the position slider. */
 export const SLICE_STEP=.002;
@@ -122,7 +123,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
   const mats=new Map(SYSTEMS.map(s=>[s.id,materialFor(s.id)]));
   let loaded=0;
   const loadChunk=async(ci:number)=>{
-   const chunk=atlas.chunks[ci],compressed=!!chunk.gzip&&typeof DecompressionStream!=='undefined';const response=await fetch(compressed?chunk.gzip!:chunk.url,{signal:abort.signal});const buffer=await decodeModelResponse(response,chunk.bytes,compressed);if(disposed)return;
+   const chunk=atlas.chunks[ci],compressed=!!chunk.gzip&&typeof DecompressionStream!=='undefined';const response=await fetch(asset(compressed?chunk.gzip!:chunk.url),{signal:abort.signal});const buffer=await decodeModelResponse(response,chunk.bytes,compressed);if(disposed)return;
    const groups=new Map<string,T.BufferGeometry[]>();
    atlas.parts.forEach((p,i)=>{
     if(p.chunk!==ci)return;
@@ -206,7 +207,7 @@ export default function AnatomyScene({atlas,state,onSelect,onProgress,onError,on
    if(held){if(study!==held){study=held;sliceKey='';volume.current(held.manifest);}return true;}
    if(loading===mode)return false;
    loading=mode;study=null;section=null;volume.current(null);
-   loadVolume(`/imaging/${mode}`,abort.signal).then(loaded=>{
+   loadVolume(asset(`/imaging/${mode}`),abort.signal).then(loaded=>{
     if(disposed)return;
     studies.set(mode,loaded);
     if(studyPath(latest.current)===mode){study=loaded;sliceKey='';volume.current(loaded.manifest);dirty=true;}

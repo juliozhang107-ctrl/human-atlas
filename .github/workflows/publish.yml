@@ -1,0 +1,52 @@
+# Publishes the site to GitHub Pages.
+#
+# Pages rather than the Vercel project this repository also carries: the build is about 190 MB,
+# and Vercel's Hobby plan caps a static upload at 100 MB, while a Pages site may be up to 1 GB.
+# The base path is taken from the repository name so the same build works under /<repo>/.
+name: Publish to GitHub Pages
+
+on:
+  push:
+    branches: [radiograph]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      # The same checks that guard the repository locally, so a broken build never reaches the site.
+      - run: npx tsc --noEmit
+      - run: node scripts/validate-atlas.mjs
+      - run: node scripts/validate-interactions.mjs
+      - run: node scripts/validate-radiograph.mjs
+      - run: node scripts/validate-imaging.mjs
+      - run: BASE_PATH="/${GITHUB_REPOSITORY#*/}/" npm run build
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

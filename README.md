@@ -150,7 +150,32 @@ Original application code is released under the [MIT License](LICENSE). The bund
 - **TotalSegmentator** CT (subjects s0287 and s0478) — CC BY 4.0, © Wasserthal et al., University Hospital Basel.
 - **TotalSegmentator MRI** (subjects s0175, s0187, s0173 and s0190) — **CC BY-NC-SA 2.0**, © Akinci D’Antonoli et al., University Hospital Basel.
 
-> **The MRI licence is non-commercial and share-alike.** While that study is bundled, this build as a whole may not be used commercially, and derivatives must carry the same terms. The code remains MIT; the restriction comes from the data. Removing the `public/imaging/mr-*` studies and the MRI modality lifts it.
+> **The MRI licence is non-commercial and share-alike.** While those studies are bundled, this build
+> as a whole may not be used commercially, and anything built on it must carry the same terms. The
+> code remains MIT; the restriction comes from the data. Removing the `public/imaging/mr-*` studies
+> and the MRI modality lifts it.
+
+**The imaging data is modified**, as CC BY-NC-SA requires stating. Every study is cropped to the
+patient, re-encoded, and has spurious labels removed; the magnetic resonance studies are additionally
+levelled across their acquisition stations and carry a display window computed here. None of the
+changes alter what the images show, but they are changes, and `tools/build_imaging.py` is the record
+of exactly what was done.
+
+## Publishing
+
+`.github/workflows/publish.yml` builds the site and deploys it to GitHub Pages on every push to
+`radiograph`. Enable it once under **Settings → Pages → Source → GitHub Actions**; the site then
+appears at `https://<owner>.github.io/<repo>/`.
+
+GitHub Pages rather than Vercel, despite the `vercel.json` this repository carries: the build is
+about 190 MB, and Vercel's Hobby plan caps a static upload at
+[100 MB](https://vercel.com/docs/limits), while a Pages site may be up to
+[1 GB with 100 GB of bandwidth a month](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits).
+A full visit downloads about 82 MB, so that bandwidth is roughly 1,200 visits a month; putting a CDN
+in front, or a Vercel Pro plan, removes the ceiling.
+
+The build reads `BASE_PATH`, so it works both at a domain root and under a project path. Nothing
+else needs changing to move hosts.
 
 Preserve the attributions when redistributing. Third-party dependencies retain their respective licenses.
 
